@@ -14,6 +14,9 @@ void __am_init_timer_irq();
 void __am_pmem_map(void *va, void *pa, int prot);
 void __am_pmem_unmap(void *va);
 
+#undef SIGSTKSZ
+#define SIGSTKSZ 8192
+
 // per-cpu structure
 typedef struct {
   void *vm_head;
