@@ -1,12 +1,12 @@
 #include <isa.h>
 #include <memory/paddr.h>
-inline word_t vaddr_ifetch(vaddr_t addr, int len) ;
+
 word_t vaddr_read(vaddr_t addr, int len) {
   return paddr_read(addr, len);
 }
 
 
-inline word_t vaddr_ifetch(vaddr_t addr, int len) {
+word_t vaddr_ifetch(vaddr_t addr, int len) {
   return vaddr_read(addr, len);
 }
 
