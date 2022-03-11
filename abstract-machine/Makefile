@@ -24,6 +24,9 @@ ifeq ($(wildcard $(AM_HOME)/am/include/am.h),)
   $(error $$AM_HOME must be an AbstractMachine repo)
 endif
 
+ARCH	=riscv64-nemu
+CONFIG_TARGET_AM=
+
 ### Check: environment variable `$ARCH` must be in the supported list
 ARCHS = $(basename $(notdir $(shell ls $(AM_HOME)/scripts/*.mk)))
 ifeq ($(filter $(ARCHS), $(ARCH)), )
@@ -84,7 +87,7 @@ CFLAGS   += -O2 -MMD -Wall -Werror $(INCFLAGS) \
             -D__PLATFORM__=$(PLATFORM) -D__PLATFORM_$(shell echo $(PLATFORM) | tr a-z A-Z | tr - _) \
             -DARCH_H=\"arch/$(ARCH).h\" \
             -fno-asynchronous-unwind-tables -fno-builtin -fno-stack-protector \
-            -Wno-main -U_FORTIFY_SOURCE -DCONFIG_TARGET_AM
+            -Wno-main -U_FORTIFY_SOURCE
 CXXFLAGS +=  $(CFLAGS) -ffreestanding -fno-rtti -fno-exceptions
 ASFLAGS  += -MMD $(INCFLAGS)
 
