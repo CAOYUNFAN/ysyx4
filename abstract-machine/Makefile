@@ -16,7 +16,7 @@ endif
 ### Override checks when `make clean/clean-all/html`
 ifeq ($(findstring $(MAKECMDGOALS),clean|clean-all|html),)
 
-ARCH=riscv64-nemu
+CONFIG_TARGET_AM :=1
 
 ### Print build info message
 $(info # Building $(NAME)-$(MAKECMDGOALS) [$(ARCH)])
