@@ -26,7 +26,7 @@ word_t mmio_read(paddr_t addr, int len) {
   #ifdef CONFIG_DTRACE
   for(int i=0;i<nr_map;++i)
   if(addr>=maps[i].low&&addr<maps[i].high){
-    printf("Dtrace:Read %s:%x,%d",maps[i].name,addr,len);
+    printf("Dtrace:Read %s:%x,len=%d\n",maps[i].name,addr,len);
     break;
   }
   #endif
@@ -37,7 +37,7 @@ void mmio_write(paddr_t addr, int len, word_t data) {
   #ifdef CONFIG_DTRACE
   for(int i=0;i<nr_map;++i)
   if(addr>=maps[i].low&&addr<maps[i].high){
-    printf("Dtrace:Write %s:%x,%d",maps[i].name,addr,len);
+    printf("Dtrace:Write %s:%x,len=%d\n",maps[i].name,addr,len);
     break;
   }
   #endif
