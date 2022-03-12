@@ -123,13 +123,12 @@ static void init_elf(){
         ret=fread(&sym,sizeof(Sym),1,fp);
         assert(ret==1);
         if(sym.st_info==STT_FUNC){
-          if(sym.st_name>name_len) continue;
+          if(sym.st_name>name_len||tot_func_num==FUNC_NUM) continue;
           funcs[tot_func_num].name=sym.st_name+name_all;
           funcs[tot_func_num].st=sym.st_value;
           funcs[tot_func_num].ed=sym.st_value+sym.st_size;
           ++tot_func_num;
         }
-        
       }
     } 
   }
