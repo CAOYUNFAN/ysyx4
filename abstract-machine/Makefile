@@ -16,8 +16,6 @@ endif
 ### Override checks when `make clean/clean-all/html`
 ifeq ($(findstring $(MAKECMDGOALS),clean|clean-all|html),)
 
-CONFIG_TARGET_AM :=1
-
 ### Print build info message
 $(info # Building $(NAME)-$(MAKECMDGOALS) [$(ARCH)])
 ### Check: environment variable `$AM_HOME` looks sane
