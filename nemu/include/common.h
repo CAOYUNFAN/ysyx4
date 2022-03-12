@@ -30,4 +30,18 @@ typedef uint16_t ioaddr_t;
 
 #include <debug.h>
 
+#ifdef CONFIG_FTRACE
+#include <elf.h>
+typedef struct{
+  char name[20];
+  uintptr_t st,ed;
+}function_unit;
+
+function_unit funcs[128];
+#define tot_func (sizeof(funcs)/sizeof(funcs[0]))
+int tot_func_num;
+typedef MUXDEF(CONFIG_ISA64, Elf64_Ehdr, Elf32_Ehdr) Ehdr;
+typedef MUXDEF(CONFIG_ISA64, Elf64_Shdr, Elf32_Shdr) Shdr; 
+#endif
+
 #endif

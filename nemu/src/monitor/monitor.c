@@ -52,12 +52,30 @@ static long load_img() {
   return size;
 }
 
+static char * elf_file=NULL;
+
+static void init_elf(){
+  if(!elf_file) return;
+  #ifdef CONFIG_FTRACE
+    FILE * fp=fopen(elf_file,"rb");
+    Assert(fp, "Can not open '%s'",elf_file);
+
+
+    tot_func_num=0;
+
+  #else
+    Log("System do not support function trace unless it is enabled.");
+  #endif
+}
+
+
 static int parse_args(int argc, char *argv[]) {
   const struct option table[] = {
     {"batch"    , no_argument      , NULL, 'b'},
     {"log"      , required_argument, NULL, 'l'},
     {"diff"     , required_argument, NULL, 'd'},
     {"port"     , required_argument, NULL, 'p'},
+    {"elf"      , required_argument, NULL, 'e'},
     {"help"     , no_argument      , NULL, 'h'},
     {0          , 0                , NULL,  0 },
   };
@@ -68,6 +86,7 @@ static int parse_args(int argc, char *argv[]) {
       case 'p': sscanf(optarg, "%d", &difftest_port); break;
       case 'l': log_file = optarg; break;
       case 'd': diff_so_file = optarg; break;
+      case 'e': elf_file = optarg; break;;
       case 1: img_file = optarg; return optind - 1;
       default:
         printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
@@ -93,6 +112,9 @@ void init_monitor(int argc, char *argv[]) {
 
   /* Open the log file. */
   init_log(log_file);
+
+  /* Open the elf file */
+  init_elf(elf_file);
 
   /* Initialize memory. */
   init_mem();
