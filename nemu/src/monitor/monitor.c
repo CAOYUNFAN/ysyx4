@@ -155,7 +155,7 @@ static int parse_args(int argc, char *argv[]) {
       case 'p': sscanf(optarg, "%d", &difftest_port); break;
       case 'l': log_file = optarg; break;
       case 'd': diff_so_file = optarg; break;
-      case 'e': MUXDEF(CONFIG_FTRACE, elf_file=optarg,Log("System do not support function trace unless it is enabled."));break;
+      case 'e': MUXDEF(CONFIG_FTRACE, elf_file=optarg,Log("System do not support function trace unless it is enabled.")); printf("1");break;
       case 1: img_file = optarg; return optind - 1;
       default:
         printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
