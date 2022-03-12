@@ -1,6 +1,6 @@
 .PHONY:sim clear
 
-STUID := #ysyx_220066_
+STUID := ysyx_220066_
 CSRC_DIR := ./csrc
 CSRC_FILES := $(shell find $(SRC_DIR) -name "*.cpp")
 VSRC_DIR := ./vsrc
@@ -11,7 +11,7 @@ EMU_TARGET := emu
 
 $(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES)
 	@echo "Verilator $(VSRC_FILES) > $(EMU_DIR)"
-	@verilator --cc -Wall \
+	@verilator --cc  \
 		-Mdir $(@D)\
 		--top-module $(EMU_TOP_MODULE)\
 		--prefix $(EMU_TARGET)\

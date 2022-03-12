@@ -2,19 +2,20 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "emu.h"
+typedef unsigned long long uLL;
+typedef unsigned int uint;
 
-
+uint imem_read(uLL pc);
 int main() {
   printf("Hello, ysyx!\n");
-  std::shared_ptr<emu> top = std::make_shared<emu>();
+  std::shared_ptr<emu> mycpu = std::make_shared<emu>();
   for(int i=0;i<10;++i) {
-    int a = rand() & 1;
-    int b = rand() & 1;
-    top->a = a;
-    top->b = b;
-    top->eval();
-    printf("a = %d, b = %d, f = %d\n", a, b, top->f);
-    assert(top->f == a ^ b);
+    mycpu->instr=imem_read(mycpu->pc);
+    mycpu->eval();
+    mycpu->clk = 0;
+    mycpu->eval();
+    mycpu->clk = 1;
+    mycpu->eval();
   }
   return 0;
 }
