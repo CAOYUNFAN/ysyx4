@@ -159,7 +159,7 @@ static int parse_args(int argc, char *argv[]) {
         #ifdef CONFIG_FTRACE
         elf_file=optarg;
         #else
-        Log("System do not support function trace unless it is enabled."); 
+      //  Log("System do not support function trace unless it is enabled."); 
         printf("1");
         #endif
         break;
