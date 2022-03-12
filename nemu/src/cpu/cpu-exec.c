@@ -79,13 +79,16 @@ static void execute(uint64_t n) {
 }
 
 #ifdef CONFIG_ITRACE
+int fail=0;
 void __attribute__((destructor)) print_buf(){
-  if(nemu_state.state!=NEMU_END){
+  if((nemu_state.state!=NEMU_END&&nemu_state.state!=NEMU_QUIT) || fail){
     for(int i=0;i<=tot;++i){
       if(i==now) printf("--> %s\n",iring_buf[i]);
       else printf("    %s\n",iring_buf[i]);
     }
+    isa_reg_display();
   }
+  
 }
 #endif
 
@@ -106,6 +109,9 @@ void assert_fail_msg() {
 /* Simulate how the CPU works. */
 void cpu_exec(uint64_t n) {
   g_print_step = (n < MAX_INST_TO_PRINT);
+  #ifdef CONFIG_ITRACE
+  if(nemu_state.state==NEMU_ABORT) fail=1;
+  #endif
   switch (nemu_state.state) {
     case NEMU_END: case NEMU_ABORT:
       printf("Program execution has ended. To restart the program, exit NEMU and run again.\n");
