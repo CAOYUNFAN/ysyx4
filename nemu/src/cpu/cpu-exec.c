@@ -17,6 +17,12 @@ static bool g_print_step = false;
 
 void device_update();
 
+#ifdef CONFIG_ITRACE
+int now,tot;
+char iring_buf[16][64];
+#define num_of_buf (sizeof(iring_buf)/sizeof(iring_buf[0]))
+#endif
+
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc) {
 #ifdef CONFIG_ITRACE_COND
   if (ITRACE_COND) { log_write("%s\n", _this->logbuf); }
@@ -54,6 +60,10 @@ static void exec_once(Decode *s, vaddr_t pc) {
   void disassemble(char *str, int size, uint64_t pc, uint8_t *code, int nbyte);
   disassemble(p, s->logbuf + sizeof(s->logbuf) - p,
       MUXDEF(CONFIG_ISA_x86, s->snpc, s->pc), (uint8_t *)&s->isa.inst.val, ilen);
+
+  sprintf(iring_buf[now],"%s",s->logbuf);
+  now=(now+1)%num_of_buf;
+  if(now>tot) tot=now;
 #endif
 }
 
@@ -67,6 +77,17 @@ static void execute(uint64_t n) {
     IFDEF(CONFIG_DEVICE, device_update());
   }
 }
+
+#ifdef CONFIG_ITRACE
+void __attribute__((destructor)) print_buf(){
+  if(nemu_state.state!=NEMU_QUIT&&nemu_state.state!=NEMU_QUIT){
+    for(int i=0;i<=tot;++i){
+      if(i==now) printf("--> %s\n",iring_buf[i]);
+      else printf("    %s\n",iring_buf[i]);
+    }
+  }
+}
+#endif
 
 static void statistic() {
   IFNDEF(CONFIG_TARGET_AM, setlocale(LC_NUMERIC, ""));
