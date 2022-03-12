@@ -80,7 +80,7 @@ static void execute(uint64_t n) {
 
 #ifdef CONFIG_ITRACE
 void __attribute__((destructor)) print_buf(){
-  if(nemu_state.state!=NEMU_END&&nemu_state.state!=NEMU_END){
+  if(nemu_state.state!=NEMU_END&&nemu_state.state!=NEMU_QUIT){
     for(int i=0;i<=tot;++i){
       if(i==now) printf("--> %s\n",iring_buf[i]);
       else printf("    %s\n",iring_buf[i]);
