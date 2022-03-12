@@ -53,6 +53,8 @@ static long load_img() {
 }
 
 static char * elf_file=NULL;
+int tot_func_num=0;
+function_unit funcs[FUNC_NUM];
 
 static void init_elf(){
   if(!elf_file) return;
