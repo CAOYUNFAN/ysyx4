@@ -7,7 +7,7 @@
 int main() {
   printf("Hello, ysyx!\n");
   std::shared_ptr<emu> top = std::make_shared<emu>();
-  for(int i=0;i<1000;++i) {
+  for(int i=0;i<10++i) {
     int a = rand() & 1;
     int b = rand() & 1;
     top->a = a;
