@@ -39,7 +39,6 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
     printf("HELLO_WORLD%d-%d,%lx!\n",count,block_size,ptr);
     for(;ptr<end&&count<block_size;++ptr,++count){
       outb(AUDIO_SBUF_ADDR+count,*((unsigned char *)ptr));
-      if(!(count&-128))printf("%d\n",count);
     }
     printf("COUNTAFTER:%d,%lx\n",count,ptr);
     outl(AUDIO_ADDR,count);
