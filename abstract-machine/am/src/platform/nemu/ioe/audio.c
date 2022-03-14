@@ -41,6 +41,6 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
       outb(AUDIO_SBUF_ADDR+count,*((unsigned char *)ptr));
     }
     printf("SHOULD_WRITE!\n");
-    outl(AUDIO_ADDR,count);
+    outl(AUDIO_COUNT_ADDR,count);
   }
 }
