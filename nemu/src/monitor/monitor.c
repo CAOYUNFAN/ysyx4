@@ -102,7 +102,10 @@ static bool check_elf(FILE * fp){
 static void init_elf(){
   if(!elf_file) return;
   FILE * fp=fopen(elf_file,"rb");
-  Assert(fp, "Can not open '%s'",elf_file);
+  if(fp==NULL){
+    Log("Can not open '%s' ,treated as no elf file.",elf_file);
+    return;
+  }
   
   if(!check_elf(fp)) return;
   Ehdr ehdr;
@@ -165,7 +168,7 @@ static int parse_args(int argc, char *argv[]) {
         #ifdef CONFIG_FTRACE
         elf_file=optarg;
         #else
-        printf("System do not support function trace unless it is enabled.\n"); 
+        Log("System do not support function trace unless it is enabled."); 
         #endif
         break;
       case 1: img_file = optarg; return optind - 1;
