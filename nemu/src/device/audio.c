@@ -39,7 +39,7 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
     case AUDIO_SAMPLES_ADDR: assert(is_write); 
       s.samples = *(audio_base + (AUDIO_SAMPLES_ADDR)/4); 
       break;
-    case AUDIO_SBUF_SIZE_ADDR: assert(is_write); 
+    case AUDIO_SBUF_SIZE_ADDR: assert(!is_write); 
       break;
     case AUDIO_COUNT_ADDR:
       if(is_write) tail=*(audio_base+AUDIO_SBUF_SIZE_ADDR/4);
