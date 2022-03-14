@@ -36,7 +36,7 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
   int block_size=inl(AUDIO_SBUF_SIZE_ADDR);
   for(;ptr<end;){
     int count=inl(AUDIO_COUNT_ADDR);
-    printf("HELLO_WORLD%d-%d!\n",count,block_size);
+//    printf("HELLO_WORLD%d-%d!\n",count,block_size);
     for(;ptr<end&&count<block_size;++ptr,++count) 
       outb(AUDIO_SBUF_ADDR+count,*((unsigned char *)ptr));
     outl(AUDIO_ADDR,count);
