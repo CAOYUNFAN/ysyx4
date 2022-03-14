@@ -40,6 +40,7 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
       s.samples = *(audio_base + (AUDIO_SAMPLES_ADDR)/4); 
       break;
     case AUDIO_SBUF_SIZE_ADDR: assert(!is_write); 
+      assert(*(audio_base+(AUDIO_SBUF_SIZE_ADDR)/4)==CONFIG_SB_SIZE);
       break;
     case AUDIO_COUNT_ADDR:
       if(is_write) tail=*(audio_base+AUDIO_SBUF_SIZE_ADDR/4);
