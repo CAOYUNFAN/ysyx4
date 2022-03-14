@@ -58,6 +58,7 @@ volatile uint32_t get_the_status() {return *(audio_base + (AUDIO_INIT_ADDR)/4);}
 
 static void mycallback(void *userdata,uint8_t * stream,int len){
   int nread = len;
+  printf("callback:%d-%d\n",front,tail);
   if(tail-front < len) nread =tail-front;
   memcpy(stream,sbuf+CONFIG_SB_SIZE-front,nread);
   front+=nread;
