@@ -44,7 +44,7 @@ static void audio_io_handler(uint32_t offset, int len, bool is_write) {
       *(audio_base + (AUDIO_COUNT_ADDR)/4) = tail; break;
     case AUDIO_INIT_ADDR: 
       assert(is_write); work(*(audio_base + (AUDIO_INIT_ADDR)/4));
-    default: printf("%d",offset);assert(0);
+    default: printf("%d\n",offset);assert(0);
   }
 }
 
