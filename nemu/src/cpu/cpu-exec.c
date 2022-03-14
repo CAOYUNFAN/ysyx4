@@ -108,6 +108,7 @@ void assert_fail_msg() {
 
 /* Simulate how the CPU works. */
 void cpu_exec(uint64_t n) {
+  Log("begin!");
   g_print_step = (n < MAX_INST_TO_PRINT);
   #ifdef CONFIG_ITRACE
   if(nemu_state.state==NEMU_ABORT) fail=1;
