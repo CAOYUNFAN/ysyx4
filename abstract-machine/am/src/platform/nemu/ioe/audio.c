@@ -40,7 +40,6 @@ void __am_audio_play(AM_AUDIO_PLAY_T *ctl) {
     for(;ptr<end&&count<block_size;++ptr,++count){
       outb(AUDIO_SBUF_ADDR+count,*((unsigned char *)ptr));
     }
-    printf("COUNTAFTER:%d,%lx\n",count,ptr);
     outl(AUDIO_ADDR,count);
   }
 }
