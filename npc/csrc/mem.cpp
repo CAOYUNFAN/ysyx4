@@ -17,7 +17,6 @@ uLL mem_read(uLL addr,int len){
 }
 
 void mem_init(char * filename){
-    printf("%s\n",filename);
     if(filename==NULL) return;
     FILE * fp=fopen(filename,"rb");
     if(fp==NULL){
