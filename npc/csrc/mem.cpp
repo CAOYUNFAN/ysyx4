@@ -15,3 +15,19 @@ uLL mem_read(uLL addr,int len){
         default: panic("Unexpected len!");
     }
 }
+
+void mem_init(char * filename){
+    FILE * fp=fopen(filename,"rb");
+    if(fp==NULL){
+        printf("Ops, nothing to load");
+        return;
+    }
+    fseek(fp,0,SEEK_END);
+    long size=ftell(fp);
+    printf("Imgfile is %s. size=%ld",filename,size);
+    assert(size<=MEM_SIZE);
+    fseek(fp,0,SEEK_SET);
+    int ret=fread(mem,size,1,fp);
+    assert(ret==1);
+    fclose(fp);
+}
