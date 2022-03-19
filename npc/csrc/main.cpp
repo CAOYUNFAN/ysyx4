@@ -6,7 +6,6 @@ uint imem_read(uLL pc);
 int main(int argc,char ** argv) {
   printf("Hello, ysyx!\n");
   assert(argc<=2);
-  printf("%d\n",argc);
   mem_init(argv[1]);
   shared_ptr<emu> mycpu = make_shared<emu>();
   for(int i=1;i<=10;++i){
