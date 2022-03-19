@@ -11,4 +11,4 @@ typedef unsigned int uint;
 typedef unsigned long long uLL;
 
 uLL mem_read(uLL addr,int len);
-void mem_init(FILE * fp);
+void mem_init(char * filename);
