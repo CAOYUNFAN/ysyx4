@@ -2,15 +2,15 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "emu.h"
-typedef unsigned long long uLL;
-typedef unsigned int uint;
+#include "common.h"
+using namespace std;
 
 uint imem_read(uLL pc);
 int main() {
   printf("Hello, ysyx!\n");
-  std::shared_ptr<emu> mycpu = std::make_shared<emu>();
-  for(int i=0;i<10;++i) {
-    mycpu->instr=imem_read(mycpu->pc);
+  shared_ptr<emu> mycpu = make_shared<emu>();
+  for(int i=1;i<=10;++i){
+    mycpu->instr=mem_read(mycpu->pc);
     mycpu->eval();
     mycpu->clk = 0;
     mycpu->eval();
