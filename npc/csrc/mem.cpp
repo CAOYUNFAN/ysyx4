@@ -20,12 +20,12 @@ void mem_init(char * filename){
     if(filename==NULL) return;
     FILE * fp=fopen(filename,"rb");
     if(fp==NULL){
-        printf("Ops, nothing to load");
+        printf("Ops, nothing to load\n");
         return;
     }
     fseek(fp,0,SEEK_END);
     long size=ftell(fp);
-    printf("Imgfile is %s. size=%ld",filename,size);
+    printf("Imgfile is %s. size=%ld\n",filename,size);
     assert(size<=MEM_SIZE);
     fseek(fp,0,SEEK_SET);
     int ret=fread(mem,size,1,fp);
