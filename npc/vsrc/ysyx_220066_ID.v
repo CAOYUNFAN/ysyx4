@@ -1,15 +1,30 @@
 module ysyx_220066_ID (
     input [31:0] instr,
-    input clk,
-    output [63:0] imm
+    output [63:0] imm,
+    output [4:0] rs1,
+    output [4:0] rs2,
+    output [4:0] rd,
+    output [1:0] ALUBSrc,
+    output ALUASrc,
+    output [5:0] ALUctr,
+    output [2:0] Branch,
+    output MemWr,
+    output MemToReg,
+    output RegWr,
+    output [2:0] MemOp,
+    output error
 );
-    output wire [4:0] rs1;
-    output wire [4:0] rs2;
-    output wire [4:0] rd;
+    
     assign rs1=instr[19:15];
-    assign rs2=instr[24:20]
+    assign rs2=instr[24:20];
     assign rd=instr[11:7];
     wire [2:0] ExtOp;
+
+    ysyx_220066_Decode decode(
+        .OP(instr[6:0]),.Funct3(instr[14:12]),.Funct7(instr[31:25]),
+        .ExtOp(ExtOp),.RegWr(RegWr),.ALUASrc(ALUASrc),.ALUBSrc(ALUBSrc),.ALUctr_out(ALUctr),
+        .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg),.error(error)
+    );
 
     ysyx_220066_IMM ysyx_220066_imm(
         .instr(instr[31:7]),.ExtOp(ExtOp),.imm(imm)
@@ -24,7 +39,7 @@ module ysyx_220066_Decode (
     output RegWr,
     output reg [1:0] ALUBSrc,
     output ALUASrc,
-    output reg [3:0] ALUctr,
+    output [5:0] ALUctr_out,
     output reg [2:0] Branch,
     output MemWr,
     output MemToReg,
@@ -36,7 +51,11 @@ module ysyx_220066_Decode (
     assign MemWr=(OP[6:2]==5'b01000);
     assign RegWr=(OP[6:2]!=5'b11000&&OP[6:2]!=5'b01000);
     assign ALUASrc=(OP[6:2]==5'b00101||OP[6:2]==5'b11011||OP[6:2]==5'b11001);
-    
+    reg ALUctr[3:0];
+    assign ALUctr_out[5]=(OP[6:2]==01110)||(OP[6:2]==01100);
+    assign ALUctr_out[4]=OP[3];
+    assign ALUctr_out[3:0]=ALUctr;
+
     always @(*)//ALUctr
     case(OP[6:2])//ExtOp:I=000,U=101,B=011,S=010,J=001
         5'b11100:begin ExtOp=3'b000;ALUBSrc=1;ALUctr=4'b0000;Branch=3'b001;err=0;end//ebreak
@@ -74,16 +93,34 @@ module ysyx_220066_Decode (
             3'b011:begin                                                     err=0; end//sd
            default:begin                                                     err=1; end//ERROR
         endcase end
-        5'b00100:begin ExtOp=3'b000;ALUBSrc=2;ALUctr[2:0]=Funct3;Branch=3'b000;
-                         ALUctr[3]=Funct7[5];
-                         err=(Funct3==3'b001&&Funct7[6:1]!=6'b000000)||(Funct3==3'b101&&(Funct7[6:1]!=6'b000000||Funct7[6:1]!=6'b010000)); end
-        5'b00110:begin ExtOp=3'b000;ALUBSrc=2;ALUctr[2:0]=Funct3;Branch=3'b000;
-                         ALUctr[3]=
+        5'b00100:begin //addi.. 
+            ExtOp=3'b000;ALUBSrc=2;ALUctr[2:0]=Funct3;Branch=3'b000;
+            ALUctr[3]=Funct7[5]&&(Funct3==3'b101);
+            err=(Funct3==3'b001&&Funct7[6:1]!=6'b000000)||(Funct3==3'b101&&(Funct7[6:1]!=6'b000000||Funct7[6:1]!=6'b010000)); 
         end
-        5'b01100:begin ExtOp=3'b000;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
-                         ALUctr[3]=(Funct3==3'b101||Funct3==3'b000)&&Funct7[5];
-                         err=(Funct7!=7'b0000000||Funct7!=7'b0100000);
-                   end
+        5'b00110:begin //addiw..
+            ExtOp=3'b000;ALUBSrc=2;ALUctr[2:0]=Funct3;Branch=3'b000;
+            ALUctr[3]=Funct7[5]&&(Funct3==3'b101);
+            err=(Funct3!=3'b000)&&(Funct3!=3'b001||Funct7!=7'b0000000)&&(Funct3!=3'b101||(Funct7!=7'b0000000&&Funct7!=7'b0100000)); 
+        end
+        5'b01100:begin //add..
+            ExtOp=3'b000;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
+            ALUctr[3]=Funct7[5];
+            err=(Funct7!=7'b0000000&&Funct7!=7'b0100000);
+        end
+        5'b01110:begin //addw..
+            ExtOp=3'b000;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
+            ALUctr[3]=Funct7[5];
+            err=(Funct7!=7'b0000000&&Funct7!=7'b0100000&&!(Funct3==3'b000||Funct3==3'b001||Funct3==3'b101));
+        end
+        5'b01100:begin //mul
+            ExtOp=3'b000;ALUBSrc=0;ALUctr={1'b0,Funct3};Branch=3'b000;
+            err=(Funct7!=7'b0000001);
+        end
+        5'b01110:begin //mulw
+           ExtOp=3'b000;ALUBSrc=0;ALUctr={1'b0,Funct3};Branch=3'b000;
+           err=(Funct7!=7'b0000001||Funct3==3'b001||Funct3==3'b010||Funct3==3'b011);
+        end
         default :begin ExtOp=3'b000;ALUBSrc=0;ALUctr=4'b0000;Branch=3'b000;err=1; end//ERROR
     endcase
 
