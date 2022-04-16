@@ -77,5 +77,8 @@ int main(int argc,char * argv[]) {
   cpu_init();
   printf("Initialization completed!\n");
   cpu_exec(-1uLL);
+  if(mycpu->error){
+    printf("SUCCESS!\n");
+  }else printf("FAIL!\n");
   return 0;
 }
