@@ -2,7 +2,7 @@
 
 STUID := ysyx_220066_
 CSRC_DIR := ./csrc
-CSRC_FILES := $(shell find $(SRC_DIR) -name "*.cpp")
+CSRC_FILES := $(shell find $(CSRC_DIR) -name "*.cpp")
 VSRC_DIR := ./vsrc
 VSRC_FILES := $(shell find $(VSRC_DIR) -name "*.v")
 EMU_DIR := ./emu
