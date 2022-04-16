@@ -11,7 +11,7 @@ EMU_TARGET := emu
 
 $(EMU_DIR)/$(EMU_TARGET).mk: $(VSRC_FILES) $(CSRC_FILES)
 	@echo "Verilator $(VSRC_FILES) > $(EMU_DIR)"
-	@verilator --cc --debug -CFLAGS-g\
+	@verilator --cc --debug -CFLAGS -g\
 		-Mdir $(@D)\
 		--top-module $(EMU_TOP_MODULE)\
 		--prefix $(EMU_TARGET)\
