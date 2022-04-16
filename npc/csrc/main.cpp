@@ -74,7 +74,9 @@ void parse_args(int argc,char * argv[]){
 int main(int argc,char * argv[]) {
   printf("Hello, ysyx!\n");
   mycpu = (emu *)malloc(sizeof(emu));
+  parse_args(argc,argv);
   cpu_init();
+  printf("Initialization completed!\n");
   cpu_exec(-1uLL);
   return 0;
 }
