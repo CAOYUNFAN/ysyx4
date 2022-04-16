@@ -36,4 +36,5 @@ void mem_init(char * filename){
     int ret=fread(mem,size,1,fp);
     assert(ret==1);
     fclose(fp);
+    printf("Img initialization completed!\n");
 }
