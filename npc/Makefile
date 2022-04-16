@@ -1,4 +1,4 @@
-.PHONY:sim clear
+.PHONY:sim clear gdb
 
 STUID := ysyx_220066_
 CSRC_DIR := ./csrc
@@ -22,6 +22,10 @@ $(EMU_DIR)/$(EMU_TARGET).mk: $(VSRC_FILES) $(CSRC_FILES)
 sim: $(EMU_DIR)/$(EMU_TARGET).mk
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
 	$(EMU_DIR)/$(EMU_TARGET) ../am-kernels/tests/cpu-tests/build/dummy-riscv64-nemu.bin
+
+gdb: $(EMU_DIR)/$(EMU_TARGET).mk
+	$(call git_commit, "sim RTL")
+	gdb $(EMU_DIR)/$(EMU_TARGET)
 
 clear:
 	rm -rf $(EMU_DIR)
