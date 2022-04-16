@@ -1,26 +1,30 @@
 #include "common.h"
-#define MEM_SIZE (8192)
+#define MEM_SIZE (0x8000000)
 #define MEM_MASK (MEM_SIZE-1)
 #define MEM_MASK_H (MEM_MASK&(-1))
 #define MEM_MASK_W (MEM_MASK&(-3))
 #define MEM_MASK_Q (MEM_MASK&(-7))
 
-static uchar mem[MEM_SIZE];
-uLL mem_read(uLL addr,int len){
-    switch (len){
-        case 1:return (uLL)mem[addr&MEM_MASK];
-        case 2:return (uLL)(*(ushort *)(mem+(addr&MEM_MASK_H)));
-        case 4:return (uLL)(*(uint *)(mem+(addr&MEM_MASK_W)));
-        case 8:return (uLL)(*(uLL *)(mem+(addr&MEM_MASK_Q)));
-        default: panic("Unexpected len!");
-    }
+static uchar mem[MEM_SIZE>>3];
+const uLL mem_start =   0x80000000;
+const uLL mem_end   =   0x88000000;
+
+uLL mem_read(uLL addr){
+    RANGE(addr,mem_start,mem_end);
+    return mem[(addr-mem_start)>>3];
+}
+
+void mem_write(uLL addr,uLL data){
+    RANGE(addr,mem_start,mem_end);
+    mem[(addr-mem_start)>>3]=data;
 }
 
 void mem_init(char * filename){
+    assert(mem_start+MEM_SIZE==mem_end);
     if(filename==NULL) return;
     FILE * fp=fopen(filename,"rb");
     if(fp==NULL){
-        printf("Ops, nothing to load\n");
+        printf("Oops, nothing to load\n");
         return;
     }
     fseek(fp,0,SEEK_END);

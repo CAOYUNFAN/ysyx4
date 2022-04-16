@@ -3,7 +3,7 @@ module ysyx_220066_cpu(
     input [31:0] instr,
     input [63:0] data_Rd,
 
-    output error,MemWr,
+    output error,MemWr,done,
     output [2:0] MemOp,
     output [63:0] pc,
     output [63:0] addr,
@@ -21,15 +21,15 @@ module ysyx_220066_cpu(
     wire [63:0] imm;
     wire [63:0] result;
     wire [1:0] ALUBsrc;
-    wire ALUAsrc,MemToReg,RegWr,error;
+    wire ALUAsrc,MemToReg,RegWr;
     wire [5:0] ALUctr;
     wire [2:0] Branch;
 
     ysyx_220066_ID module_id(
         .instr(instr),
         .rs1(rs1),.rs2(rs2),.rd(rd),.imm(imm),
-        .ALUAsrc(ALUAsrc),.ALUBsrc(ALUBsrc),.ALUctr(ALUctr),RegWr(RegWr),
-        .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg)
+        .ALUASrc(ALUAsrc),.ALUBSrc(ALUBsrc),.ALUctr(ALUctr),.RegWr(RegWr),
+        .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg),.error(error),.done(done)
     );
 
     wire [63:0] result;
@@ -38,16 +38,16 @@ module ysyx_220066_cpu(
     );
 
     wire [63:0] src1; 
-    assign src1=(rs1==5'h0 ? 64'h0:regs.rf[rs1]);
+    assign src1=(rs1==5'h0 ? 64'h0:module_regs.rf[rs1]);
     wire [63:0] src2; 
-    assign src2=(rs2==5'h0 ? 64'h0:regs.rf[rs2]);
+    assign src2=(rs2==5'h0 ? 64'h0:module_regs.rf[rs2]);
     wire [63:0] alu_result;
     ysyx_220066_EX module_ex(
         .src1(src1),.src2(src2),.imm(imm),.in_pc(pc),
         .ALUAsrc(ALUAsrc),.ALUBsrc(ALUBsrc),.ALUctr(ALUctr),.Branch(Branch),
         .result(alu_result),.nxtpc(nxtpc)
     );
-
+    assign data_Wr=src2;
     ysyx_220066_M module_m(
         .MemToReg(MemToReg),.ALUout(alu_result),
         .data_read(data_Rd), .m_out(result)

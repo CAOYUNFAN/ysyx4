@@ -9,14 +9,16 @@ EMU_DIR := ./emu
 EMU_TOP_MODULE :=$(STUID)top
 EMU_TARGET := emu
 
-$(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES)
+$(EMU_DIR)/$(EMU_TARGET).mk: $(VSRC_FILES) $(CSRC_FILES)
 	@echo "Verilator $(VSRC_FILES) > $(EMU_DIR)"
-	@verilator --cc -Wall \
+	@verilator --cc \
 		-Mdir $(@D)\
 		--top-module $(EMU_TOP_MODULE)\
 		--prefix $(EMU_TARGET)\
 		--exe $(CSRC_FILES)\
-		$(VSRC_FILES) 
+		$(VSRC_FILES)
+
+$(EMU_DIR)/$(EMU_TARGET):$(EMU_DIR)/$(EMU_TARGET).mk
 	@make -C $(EMU_DIR) -f $(EMU_TARGET).mk 
 
 sim: $(EMU_DIR)/$(EMU_TARGET)

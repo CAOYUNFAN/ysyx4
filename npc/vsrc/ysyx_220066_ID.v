@@ -12,7 +12,7 @@ module ysyx_220066_ID (
     output MemToReg,
     output RegWr,
     output [2:0] MemOp,
-    output error
+    output error,done
 );
     
     assign rs1=instr[19:15];
@@ -23,7 +23,7 @@ module ysyx_220066_ID (
     ysyx_220066_Decode decode(
         .OP(instr[6:0]),.Funct3(instr[14:12]),.Funct7(instr[31:25]),
         .ExtOp(ExtOp),.RegWr(RegWr),.ALUASrc(ALUASrc),.ALUBSrc(ALUBSrc),.ALUctr_out(ALUctr),
-        .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg),.error(error)
+        .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg),.error(error),.done(done)
     );
 
     ysyx_220066_IMM ysyx_220066_imm(
@@ -41,21 +41,21 @@ module ysyx_220066_Decode (
     output ALUASrc,
     output [5:0] ALUctr_out,
     output reg [2:0] Branch,
-    output MemWr,
+    output MemWr,done,
     output MemToReg,
     output [2:0] MemOp,
-    output reg error
+    output error
 );
     assign MemOp=Funct3;
     assign MemToReg=(OP[6:2]==5'b00000);
     assign MemWr=(OP[6:2]==5'b01000);
     assign RegWr=(OP[6:2]!=5'b11000&&OP[6:2]!=5'b01000);
     assign ALUASrc=(OP[6:2]==5'b00101||OP[6:2]==5'b11011||OP[6:2]==5'b11001);
-    reg ALUctr[3:0];
-    assign ALUctr_out[5]=(OP[6:2]==01110)||(OP[6:2]==01100);
+    reg [3:0] ALUctr;reg err;
+    assign ALUctr_out[5]=(OP[6:2]==5'b01110)||(OP[6:2]==5'b01100&&Funct7[0]);
     assign ALUctr_out[4]=OP[3];
     assign ALUctr_out[3:0]=ALUctr;
-
+    assign done=OP[6:2]==5'b11100;
     always @(*)//ALUctr
     case(OP[6:2])//ExtOp:I=000,U=101,B=011,S=010,J=001
         5'b11100:begin ExtOp=3'b000;ALUBSrc=1;ALUctr=4'b0000;Branch=3'b001;err=0;end//ebreak
@@ -106,20 +106,12 @@ module ysyx_220066_Decode (
         5'b01100:begin //add..
             ExtOp=3'b000;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
             ALUctr[3]=Funct7[5];
-            err=(Funct7!=7'b0000000&&Funct7!=7'b0100000);
+            err=(Funct7!=7'b0000000&&Funct7!=7'b0100000&&Funct7!=7'b0000001);
         end
         5'b01110:begin //addw..
             ExtOp=3'b000;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
             ALUctr[3]=Funct7[5];
-            err=(Funct7!=7'b0000000&&Funct7!=7'b0100000&&!(Funct3==3'b000||Funct3==3'b001||Funct3==3'b101));
-        end
-        5'b01100:begin //mul
-            ExtOp=3'b000;ALUBSrc=0;ALUctr={1'b0,Funct3};Branch=3'b000;
-            err=(Funct7!=7'b0000001);
-        end
-        5'b01110:begin //mulw
-           ExtOp=3'b000;ALUBSrc=0;ALUctr={1'b0,Funct3};Branch=3'b000;
-           err=(Funct7!=7'b0000001||Funct3==3'b001||Funct3==3'b010||Funct3==3'b011);
+            err=(Funct7!=7'b0000000&&Funct7!=7'b0100000&&!(Funct3==3'b000||Funct3==3'b001||Funct3==3'b101))&&(Funct7!=7'b0000001||Funct3==3'b001||Funct3==3'b010||Funct3==3'b011);
         end
         default :begin ExtOp=3'b000;ALUBSrc=0;ALUctr=4'b0000;Branch=3'b000;err=1; end//ERROR
     endcase
@@ -132,7 +124,7 @@ module ysyx_220066_IMM (
     input [2:0] ExtOp,
     output [63:0] imm
 );//ExtOp:I=000,U=101,B=011,S=010,J=001
-    assign imm[63:31]={32{instr[31]}};
+    assign imm[63:31]={33{instr[31]}};
     assign imm[30:20]=ExtOp[2]?instr[30:20]:{11{instr[31]}};
     assign imm[19:12]=(~ExtOp[1]&ExtOp[0])?instr[19:12]:{8{instr[31]}};
     assign imm[11]   =~ExtOp[2]?1'b0://U

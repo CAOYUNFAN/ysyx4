@@ -4,9 +4,9 @@ module ysyx_220066_IF (
     output reg [63:0] pc
 );
     always @(posedge clk) begin
-        if(rst) pc<=64'h0;
+        if(rst) pc<=64'h80000000;
         else begin
-            nxtpc<=pc;
+            pc<=nxtpc;
         end
     end
 endmodule

@@ -17,7 +17,7 @@ module ysyx_220066_EX(
     assign result=ALUctr[5]?result_mul:result_alu;
     ysyx_220066_ALU alu(
         .data_input(ALUAsrc?in_pc:src1),
-        .datab_input(ALUBSrc[1]?imm:(ALUBSrc[0]?64'h4:BusB)),
+        .datab_input(ALUBsrc[1]?imm:(ALUBsrc[0]?64'h4:src2)),
         .aluctr(ALUctr[4:0]),.zero(zero),.result(result_alu)
         );
     ysyx_220066_Multi multi(

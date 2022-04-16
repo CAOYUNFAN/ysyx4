@@ -5,20 +5,19 @@ module ysyx_220066_ALU(
     output zero,
     output reg [63:0] result
     );
-    wire ALctr,SUBctr,SIGctr,Wctr,CF,SF,OF,Cout;
+    wire ALctr,SUBctr,SIGctr,Wctr,CF,SF,OF;
     wire [63:0] Add_result;
-    wire [63:0] shift_result;
     ysyx_220066_ALU_decode ysyx_220066_alu_decode(aluctr[4:3],ALctr,SUBctr,SIGctr,Wctr);
     wire [63:0] data;
     assign data[31:0]=data_input[31:0];
     assign data[63:32]=Wctr?{32{data_input[31]}}:data_input[63:32];
-    wire [63:0] dataa;
-    assign dataa[31:0]=data_input[31:0];
-    assign dataa[63:32]=Wctr?{32{data_input[31]&ALctr}}:data_input[63:32];
+    wire [63:0] data_a;
+    assign data_a[31:0]=data_input[31:0];
+    assign data_a[63:32]=Wctr?{32{data_input[31]&ALctr}}:data_input[63:32];
     wire [63:0] datab;
     assign datab[31:0]=datab_input[31:0];
     assign datab[63:32]=Wctr?{32{datab_input[31]}}:datab_input[63:32];
-    ysyx_220066_Adder ysyx_220066_adder(data,datab,SUBctr,Add_result,CF,zero,SF,OF,Cout);
+    ysyx_220066_Adder ysyx_220066_adder(data,datab,SUBctr,Add_result,CF,zero,SF,OF);
     always @(*)
     case (aluctr[2:0])
         3'o0: result=Add_result;
@@ -41,10 +40,10 @@ module ysyx_220066_Adder(
     input [63:0] y,
     input SUBctr,
     output reg [63:0] result,
-    output reg CF,ZF,SF,OF,Cout
+    output reg CF,ZF,SF,OF
     );
     reg [63:0] y_;
-    reg Ctemp;
+    reg Ctemp,Cout;
     always @(*) begin
         y_=SUBctr?~y:y;
         {Ctemp,result[62:0]}={1'b0,x[62:0]}+{1'b0,y_[62:0]}+{{63{1'b0}},SUBctr};

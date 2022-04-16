@@ -2,13 +2,20 @@
 #include <assert.h>
 #include <stdlib.h>
 #define panic(message)\
-    printf("%s",message);\
+    fprintf(stderr,"%s",message);\
     assert(0);
+
+#define RANGE(addr,start,end)\
+    if((addr)<start||(addr)>end){\
+        fprintf(stderr,"Unexpected Addr %p!\n",(void *)(addr));\
+        assert((addr)>=start&&(addr)<=end);\
+    }
 
 typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef unsigned long long uLL;
 
-uLL mem_read(uLL addr,int len);
+uLL mem_read(uLL addr);
 void mem_init(char * filename);
+void mem_write(uLL addr,uLL data);

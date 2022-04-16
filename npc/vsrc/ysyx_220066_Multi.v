@@ -9,7 +9,7 @@ module ysyx_220066_Multi(
     wire [127:0] mul_high;
     assign mul_high={{64{src1[63]}},src1}*{{64{src2[63]}},src2};
     wire [127:0] mul_hsu;
-    assign mul_hs={{64{src1[63]}},src1}*{64'h0,src2};
+    assign mul_hsu={{64{src1[63]}},src1}*{64'h0,src2};
     wire [127:0] mul_hu;
     assign mul_hu={64'h0,src1}*{64'h0,src2};
     wire [63:0] div;
