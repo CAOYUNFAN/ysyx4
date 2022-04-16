@@ -9,8 +9,10 @@ void cpu_init(){
   mycpu->rst=1;
   mycpu->clk=0;
   mycpu->eval();
+  printf("a\n");
   mycpu->clk=1;
   mycpu->eval();
+  printf("a\n");
   mycpu->clk=0;
   mycpu->eval();
   mycpu->rst=0;
