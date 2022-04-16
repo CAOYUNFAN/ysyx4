@@ -27,6 +27,7 @@ void mem_init(char * filename){
         printf("Oops, nothing to load\n");
         return;
     }
+    printf("Openfile %s\n",filename);
     fseek(fp,0,SEEK_END);
     long size=ftell(fp);
     printf("Imgfile is %s. size=%ld\n",filename,size);
