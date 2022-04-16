@@ -1,6 +1,6 @@
 #include "emu.h"
 #include "common.h"
-#include <unistd.h>
+#include <getopt.h>
 using namespace std;
 
 emu * mycpu=NULL;
@@ -31,7 +31,7 @@ void cpu_exec(uLL n){
 
 char * img_file=NULL;
 void parse_args(int argc,char * argv[]){
-  const option table[] ={
+  static const option table[] ={
     {"batch"    , no_argument      , NULL, 'b'},
     {"log"      , required_argument, NULL, 'l'},
     {"diff"     , required_argument, NULL, 'd'},
@@ -39,7 +39,8 @@ void parse_args(int argc,char * argv[]){
     {"elf"      , required_argument, NULL, 'e'},
     {"help"     , no_argument      , NULL, 'h'},
     {0          , 0                , NULL,  0 },
-  }int o;
+  };
+  int o;
   while ( (o = getopt_long(argc, argv, "-bhl:d:p:", table, NULL)) != -1) {
     switch (o) {
       case 'b': //sdb_set_batch_mode(); break;
@@ -53,7 +54,7 @@ void parse_args(int argc,char * argv[]){
         Log("System do not support function trace unless it is enabled."); 
         #endif
         break;*/
-      case 1: img_file = optarg; return;
+      case 1: mem_init(optarg);return;
       default:
         printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
         printf("\t-b,--batch              run with batch mode\n");
@@ -65,8 +66,8 @@ void parse_args(int argc,char * argv[]){
         exit(0);
     }
   }
-  return 0;
-  mem_init(img_file);
+  mem_init(NULL);
+  return;
 }
 
 int main(int argc,char * argv[]) {
