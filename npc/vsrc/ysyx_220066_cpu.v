@@ -24,12 +24,14 @@ module ysyx_220066_cpu(
     wire ALUAsrc,MemToReg,RegWr;
     wire [5:0] ALUctr;
     wire [2:0] Branch;
+    wire error_temp;
+    assign error=error_temp&!rst;
 
     ysyx_220066_ID module_id(
         .instr(instr),
         .rs1(rs1),.rs2(rs2),.rd(rd),.imm(imm),
         .ALUASrc(ALUAsrc),.ALUBSrc(ALUBsrc),.ALUctr(ALUctr),.RegWr(RegWr),
-        .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg),.error(error),.done(done)
+        .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg),.error(error_temp),.done(done)
     );
 
     wire [63:0] result;
