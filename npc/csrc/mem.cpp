@@ -24,7 +24,9 @@ void mem_init(char * filename){
     if(filename==NULL) return;
     FILE * fp=fopen(filename,"rb");
     if(fp==NULL){
-        printf("Oops, nothing to load\n");
+        printf("Nothing to load. Using the default img.\n");
+        mem[0]=0x23b8020097020000LL;
+        mem[1]=0x7300100003b50201LL;
         return;
     }
     printf("Openfile %s\n",filename);
