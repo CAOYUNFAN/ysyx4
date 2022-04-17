@@ -137,7 +137,7 @@ module ysyx_220066_IMM (
     assign imm[63:31]={33{instr[31]}};
     assign imm[30:20]=ExtOp[2]?instr[30:20]:{11{instr[31]}};
     assign imm[19:12]=(~ExtOp[1]&ExtOp[0])?instr[19:12]:{8{instr[31]}};
-    assign imm[11]   =~ExtOp[2]?1'b0://U
+    assign imm[11]   =ExtOp[2]?1'b0://U
                       ~ExtOp[0]?instr[31]://IS
                       ExtOp[1] ?instr[7] :instr[20];//B-J
     assign imm[10: 5]=ExtOp[2] ?{6{1'b0}}:instr[30:25];
