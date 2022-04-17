@@ -8,7 +8,7 @@
 static uLL mem[MEM_SIZE>>3];
 
 uLL mem_read(uLL addr){
-    return mem[(addr-mem_start)>>3];
+    return mem[((addr-mem_start)&(MEM_SIZE-1))>>3];
 }
 
 void mem_write(uLL addr,uLL data){
