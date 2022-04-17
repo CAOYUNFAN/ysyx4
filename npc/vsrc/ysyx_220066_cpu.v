@@ -11,7 +11,7 @@ module ysyx_220066_cpu(
 );
     wire [63:0] nxtpc;
     ysyx_220066_IF module_if(
-        .clk(clk),.rst(rst),
+        .clk(~clk),.rst(rst),
         .nxtpc(nxtpc),.pc(pc)
     );
 
