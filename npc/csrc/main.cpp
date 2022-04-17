@@ -19,7 +19,7 @@ void cpu_init(){
 void cpu_exec(uLL n){
   while (n--){
     if(mycpu->error||mycpu->done) return;
-    RANGE(mycpu->addr,mem_start,mem_end);
+    RANGE(mycpu->pc,mem_start,mem_end);
     mycpu->instr_data=mem_read(mycpu->pc);
     mycpu->data_Rd_data=mem_read(mycpu->addr);
     mycpu->clk=1;
