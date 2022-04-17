@@ -143,6 +143,7 @@ static void init_elf(){
   }
 
   fclose(fp);
+  Log("Elf_file=%s loading ready!",elf_file);
 }
 #endif
 
