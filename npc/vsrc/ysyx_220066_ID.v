@@ -118,7 +118,7 @@ module ysyx_220066_Decode (
     endcase
 
     always @(*) begin
-        $display("OP=%b",OP);
+        $display("OP=%b,MemWr=%b",OP,MemWr);
     end
 
     assign error=err||!(OP[1:0]==2'b11);
