@@ -6,11 +6,8 @@
 #define MEM_MASK_Q (MEM_MASK&(-7))
 
 static uLL mem[MEM_SIZE>>3];
-const uLL mem_start =   0x80000000;
-const uLL mem_end   =   0x88000000;
 
 uLL mem_read(uLL addr){
-    RANGE(addr,mem_start,mem_end);
     return mem[(addr-mem_start)>>3];
 }
 

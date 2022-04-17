@@ -8,7 +8,7 @@ module ysyx_220066_ID (
     output ALUASrc,
     output [5:0] ALUctr,
     output [2:0] Branch,
-    output MemWr,
+    output MemWr,MemRd,
     output MemToReg,
     output RegWr,
     output [2:0] MemOp,
@@ -22,7 +22,7 @@ module ysyx_220066_ID (
 
     ysyx_220066_Decode decode(
         .OP(instr[6:0]),.Funct3(instr[14:12]),.Funct7(instr[31:25]),
-        .ExtOp(ExtOp),.RegWr(RegWr),.ALUASrc(ALUASrc),.ALUBSrc(ALUBSrc),.ALUctr_out(ALUctr),
+        .ExtOp(ExtOp),.RegWr(RegWr),.ALUASrc(ALUASrc),.ALUBSrc(ALUBSrc),.ALUctr_out(ALUctr),.MemRd(MemRd),
         .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg),.error(error),.done(done)
     );
 
@@ -41,7 +41,7 @@ module ysyx_220066_Decode (
     output ALUASrc,
     output [5:0] ALUctr_out,
     output reg [2:0] Branch,
-    output MemWr,done,
+    output MemWr,done,MemRd,
     output MemToReg,
     output [2:0] MemOp,
     output error
@@ -49,6 +49,7 @@ module ysyx_220066_Decode (
     assign MemOp=Funct3;
     assign MemToReg=(OP[6:2]==5'b00000);
     assign MemWr=(OP[6:2]==5'b01000);
+    assign MemRd=(OP[6:2]==5'b00000);
     assign RegWr=(OP[6:2]!=5'b11000&&OP[6:2]!=5'b01000);
     assign ALUASrc=(OP[6:2]==5'b00101||OP[6:2]==5'b11011||OP[6:2]==5'b11001);
     reg [3:0] ALUctr;reg err;

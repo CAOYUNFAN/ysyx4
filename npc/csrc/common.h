@@ -10,6 +10,8 @@
         fprintf(stderr,"Unexpected Addr %p!\n",(void *)(addr));\
         assert((addr)>=start&&(addr)<=end);\
     }
+#define mem_start    (0x80000000uLL)
+#define mem_end      (0x88000000uLL)
 
 typedef unsigned char uchar;
 typedef unsigned short ushort;

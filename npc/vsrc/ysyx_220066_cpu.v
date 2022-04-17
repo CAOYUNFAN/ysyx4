@@ -3,7 +3,7 @@ module ysyx_220066_cpu(
     input [31:0] instr,
     input [63:0] data_Rd,
 
-    output error,MemWr,done,
+    output error,MemWr,MemRd,done,
     output [2:0] MemOp,
     output [63:0] pc,
     output [63:0] addr,
@@ -30,7 +30,7 @@ module ysyx_220066_cpu(
     ysyx_220066_ID module_id(
         .instr(instr),
         .rs1(rs1),.rs2(rs2),.rd(rd),.imm(imm),
-        .ALUASrc(ALUAsrc),.ALUBSrc(ALUBsrc),.ALUctr(ALUctr),.RegWr(RegWr),
+        .ALUASrc(ALUAsrc),.ALUBSrc(ALUBsrc),.ALUctr(ALUctr),.RegWr(RegWr),.MemRd(MemRd),
         .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg),.error(error_temp),.done(done)
     );
 
