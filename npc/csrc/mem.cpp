@@ -19,14 +19,22 @@ void mem_write(uLL addr,uLL data){
     mem[(addr-mem_start)>>3]=data;
 }
 
+void default_img(){
+    printf("Nothing to load. Using the default img.\n");
+    mem[0]=0x23b8020097020000LL;
+    mem[1]=0x7300100003b50201LL;
+    return;
+}
+
 void mem_init(char * filename){
     assert(mem_start+MEM_SIZE==mem_end);
-    if(filename==NULL) return;
+    if(filename==NULL){
+        default_img();
+        return;
+    }
     FILE * fp=fopen(filename,"rb");
     if(fp==NULL){
-        printf("Nothing to load. Using the default img.\n");
-        mem[0]=0x23b8020097020000LL;
-        mem[1]=0x7300100003b50201LL;
+        default_img();
         return;
     }
     printf("Openfile %s\n",filename);
