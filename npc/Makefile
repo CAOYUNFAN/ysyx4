@@ -27,7 +27,7 @@ sim: $(EMU_DIR)/$(EMU_TARGET).mk
 
 sim_gdb: $(EMU_DIR)/$(EMU_TARGET).mk
 	$(call git_commit, "sim_gdb RTL")
-	gdb $(EMU_DIR)/$(EMU_TARGET) $(IMG)
+	gdb -s $(EMU_DIR)/$(EMU_TARGET) --args $(IMG)
 
 clear:
 	rm -rf $(EMU_DIR)
