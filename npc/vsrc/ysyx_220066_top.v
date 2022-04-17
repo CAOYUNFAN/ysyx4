@@ -5,9 +5,7 @@ module ysyx_220066_top(
   output [63:0] addr,
   output reg [63:0] data_Wr_data,
   input [63:0] data_Rd_data,
-  output MemWr,
-  output error,
-  output done
+  output MemWr,error,done,status
 );
   wire [31:0] instr;
   assign instr=pc[2]?instr_data[63:32]:instr_data[31:0];
@@ -85,4 +83,5 @@ module ysyx_220066_top(
     .addr(addr),.MemOp(MemOp),
     .data_Rd(data_Rd),.data_Wr(data_Wr),.MemWr(MemWr),.error(error),.done(done)
   );
+  assign status=cpu.module_regs.rf[10][0];
 endmodule
