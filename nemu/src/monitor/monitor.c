@@ -82,17 +82,17 @@ static bool check_elf(FILE * fp){
   }
 
   if(ehdr.e_ident[5]!=ELFDATA2LSB){
-    Log("Not supported edian, ignored");
+    Log("Not supported edian, elf is ignored");
     return 0;
   }
 
   if(!ehdr.e_shoff) {
-    Log("No Sections. Ignored.");
+    Log("No Sections. Elf is ignored.");
     return 0;
   }
 
   if(!ehdr.e_shnum) {
-    Log("Too many sections. Ignored.");
+    Log("Too many sections. Elf is ignored.");
     return 0;
   }
 
