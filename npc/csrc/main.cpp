@@ -98,7 +98,7 @@ int main(int argc,char * argv[]) {
       if(ch=='c') cpu_exec(-1uLL);
       if(ch=='s') cpu_exec(1);
       if(ch=='r'){
-        for(int i=0;i<32;++i) printf("%5s: 0x%064lx %ld\n",regs[i],mycpu->dbg_regs[i],mycpu->dbg_regs[i]);
+        for(int i=0;i<32;++i) printf("%5s: 0x%016lx %ld\n",regs[i],mycpu->dbg_regs[i],mycpu->dbg_regs[i]);
         printf("%5s: %lx\n","pc",mycpu->pc);
       }
       ch=getchar();
