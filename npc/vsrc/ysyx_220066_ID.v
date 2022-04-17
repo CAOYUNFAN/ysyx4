@@ -30,9 +30,9 @@ module ysyx_220066_ID (
         .instr(instr[31:7]),.ExtOp(ExtOp),.imm(imm)
     );
 
-    always @(*) begin
-        $display("Instr=%h,imm=%h",instr,imm);
-    end
+//    always @(*) begin
+//        $display("Instr=%h,imm=%h",instr,imm);
+//    end
 
 endmodule
 
