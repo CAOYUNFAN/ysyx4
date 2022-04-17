@@ -94,12 +94,14 @@ int main(int argc,char * argv[]) {
   if(is_batch) cpu_exec(-1uLL);
   else{
     char ch=getchar();
-    if(ch=='c') cpu_exec(-1uLL);
-    if(ch=='s') cpu_exec(1);
-    if(ch=='r'){
-      for(int i=0;i<32;++i) printf("%5s: 0x%064lx %ld\n",regs[i],mycpu->dbg_regs[i],mycpu->dbg_regs[i]);
-      printf("%5s: %lx\n","pc",mycpu->pc);
-    }
+    while (ch!='q') {
+      if(ch=='c') cpu_exec(-1uLL);
+      if(ch=='s') cpu_exec(1);
+      if(ch=='r'){
+        for(int i=0;i<32;++i) printf("%5s: 0x%064lx %ld\n",regs[i],mycpu->dbg_regs[i],mycpu->dbg_regs[i]);
+        printf("%5s: %lx\n","pc",mycpu->pc);
+      }
+    } 
   }
   if(!mycpu->error){
     if(!mycpu->status) printf("SUCCESS!\n");
