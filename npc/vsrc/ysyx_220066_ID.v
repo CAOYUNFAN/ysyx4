@@ -59,7 +59,7 @@ module ysyx_220066_Decode (
     assign ALUASrc=(OP[6:2]==5'b00101||OP[6:2]==5'b11011||OP[6:2]==5'b11001);
     reg [3:0] ALUctr;reg err;
     assign ALUctr_out[5]=(OP[6:2]==5'b01110)||(OP[6:2]==5'b01100&&Funct7[0]);
-    assign ALUctr_out[4]=OP[3];
+    assign ALUctr_out[4]=OP[3]&~OP[4];
     assign ALUctr_out[3:0]=ALUctr;
     assign done=OP[6:2]==5'b11100;
     always @(*)//ALUctr
