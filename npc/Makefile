@@ -13,7 +13,7 @@ IMG ?=
 
 $(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES)
 	@echo "Verilator $(VSRC_FILES) > $(EMU_DIR)"
-	@verilator --cc --debug -CFLAGS -g\
+	@verilator --cc -CFLAGS -g\
 		-Mdir $(@D)\
 		--top-module $(EMU_TOP_MODULE)\
 		--prefix $(EMU_TARGET)\
