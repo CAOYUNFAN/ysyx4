@@ -18,8 +18,8 @@ void mem_write(uLL addr,uLL data){
 
 void default_img(){
     printf("Nothing to load. Using the default img.\n");
-    mem[0]=0x23b8020097020000LL;
-    mem[1]=0x7300100003b50201LL;
+    mem[0]=0x0002b82300000297LL;
+    mem[1]=0x001000730102b503LL;
     return;
 }
 
