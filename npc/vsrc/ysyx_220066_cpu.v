@@ -36,7 +36,7 @@ module ysyx_220066_cpu(
 
     wire [63:0] result;
     ysyx_220066_Regs module_regs(
-        .clk(clk),.wdata(result),.waddr(rd),.wen(RegWr)
+        .clk(~clk),.wdata(result),.waddr(rd),.wen(RegWr)
     );
 
     wire [63:0] src1; 
