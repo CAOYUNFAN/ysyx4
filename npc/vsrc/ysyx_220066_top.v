@@ -11,7 +11,7 @@ module ysyx_220066_top(
   output MemWr,MemRd,error,done,status
 );
   wire [31:0] instr;
-  assign instr=!pc[2]?instr_data[63:32]:instr_data[31:0];
+  assign instr=pc[2]?instr_data[63:32]:instr_data[31:0];
   wire [2:0] MemOp;
   reg [63:0] data_Rd;
   reg [7:0] b_Rd;reg [15:0] h_Rd;reg [31:0] w_Rd;
