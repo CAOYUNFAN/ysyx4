@@ -11,7 +11,7 @@ EMU_TARGET := emu
 
 IMG ?= 
 
-$(EMU_DIR)/$(EMU_TARGET).mk: $(VSRC_FILES) $(CSRC_FILES)
+$(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES)
 	@echo "Verilator $(VSRC_FILES) > $(EMU_DIR)"
 	@verilator --cc --debug -CFLAGS -g\
 		-Mdir $(@D)\
@@ -21,13 +21,13 @@ $(EMU_DIR)/$(EMU_TARGET).mk: $(VSRC_FILES) $(CSRC_FILES)
 		$(VSRC_FILES)
 	@make -C $(EMU_DIR) -f $(EMU_TARGET).mk 
 
-sim: $(EMU_DIR)/$(EMU_TARGET).mk
+sim: $(EMU_DIR)/$(EMU_TARGET)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	$(EMU_DIR)/$(EMU_TARGET) $(IMG)
+	$< $(IMG)
 
-sim_gdb: $(EMU_DIR)/$(EMU_TARGET).mk
+sim_gdb: $(EMU_DIR)/$(EMU_TARGET)
 	$(call git_commit, "sim_gdb RTL")
-	gdb -s $(EMU_DIR)/$(EMU_TARGET) --args $(IMG)
+	gdb -s $< --args $< $(IMG)
 
 clear:
 	rm -rf $(EMU_DIR)
