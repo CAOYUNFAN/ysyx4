@@ -9,6 +9,8 @@ EMU_DIR := ./emu
 EMU_TOP_MODULE :=$(STUID)top
 EMU_TARGET := emu
 
+IMG ?= 
+
 $(EMU_DIR)/$(EMU_TARGET).mk: $(VSRC_FILES) $(CSRC_FILES)
 	@echo "Verilator $(VSRC_FILES) > $(EMU_DIR)"
 	@verilator --cc --debug -CFLAGS -g\
