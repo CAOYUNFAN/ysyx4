@@ -29,6 +29,10 @@ module ysyx_220066_ID (
     ysyx_220066_IMM ysyx_220066_imm(
         .instr(instr[31:7]),.ExtOp(ExtOp),.imm(imm)
     );
+
+    always @(*) begin
+        $display("Instr=%h",instr);
+    end
 endmodule
 
 module ysyx_220066_Decode (
