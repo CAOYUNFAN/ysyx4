@@ -33,6 +33,11 @@ module ysyx_220066_ALU(
         3'o6: result=data|datab;
         3'o7: result=data&datab;
     endcase
+
+    always @(*) begin
+        $display("data_input=%x,datab_input=%x,result=%x",data_input,datab_input,result);
+    end
+
 endmodule
 
 module ysyx_220066_Adder(
