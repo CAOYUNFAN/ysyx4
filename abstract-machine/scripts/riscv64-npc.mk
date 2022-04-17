@@ -15,17 +15,17 @@ LDFLAGS   += -T $(AM_HOME)/scripts/linker.ld --defsym=_pmem_start=0x80000000 --d
 LDFLAGS   += --gc-sections -e _start
 CFLAGS += -DMAINARGS=\"$(mainargs)\"
 
-NPCFLAGS  += -l $(shell dirname $(IMAGE).elf)/npc-log.txt -b
+NPCFLAGS  += -l $(shell dirname $(IMAGE).elf)/npc-log.txt -b 
 
-.PHONY: $(AM_HOME)/am/src/riscv/npc/trm.c sim sim_gdb
+.PHONY: $(AM_HOME)/am/src/riscv/npc/trm.c run gdb
 
 image: $(IMAGE).elf
 	@$(OBJDUMP) -d $(IMAGE).elf > $(IMAGE).txt
 	@echo + OBJCOPY "->" $(IMAGE_REL).bin
 	@$(OBJCOPY) -S --set-section-flags .bss=alloc,contents -O binary $(IMAGE).elf $(IMAGE).bin
 
-sim: image
-    make -C $(NPC_HOME) run ARGS="$(NPCFLAGS)" IMG=$(IMAGE)
+run: image
+	make -C $(NPC_HOME) run ARGS="$(NPCFLAGS)" IMG=$(IMAGE).bin
 
-sim_gdb: image
-    make -C $(NPC_HOME) sim_gdb ARGS="$(NPCFLAGS)" IMG=$(IMAGE)
+gdb: image
+	make -C $(NPC_HOME) sim_gdb ARGS="$(NPCFLAGS)" IMG=$(IMAGE).bin
