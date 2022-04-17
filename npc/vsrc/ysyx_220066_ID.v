@@ -58,7 +58,6 @@ module ysyx_220066_Decode (
     assign ALUctr_out[3:0]=ALUctr;
     assign done=OP[6:2]==5'b11100;
     always @(*)//ALUctr
-        //$display("OP=%b",OP);
     case(OP[6:2])//ExtOp:I=000,U=101,B=011,S=010,J=001
         5'b11100:begin ExtOp=3'b000;ALUBSrc=1;ALUctr=4'b0000;Branch=3'b001;err=0;end//ebreak
 
@@ -117,6 +116,10 @@ module ysyx_220066_Decode (
         end
         default :begin ExtOp=3'b000;ALUBSrc=0;ALUctr=4'b0000;Branch=3'b000;err=1; end//ERROR
     endcase
+
+    always @(*) begin
+        $display("OP=%b",OP);
+    end
 
     assign error=err||!(OP[1:0]==2'b11);
 endmodule
