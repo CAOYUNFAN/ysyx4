@@ -101,6 +101,7 @@ int main(int argc,char * argv[]) {
         for(int i=0;i<32;++i) printf("%5s: 0x%064lx %ld\n",regs[i],mycpu->dbg_regs[i],mycpu->dbg_regs[i]);
         printf("%5s: %lx\n","pc",mycpu->pc);
       }
+      ch=getchar();
     } 
   }
   if(!mycpu->error){
