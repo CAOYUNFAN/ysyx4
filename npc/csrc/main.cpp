@@ -44,14 +44,14 @@ const char *regs[] = {
   "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
 };
 
-char * img_file=NULL;
+char * img_file=NULL, * log_file=NULL, * diff_so_file=NULL;
+int difftest_port=0;
 void parse_args(int argc,char * argv[]){
   static const option table[] ={
     {"batch"    , no_argument      , NULL, 'b'},
     {"log"      , required_argument, NULL, 'l'},
     {"diff"     , required_argument, NULL, 'd'},
     {"port"     , required_argument, NULL, 'p'},
-    {"elf"      , required_argument, NULL, 'e'},
     {"help"     , no_argument      , NULL, 'h'},
     {0          , 0                , NULL,  0 },
   };
@@ -59,16 +59,9 @@ void parse_args(int argc,char * argv[]){
   while ( (o = getopt_long(argc, argv, "-bhl:d:p:", table, NULL)) != -1) {
     switch (o) {
       case 'b': sdb_set_batch_mode(); break;
-      case 'p': //sscanf(optarg, "%d", &difftest_port); break;
-      case 'l': //log_file = optarg; break;
-      case 'd': //diff_so_file = optarg; break;
-      case 'e': /*
-        #ifdef CONFIG_FTRACE
-        elf_file=optarg;
-        #else
-        Log("System do not support function trace unless it is enabled."); 
-        #endif
-        break;*/
+      case 'p': sscanf(optarg, "%d", &difftest_port); break;
+      case 'l': log_file = optarg; break;
+      case 'd': diff_so_file = optarg; break;
       case 1: mem_init(optarg);return;
       default:
         printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
