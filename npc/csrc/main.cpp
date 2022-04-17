@@ -80,6 +80,6 @@ int main(int argc,char * argv[]) {
   if(mycpu->error){
     if(!mycpu->status) printf("SUCCESS!\n");
     else printf("FAIL!\n");
-  }else printf("unkown command on pc=%llx\n",mycpu->pc);
+  }else printf("unkown command on pc=%lx\n",mycpu->pc);
   return 0;
 }
