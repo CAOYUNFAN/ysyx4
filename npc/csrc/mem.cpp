@@ -5,7 +5,7 @@
 #define MEM_MASK_W (MEM_MASK&(-3))
 #define MEM_MASK_Q (MEM_MASK&(-7))
 
-static uchar mem[MEM_SIZE>>3];
+static uLL mem[MEM_SIZE>>3];
 const uLL mem_start =   0x80000000;
 const uLL mem_end   =   0x88000000;
 
