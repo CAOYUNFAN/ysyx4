@@ -35,7 +35,7 @@ module ysyx_220066_ALU(
     endcase
 
     always @(*) begin
-        $display("data_input=%x,datab_input=%x,result=%x",data_input,datab_input,Add_result);
+        $display("data_input=%x,datab_input=%x,result=%x,aluctr=%b",data_input,datab_input,Add_result,aluctr);
     end
 
 endmodule
