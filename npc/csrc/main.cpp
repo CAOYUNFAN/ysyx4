@@ -78,7 +78,8 @@ int main(int argc,char * argv[]) {
   printf("Initialization completed!\n");
   cpu_exec(-1uLL);
   if(mycpu->error){
-    printf("SUCCESS!\n");
-  }else printf("FAIL!\n");
+    if(!mycpu->status) printf("SUCCESS!\n");
+    else printf("FAIL!\n");
+  }else printf("unkown command on pc=%llx\n",mycpu->pc);
   return 0;
 }
