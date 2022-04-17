@@ -15,7 +15,7 @@ LDFLAGS   += -T $(AM_HOME)/scripts/linker.ld --defsym=_pmem_start=0x80000000 --d
 LDFLAGS   += --gc-sections -e _start
 CFLAGS += -DMAINARGS=\"$(mainargs)\"
 
-NPCFLAGS  += -l $(shell dirname $(IMAGE).elf)/npc-log.txt -b 
+NPCFLAGS  += -l $(shell dirname $(IMAGE).elf)/npc-log.txt 
 
 .PHONY: $(AM_HOME)/am/src/riscv/npc/trm.c run gdb
 

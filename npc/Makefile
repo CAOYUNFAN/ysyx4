@@ -23,11 +23,11 @@ $(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES)
 
 sim: $(EMU_DIR)/$(EMU_TARGET)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	$< $(IMG)
+	$< $(ARGS) $(IMG)
 
 sim_gdb: $(EMU_DIR)/$(EMU_TARGET)
 	$(call git_commit, "sim_gdb RTL")
-	gdb -s $< --args $< $(IMG)
+	gdb -s $< --args $< $(ARGS) $(IMG)
 
 clear:
 	rm -rf $(EMU_DIR)

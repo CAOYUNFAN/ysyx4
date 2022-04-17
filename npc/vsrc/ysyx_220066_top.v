@@ -89,6 +89,7 @@ module ysyx_220066_top(
   assign status=cpu.module_regs.rf[10][0];
   integer i;
   always @(*) begin
-    for(i=0;i<32;i=i+1) dbg_regs[i]=cpu.module_regs.rf[i];
+    for(i=1;i<32;i=i+1) dbg_regs[i]=cpu.module_regs.rf[i];
+    dbg_regs[0]=0;
   end
 endmodule

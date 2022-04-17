@@ -5,6 +5,13 @@ using namespace std;
 
 emu * mycpu=NULL;
 
+int is_batch=0;
+
+void sdb_set_batch_mode(){
+  is_batch=1;
+  return;
+}
+
 void cpu_init(){
   mycpu->rst=1;
   mycpu->clk=0;
@@ -30,6 +37,13 @@ void cpu_exec(uLL n){
   }
 }
 
+const char *regs[] = {
+  "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
+  "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
+  "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
+  "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"
+};
+
 char * img_file=NULL;
 void parse_args(int argc,char * argv[]){
   static const option table[] ={
@@ -44,7 +58,7 @@ void parse_args(int argc,char * argv[]){
   int o;
   while ( (o = getopt_long(argc, argv, "-bhl:d:p:", table, NULL)) != -1) {
     switch (o) {
-      case 'b': //sdb_set_batch_mode(); break;
+      case 'b': sdb_set_batch_mode(); break;
       case 'p': //sscanf(optarg, "%d", &difftest_port); break;
       case 'l': //log_file = optarg; break;
       case 'd': //diff_so_file = optarg; break;
@@ -77,7 +91,16 @@ int main(int argc,char * argv[]) {
   parse_args(argc,argv);
   cpu_init();
   printf("Initialization completed!\n");
-  cpu_exec(-1uLL);
+  if(is_batch) cpu_exec(-1uLL);
+  else{
+    char ch=getchar();
+    if(ch=='c') cpu_exec(-1uLL);
+    if(ch=='s') cpu_exec(1);
+    if(ch=='r'){
+      for(int i=0;i<32;++i) printf("%5s: 0x%064lx %ld\n",regs[i],mycpu->dbg_regs[i],mycpu->dbg_regs[i]);
+      printf("%5s: %lx\n","pc",mycpu->pc);
+    }
+  }
   if(!mycpu->error){
     if(!mycpu->status) printf("SUCCESS!\n");
     else printf("FAIL!\n");
