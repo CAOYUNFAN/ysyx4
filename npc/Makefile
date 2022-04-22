@@ -10,14 +10,14 @@ VSRC_FILES := $(shell find $(VSRC_DIR) -name "*.v")
 EMU_DIR := $(NPC_HOME)/emu
 EMU_TOP_MODULE :=$(STUID)top
 EMU_TARGET := emu
-CFLAGS_NPC = -g -I$(CSRC_INCLUDE_DIR)
+CFLAGS_NPC = -I$(CSRC_INCLUDE_DIR) -lreadline -g
 CFLAGS_NPC_2 = $(addprefix -CFLAGS , $(CFLAGS_NPC))
 
 IMG ?= 
 
 $(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES) $(CSRC_INCLUDE)
-	@echo "Verilator $(VSRC_FILES) > $(EMU_DIR)"
-	verilator --cc $(CFLAGS_NPC_2)\
+	@echo "Verilator VSRC_FILES > EMU_DIR"
+	@verilator --cc $(CFLAGS_NPC_2)\
 		-Mdir $(@D)\
 		--top-module $(EMU_TOP_MODULE)\
 		--prefix $(EMU_TARGET)\

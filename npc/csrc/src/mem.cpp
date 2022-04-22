@@ -1,9 +1,4 @@
-#include <common.h>
-#define MEM_SIZE (0x8000000)
-#define MEM_MASK (MEM_SIZE-1)
-#define MEM_MASK_H (MEM_MASK&(-1))
-#define MEM_MASK_W (MEM_MASK&(-3))
-#define MEM_MASK_Q (MEM_MASK&(-7))
+#include <memory.h>
 
 static uLL mem[MEM_SIZE>>3];
 
