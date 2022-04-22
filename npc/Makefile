@@ -1,19 +1,23 @@
 .PHONY:sim clear sim_gdb
 
 STUID := ysyx_220066_
-CSRC_DIR := ./csrc
+CSRC_DIR := $(NPC_HOME)/csrc/src/
 CSRC_FILES := $(shell find $(CSRC_DIR) -name "*.cpp")
-VSRC_DIR := ./vsrc
+CSRC_INCLUDE_DIR := $(NPC_HOME)/csrc/include/
+CSRC_INCLUDE := $(shell find $(CSRC_INCLUDE) -name "*.h")
+VSRC_DIR := $(NPC_HOME)/vsrc
 VSRC_FILES := $(shell find $(VSRC_DIR) -name "*.v")
-EMU_DIR := ./emu
+EMU_DIR := $(NPC_HOME)/emu
 EMU_TOP_MODULE :=$(STUID)top
 EMU_TARGET := emu
+CFLAGS_NPC = -g -I$(CSRC_INCLUDE_DIR)
+CFLAGS_NPC_2 = $(addprefix -CFLAGS , $(CFLAGS_NPC))
 
 IMG ?= 
 
-$(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES)
+$(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES) $(CSRC_INCLUDE)
 	@echo "Verilator $(VSRC_FILES) > $(EMU_DIR)"
-	@verilator --cc -CFLAGS -g\
+	verilator --cc $(CFLAGS_NPC_2)\
 		-Mdir $(@D)\
 		--top-module $(EMU_TOP_MODULE)\
 		--prefix $(EMU_TARGET)\

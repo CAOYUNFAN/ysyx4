@@ -1,4 +1,4 @@
-#include "common.h"
+#include <common.h>
 #define MEM_SIZE (0x8000000)
 #define MEM_MASK (MEM_SIZE-1)
 #define MEM_MASK_H (MEM_MASK&(-1))

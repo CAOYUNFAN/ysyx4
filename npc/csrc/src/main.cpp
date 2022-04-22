@@ -1,5 +1,5 @@
 #include "emu.h"
-#include "common.h"
+#include <common.h>
 #include <getopt.h>
 using namespace std;
 
