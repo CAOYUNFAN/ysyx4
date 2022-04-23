@@ -1,6 +1,6 @@
 #include <common.h>
 #include <memory.h>
-#include <kernel.h>
+#include <regs.h>
 #include <getopt.h>
 
 int is_batch=0,is_difftest=0;
@@ -56,6 +56,8 @@ void cpu_init(){
 
 void initialize(int argc,char * argv[]){
   mycpu = new emu;
+  extern CPU_state cpu;
+  cpu.pc=0x80000000;
   parse_args(argc,argv);
   cpu_init();
 }

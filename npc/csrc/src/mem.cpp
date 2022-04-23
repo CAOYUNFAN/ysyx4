@@ -1,4 +1,5 @@
 #include <memory.h>
+#include <regs.h>
 
 static uLL mem[MEM_SIZE>>3];
 
