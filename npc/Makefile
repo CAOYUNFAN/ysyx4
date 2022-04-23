@@ -29,7 +29,7 @@ $(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES) $(CSRC_INCLUDE)
 
 sim: $(EMU_DIR)/$(EMU_TARGET)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	$< $(ARGS) $(IMG)
+	LD_PRELOAD+=libasan $< $(ARGS) $(IMG)
 
 sim_gdb: $(EMU_DIR)/$(EMU_TARGET)
 	$(call git_commit, "sim_gdb RTL")
