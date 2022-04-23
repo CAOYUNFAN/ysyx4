@@ -3,10 +3,10 @@
 using namespace std;
 
 int main(int argc,char * argv[]) {
-  printf("Hello, ysyx!\n");
+  Log("Hello, ysyx!\n");
   extern void initialize(int argc,char * argv[]);
   initialize(argc,argv);
-  printf("Initialization completed!\n");
+  Log("Initialization completed!\n");
   extern void work();
   work();
   return 0;
