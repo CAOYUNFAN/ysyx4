@@ -12,7 +12,7 @@ void mem_write(uLL addr,uLL data){
 }
 
 void default_img(){
-    Log("Nothing to load. Using the default img.\n");
+    Log("Nothing to load. Using the default img.");
     mem[0]=0x0002b82300000297LL;
     mem[1]=0x001000730102b503LL;
     return;
@@ -29,16 +29,16 @@ long mem_init(char * filename){
         default_img();
         return 16;
     }
-    Log("Openfile %s\n",filename);
+    Log("Openfile %s",filename);
     fseek(fp,0,SEEK_END);
     long size=ftell(fp);
-    Log("Imgfile is %s. size=%ld\n",filename,size);
+    Log("Imgfile is %s. size=%ld",filename,size);
     assert(size<=MEM_SIZE);
     fseek(fp,0,SEEK_SET);
     int ret=fread(mem,size,1,fp);
     assert(ret==1);
     fclose(fp);
-    Log("Img initialization completed!\n");
+    Log("Img initialization completed!");
     return size;
 }
 
