@@ -5,10 +5,10 @@
 
 void difftest_memcpy(paddr_t addr, void *buf, size_t n, bool direction) {
   if(direction==DIFFTEST_TO_DUT){
-    memcpy(buf,guest_to_host(RESET_VECTOR),n);
+    memcpy(buf,guest_to_host(addr),n);
   }else{
     Assert(direction==DIFFTEST_TO_REF,"Unexpected direction %d",direction);
-    memcpy(guest_to_host(RESET_VECTOR),buf,n);
+    memcpy(guest_to_host(addr),buf,n);
   }
   return;
 }

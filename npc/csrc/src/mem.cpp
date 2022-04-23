@@ -18,16 +18,16 @@ void default_img(){
     return;
 }
 
-void mem_init(char * filename){
+long mem_init(char * filename){
     assert(mem_start+MEM_SIZE==mem_end);
     if(filename==NULL){
         default_img();
-        return;
+        return 16;
     }
     FILE * fp=fopen(filename,"rb");
     if(fp==NULL){
         default_img();
-        return;
+        return 16;
     }
     printf("Openfile %s\n",filename);
     fseek(fp,0,SEEK_END);
@@ -39,4 +39,9 @@ void mem_init(char * filename){
     assert(ret==1);
     fclose(fp);
     printf("Img initialization completed!\n");
+    return size;
+}
+
+void * mem_addr(){
+    return (void *)mem;
 }

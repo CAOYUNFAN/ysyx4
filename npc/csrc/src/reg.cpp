@@ -14,3 +14,16 @@ void reg_display() {
 
     Cao_show_reg("pc",mycpu->pc); 
 }
+
+bool difftest_checkregs(CPU_state * ref,uLL pc){
+  extern CPU_state cpu;
+  for(int i=0;i<32;i++) if(cpu.gpr[i]!=ref->gpr[i]) return false;
+  return cpu.pc==ref->pc;
+}
+
+void force_update_regs(){
+  extern CPU_state cpu;
+  for(int i=0;i<32;i++) cpu.gpr[i]=mycpu->dbg_regs[i];
+  cpu.pc=mycpu->pc;
+  return;
+}

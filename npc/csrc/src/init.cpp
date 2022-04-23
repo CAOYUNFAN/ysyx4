@@ -3,15 +3,17 @@
 #include <kernel.h>
 #include <getopt.h>
 
-int is_batch=0;
+int is_batch=0,is_difftest=0;
 void sdb_set_batch_mode(){
   is_batch=1;
   return;
 }
 
 char * img_file=NULL, *log_file=NULL, * diff_so_file=NULL;
+static int size;
 emu * mycpu=NULL;
 int difftest_port=0;
+void init_difftest(char * ref_so_file, unsigned long img_size);
 void parse_args(int argc,char * argv[]){
   static const option table[] ={
     {"batch"    , no_argument      , NULL, 'b'},
@@ -25,8 +27,8 @@ void parse_args(int argc,char * argv[]){
     switch (o) {
       case 'b': sdb_set_batch_mode(); break;
       case 'l': log_file = optarg; break;
-      case 'd': diff_so_file = optarg; break;
-      case 1: mem_init(optarg);return;
+      case 'd': is_difftest=1;diff_so_file = optarg; break;
+      case 1: size=mem_init(optarg);return;
       default:
         printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
         printf("\t-b,--batch              run with batch mode\n");
@@ -36,7 +38,8 @@ void parse_args(int argc,char * argv[]){
         exit(0);
     }
   }
-  mem_init(NULL);
+  size=mem_init(NULL);
+  if(is_difftest) init_difftest(diff_so_file,size);
   return;
 }
 

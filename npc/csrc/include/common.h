@@ -9,9 +9,10 @@
 #define ASNI_FG_BLUE    "\33[1;34m"
 #define ASNI_FMT(str, fmt) fmt str ASNI_NONE
 
-#define Log(format, ...) \
-    _Log(ASNI_FMT("[%s:%d %s] " format, ASNI_FG_BLUE) "\n", \
-        __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+#define _Log(...) \
+  do { \
+    printf(__VA_ARGS__); \
+  } while (0)
 
 #define Log(format, ...) \
     _Log(ASNI_FMT("[%s:%d %s] " format, ASNI_FG_BLUE) "\n", \

@@ -1,6 +1,14 @@
 #include <common.h>
 #include <memory.h>
 #include <regs.h>
+uLL oldpc;
+void trace_and_difftest(){
+    extern int is_difftest;
+    if(is_difftest){
+        extern void difftest_step(uLL,uLL);
+        difftest_step(oldpc,mycpu->pc);
+    }
+}
 
 void cpu_exec_once(){
     RANGE(mycpu->pc,mem_start,mem_end);printf("%lx\n",mycpu->pc);
@@ -23,18 +31,21 @@ void cpu_exec_once(){
 void cpu_exec(uLL n){
     while (n--){
         if(mycpu->error||mycpu->done) return;
+        oldpc=mycpu->pc;
         cpu_exec_once();
- //       force_update_regs();
+        extern void force_update_regs();
+        force_update_regs();
+        trace_and_difftest();
     }
 }
 char line_read[1000];
 static char* rl_gets() {
-  printf("(npc) ");
-  int x=0;
-  line_read[0]=getchar();
-  while (line_read[x]!='\n') line_read[++x]=getchar();
-  line_read[x]=0;  
-  return line_read;
+    printf("(npc) ");
+    int x=0;
+    line_read[0]=getchar();
+    while (line_read[x]!='\n') line_read[++x]=getchar();
+    line_read[x]=0;  
+    return line_read;
 }
 
 static int cmd_c(char *args) {cpu_exec(-1uLL);return 0;}
@@ -92,7 +103,7 @@ static int cmd_si(char *args){
 
 static int cmd_info(char *args){
     reg_display();
-	return 0;
+	  return 0;
 }
 
 void work(){

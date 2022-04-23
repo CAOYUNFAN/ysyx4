@@ -5,8 +5,9 @@
 #define mem_end      (0x88000000uLL)
 #define MEM_SIZE (0x8000000)
 uLL mem_read(uLL addr);
-void mem_init(char * filename);
+long mem_init(char * filename);
 void mem_write(uLL addr,uLL data);
+void * mem_addr();
 
 #define INCLUDE_MEMORY
 #endif
