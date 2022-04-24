@@ -10,7 +10,7 @@ uLL mem_read(uLL addr){
 void mem_write(uLL addr,uLL data){
     RANGE(addr,mem_start,mem_end);
     #ifdef MTRACE
-    Log("Write to memory %llx:0x%llx=%lld",addr,data,data);
+    Log("Write to memory %llx:0x%llx=%lld",addr&(-8uLL),data,data);
     #endif
     mem[(addr-mem_start)>>3]=data;
 }
@@ -53,6 +53,6 @@ void * mem_addr(){
 extern "C" void pmem_read(LL raddr,LL *rdata){
     *rdata=mem_read(raddr);
     #ifdef MTRACE
-    if(mycpu->MemRd) Log("Read from memory %llx:0x%llx=%lld",raddr,*rdata,*rdata);
+    if(mycpu->MemRd) Log("Read from memory %llx:0x%llx=%lld",raddr&(-8uLL),*rdata,*rdata);
     #endif
 }
