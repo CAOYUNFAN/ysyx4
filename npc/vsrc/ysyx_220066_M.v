@@ -8,8 +8,4 @@ module ysyx_220066_M (
 
     assign m_out=MemToReg?data_read:ALUout;
 
-    always @(*) begin
-        $display("m_out=%h,ALUout=%h",m_out,ALUout);
-    end
-
 endmodule
