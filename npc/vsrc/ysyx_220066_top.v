@@ -81,6 +81,7 @@ module ysyx_220066_top(
       end
       default: wmask=8'hff;
     endcase
+    if(MemWr)$display("Write to:addr=%h,data=%x,help=%h,real=%h",addr,data_Wr,data_Wr_help,data_Wr_data);
   end
   assign data_Wr_data[ 7: 0]=wmask[0]?data_Wr[ 7: 0]:data_Wr_help[ 7: 0];
   assign data_Wr_data[15: 8]=wmask[1]?data_Wr[15: 8]:data_Wr_help[15: 8];

@@ -58,6 +58,5 @@ module ysyx_220066_cpu(
 
     always @(*) if(!rst) begin
         $display("clk=%b,pc=%h,instr=%h,MemToReg=%b,result=%h",clk,pc,instr,MemToReg,result);
-        //$display("rd=%h,data=%x,wen=%b",rd,result,RegWr);
     end
 endmodule
