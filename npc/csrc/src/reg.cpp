@@ -11,13 +11,15 @@ const char *regs[] = {
 
 void reg_display() {
     for(int i=0;i<32;i++) Cao_show_reg(regs[i],mycpu->dbg_regs[i]);
-
     Cao_show_reg("pc",mycpu->pc); 
 }
 
 bool difftest_checkregs(CPU_state * ref,uLL pc){
   extern CPU_state cpu;
-  for(int i=0;i<32;i++) if(cpu.gpr[i]!=ref->gpr[i]) return false;
+  for(int i=0;i<32;i++) if(cpu.gpr[i]!=ref->gpr[i]) {
+    Log("DIFFERENT! %s,ref=%lx",regs[i],ref[i]);
+    return false;
+  }
   return cpu.pc==ref->pc;
 }
 
