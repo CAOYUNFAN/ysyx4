@@ -66,7 +66,7 @@ module ysyx_220066_Decode (
     case(OP[6:2])//ExtOp:I=000,U=101,B=011,S=010,J=001
         5'b11100:begin ExtOp=3'b000;ALUBSrc=1;ALUctr=4'b0000;Branch=3'b000;err=0;end//ebreak
 
-        5'b01101:begin ExtOp=3'b101;ALUBSrc=2;ALUctr=4'b0011;Branch=3'b000;err=0; end//lui
+        5'b01101:begin ExtOp=3'b101;ALUBSrc=2;ALUctr=4'b1111;Branch=3'b000;err=0; end//lui
         5'b00101:begin ExtOp=3'b101;ALUBSrc=2;ALUctr=4'b0000;Branch=3'b000;err=0; end//auipc
         5'b11011:begin ExtOp=3'b001;ALUBSrc=1;ALUctr=4'b0000;Branch=3'b001;err=0; end//jal
         5'b11001:begin ExtOp=3'b000;ALUBSrc=1;ALUctr=4'b0000;Branch=3'b010; case(Funct3)

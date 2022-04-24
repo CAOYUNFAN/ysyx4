@@ -5,9 +5,9 @@ module ysyx_220066_ALU(
     output zero,
     output reg [63:0] result
     );
-    wire ALctr,SUBctr,SIGctr,Wctr,CF,SF,OF;
+    wire ALctr,SUBctr,Wctr,CF,SF,OF;
     wire [63:0] Add_result;
-    ysyx_220066_ALU_decode alu_decode(aluctr[4:3],aluctr[1],ALctr,SUBctr,SIGctr,Wctr);
+    ysyx_220066_ALU_decode alu_decode(aluctr[4:3],aluctr[1],ALctr,SUBctr,Wctr);
     wire [31:0] data_sll;
     assign data_sll=(data_input[31:0]<<datab_input[4:0]);
     wire [31:0] data_srl;
@@ -20,18 +20,14 @@ module ysyx_220066_ALU(
     case (aluctr[2:0])
         3'o0: result={Wctr?{32{Add_result[31]}}:Add_result[63:32],Add_result[31:0]};
         3'o1: result=Wctr?{{32{data_sll[31]}},data_sll}:data_input<<datab_input[5:0];
-        3'o2: begin
-                  result[0]=SIGctr?(CF)
-                                  :(OF^SF);
-                  result[63:1]={63{1'b0}};
-              end
-        3'o3: result=datab_input;
+        3'o2: result={{63{1'b0}},CF};
+        3'o3: result={{63{1'b0}},OF^SF};
         3'o4: result=data_input^datab_input;
         3'o5: result=~Wctr?
                     (ALctr?($signed(($signed(data_input))>>>datab_input[5:0])):data_input>>datab_input[5:0]):
                     (ALctr?{{32{data_sra[31]}},data_sra}:{{32{data_srl[31]}},data_srl});
         3'o6: result=data_input|datab_input;
-        3'o7: result=data_input&datab_input;
+        3'o7: result=({64{aluctr[3]}}|data_input)&datab_input;
     endcase
 
     always @(*) begin
@@ -63,10 +59,9 @@ endmodule
 module ysyx_220066_ALU_decode(
     input [4:3] ALUctr,
     input ALUctr_1,
-    output ALctr,SUBctr,SIGctr,Wctr
+    output ALctr,SUBctr,Wctr
     );
     assign SUBctr=ALUctr[3]|ALUctr_1;
     assign ALctr=ALUctr[3];
-    assign SIGctr=ALUctr[3];
     assign Wctr=ALUctr[4];
 endmodule
