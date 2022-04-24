@@ -20,6 +20,7 @@ void cpu_exec_once(){
         Assert(mycpu->addr>=mem_start&&mycpu->addr<mem_end,"Read Out of Bound on %p\n",(void *)mycpu->addr);
         mycpu->data_Rd_data=mem_read(mycpu->addr);
     }
+    if(mycpu->done) return;
     if(mycpu->MemWr&&!mycpu->error) {
         Assert(mycpu->addr>=mem_start&&mycpu->addr<mem_end,"Write Out of Bound on %p\n",(void *)mycpu->addr);
         mem_write(mycpu->addr,mycpu->data_Wr_data);
