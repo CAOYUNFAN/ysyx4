@@ -15,8 +15,13 @@ module ysyx_220066_top(
   wire [2:0] MemOp;
   reg [63:0] data_Rd;
   reg [7:0] b_Rd;reg [15:0] h_Rd;reg [31:0] w_Rd;
+  reg [2:0] addr_;
+  always @(negedge clk) begin
+    addr_=addr_[2:0];
+  end
+
   always @(*) begin
-    case(addr[2:0])
+    case(addr_[2:0])
       3'b000:begin b_Rd=data_Wr_data[ 7: 0]; h_Rd=data_Wr_data[15: 0]; w_Rd=data_Wr_data[31: 0];end
       3'b001:begin b_Rd=data_Wr_data[15: 8]; h_Rd=data_Wr_data[15: 0]; w_Rd=data_Wr_data[31: 0];end
       3'b010:begin b_Rd=data_Wr_data[23:16]; h_Rd=data_Wr_data[31:16]; w_Rd=data_Wr_data[31: 0];end
@@ -39,8 +44,8 @@ module ysyx_220066_top(
     endcase
   end
 
-  always @(*) begin
-    $display("addr=%h,addr_low=%b",addr,addr[2:0]);
+  always @(posedge clk) begin
+    $display("addr=%h,addr_low=%b",addr,addr_[2:0]);
   end
 
   wire [63:0] data_Wr_help;
@@ -50,28 +55,28 @@ module ysyx_220066_top(
   always @(*) begin
     case(MemOp)
       3'b000:begin
-        wmask[0]=(addr[2:0]==3'o0);
-        wmask[1]=(addr[2:0]==3'o1);
-        wmask[2]=(addr[2:0]==3'o2);
-        wmask[3]=(addr[2:0]==3'o3);
-        wmask[4]=(addr[2:0]==3'o4);
-        wmask[5]=(addr[2:0]==3'o5);
-        wmask[6]=(addr[2:0]==3'o6);
-        wmask[7]=(addr[2:0]==3'o7);
+        wmask[0]=(addr_[2:0]==3'o0);
+        wmask[1]=(addr_[2:0]==3'o1);
+        wmask[2]=(addr_[2:0]==3'o2);
+        wmask[3]=(addr_[2:0]==3'o3);
+        wmask[4]=(addr_[2:0]==3'o4);
+        wmask[5]=(addr_[2:0]==3'o5);
+        wmask[6]=(addr_[2:0]==3'o6);
+        wmask[7]=(addr_[2:0]==3'o7);
       end
       3'b001:begin
-        wmask[0]=(addr[2:1]==2'o0);
-        wmask[1]=(addr[2:1]==2'o0);
-        wmask[2]=(addr[2:1]==2'o1);
-        wmask[3]=(addr[2:1]==2'o1);
-        wmask[4]=(addr[2:1]==2'o2);
-        wmask[5]=(addr[2:1]==2'o2);
-        wmask[6]=(addr[2:1]==2'o3);
-        wmask[7]=(addr[2:1]==2'o3);
+        wmask[0]=(addr_[2:1]==2'o0);
+        wmask[1]=(addr_[2:1]==2'o0);
+        wmask[2]=(addr_[2:1]==2'o1);
+        wmask[3]=(addr_[2:1]==2'o1);
+        wmask[4]=(addr_[2:1]==2'o2);
+        wmask[5]=(addr_[2:1]==2'o2);
+        wmask[6]=(addr_[2:1]==2'o3);
+        wmask[7]=(addr_[2:1]==2'o3);
       end
       3'b010:begin
-        wmask[3:0]={4{addr[2]}};
-        wmask[7:4]={4{addr[2]}};
+        wmask[3:0]={4{addr_[2]}};
+        wmask[7:4]={4{addr_[2]}};
       end
       default: wmask=8'hff;
     endcase

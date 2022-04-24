@@ -6,7 +6,7 @@ module ysyx_220066_cpu(
     output error,MemWr,MemRd,done,
     output [2:0] MemOp,
     output [63:0] pc,
-    output reg [63:0] addr,
+    output [63:0] addr,
     output [63:0] data_Wr
 );
     wire [63:0] nxtpc;
@@ -54,9 +54,7 @@ module ysyx_220066_cpu(
         .MemToReg(MemToReg),.ALUout(alu_result),
         .data_read(data_Rd), .m_out(result)
     );
-    always @(negedge clk) begin
-        addr=alu_result;
-    end
+    assign addr=alu_result;
 
 /*    always @(*) if(!rst) begin
         $display("rd=%h,data=%x,wen=%b",rd,result,RegWr);
