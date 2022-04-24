@@ -53,9 +53,11 @@ module ysyx_220066_top(
 
   wire [63:0] data_Wr;
   reg [7:0] wmask;
+  reg [63:0] data_Wrr;
   always @(*) begin
     case(MemOp)
       3'b000:begin
+        data_Wrr={8{data_Wr[7:0]}};
         wmask[0]=(addr[2:0]==3'o0);
         wmask[1]=(addr[2:0]==3'o1);
         wmask[2]=(addr[2:0]==3'o2);
@@ -66,6 +68,7 @@ module ysyx_220066_top(
         wmask[7]=(addr[2:0]==3'o7);
       end
       3'b001:begin
+        data_Wrr={4{data_Wr[15:0]}};
         wmask[0]=(addr[2:1]==2'o0);
         wmask[1]=(addr[2:1]==2'o0);
         wmask[2]=(addr[2:1]==2'o1);
@@ -76,20 +79,24 @@ module ysyx_220066_top(
         wmask[7]=(addr[2:1]==2'o3);
       end
       3'b010:begin
+        data_Wrr={2{data_Wr[31:0]}};
         wmask[3:0]={4{~addr[2]}};
         wmask[7:4]={4{addr[2]}};
       end
-      default: wmask=8'hff;
+      default: begin
+        wmask=8'hff;
+        data_Wrr=data_Wr;
+      end
     endcase
   end
-  assign data_Wr_data[ 7: 0]=wmask[0]?data_Wr[ 7: 0]:data_Wr_help[ 7: 0];
-  assign data_Wr_data[15: 8]=wmask[1]?data_Wr[15: 8]:data_Wr_help[15: 8];
-  assign data_Wr_data[23:16]=wmask[2]?data_Wr[23:16]:data_Wr_help[23:16];
-  assign data_Wr_data[31:24]=wmask[3]?data_Wr[31:24]:data_Wr_help[31:24];
-  assign data_Wr_data[39:32]=wmask[4]?data_Wr[39:32]:data_Wr_help[39:32];
-  assign data_Wr_data[47:40]=wmask[5]?data_Wr[47:40]:data_Wr_help[47:40];
-  assign data_Wr_data[55:48]=wmask[6]?data_Wr[55:48]:data_Wr_help[55:48];
-  assign data_Wr_data[63:56]=wmask[7]?data_Wr[63:56]:data_Wr_help[63:56];
+  assign data_Wr_data[ 7: 0]=wmask[0]?data_Wrr[ 7: 0]:data_Wr_help[ 7: 0];
+  assign data_Wr_data[15: 8]=wmask[1]?data_Wrr[15: 8]:data_Wr_help[15: 8];
+  assign data_Wr_data[23:16]=wmask[2]?data_Wrr[23:16]:data_Wr_help[23:16];
+  assign data_Wr_data[31:24]=wmask[3]?data_Wrr[31:24]:data_Wr_help[31:24];
+  assign data_Wr_data[39:32]=wmask[4]?data_Wrr[39:32]:data_Wr_help[39:32];
+  assign data_Wr_data[47:40]=wmask[5]?data_Wrr[47:40]:data_Wr_help[47:40];
+  assign data_Wr_data[55:48]=wmask[6]?data_Wrr[55:48]:data_Wr_help[55:48];
+  assign data_Wr_data[63:56]=wmask[7]?data_Wrr[63:56]:data_Wr_help[63:56];
   ysyx_220066_cpu cpu(
     .clk(clk),.rst(rst),
     .pc(pc),.instr(instr),
