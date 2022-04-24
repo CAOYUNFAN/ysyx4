@@ -22,6 +22,7 @@ module ysyx_220066_top(
   reg [63:0] data_Rd_data;
   always @(*) begin
     pmem_read(addr,data_Rd_data);
+    $display("data=%h",data_Rd_data);
   end
 
   always @(*) begin
