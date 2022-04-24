@@ -26,8 +26,9 @@ void cpu_exec_once(){
         mem_write(mycpu->addr,mycpu->data_Wr_data);
     }
     mycpu->clk=0;
-    mycpu->eval();
     Log("One cycle-DOWN!");
+    mycpu->eval();
+    Log("One cycle-Completed!");
 }
 
 void cpu_exec(uLL n){
