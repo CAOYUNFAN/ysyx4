@@ -13,7 +13,7 @@ void trace_and_difftest(){
 #ifdef INSTR
 #define CC(...) Log(__VA_ARGS__)
 #else
-#define CC() (0)
+#define CC(...) (0)
 #endif 
 
 void cpu_exec_once(){
