@@ -15,6 +15,7 @@ void cpu_exec_once(){
     mycpu->instr_data=mem_read(mycpu->pc);
     mycpu->data_Wr_help=mem_read(mycpu->addr);
     mycpu->clk=1;
+    Log("One cycle-UP!");
     mycpu->eval();
     if(mycpu->MemRd&&!mycpu->error){
         Assert(mycpu->addr>=mem_start&&mycpu->addr<mem_end,"Read Out of Bound on %p\n",(void *)mycpu->addr);
@@ -26,6 +27,7 @@ void cpu_exec_once(){
     }
     mycpu->clk=0;
     mycpu->eval();
+    Log("One cycle-DOWN!");
 }
 
 void cpu_exec(uLL n){
