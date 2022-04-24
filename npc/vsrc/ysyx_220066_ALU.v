@@ -27,16 +27,16 @@ module ysyx_220066_ALU(
                                    :(OF^SF);
                   result[63:1]={63{1'b0}};
               end
-        3'o3: result=datab;
-        3'o4: result=data^datab;
+        3'o3: result=datab_input;
+        3'o4: result=data_input^datab_input;
         3'o5: result=ALctr?($signed(($signed(data_a))>>>datab[5:0])):data_a>>datab[5:0];
-        3'o6: result=data|datab;
-        3'o7: result=data&datab;
+        3'o6: result=data_input|datab_input;
+        3'o7: result=data_input&datab_input;
     endcase
 
-/*    always @(*) begin
-        $display("data_input=%x,datab_input=%x,result=%x,aluctr=%b",data_input,datab_input,Add_result,aluctr);
-    end*/
+    always @(*) begin
+        $display("data_input=%x,datab_input=%x,result=%x,aluctr=%b",data_input,datab_input,result,aluctr);
+    end
 
 endmodule
 
