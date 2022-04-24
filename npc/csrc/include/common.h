@@ -22,6 +22,8 @@
     do { \
         if (!(cond)) { \
             fflush(stdout), fprintf(stderr, ASNI_FMT("[%s:%d %s]" format, ASNI_FG_RED) "\n", __FILE__,__LINE__,__func__,##  __VA_ARGS__); \
+            extern void reg_display();\
+            void reg_display();\
             assert(cond); \
         } \
     } while (0)
