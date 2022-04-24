@@ -7,7 +7,7 @@ module ysyx_220066_ALU(
     );
     wire ALctr,SUBctr,SIGctr,Wctr,CF,SF,OF;
     wire [63:0] Add_result;
-    ysyx_220066_ALU_decode ysyx_220066_alu_decode(aluctr[4:3],ALctr,SUBctr,SIGctr,Wctr);
+    ysyx_220066_ALU_decode alu_decode(aluctr[4:3],ALctr,SUBctr,SIGctr,Wctr);
     wire [63:0] data;
     assign data[31:0]=data_input[31:0];
     assign data[63:32]=Wctr?{32{data_input[31]}}:data_input[63:32];
@@ -17,7 +17,7 @@ module ysyx_220066_ALU(
     wire [63:0] datab;
     assign datab[31:0]=datab_input[31:0];
     assign datab[63:32]=Wctr?{32{datab_input[31]}}:datab_input[63:32];
-    ysyx_220066_Adder ysyx_220066_adder(data,datab,SUBctr,Add_result,CF,zero,SF,OF);
+    ysyx_220066_Adder adder(data,datab,SUBctr,Add_result,CF,zero,SF,OF);
     always @(*)
     case (aluctr[2:0])
         3'o0: result=Add_result;
@@ -35,7 +35,7 @@ module ysyx_220066_ALU(
     endcase
 
     always @(*) begin
-        $display("data_input=%x,datab_input=%x,result=%x,aluctr=%b",data_input,datab_input,result,aluctr);
+        $display("data_input=%x,datab_input=%x,result=%x,aluctr=%b,zero=%b",data_input,datab_input,result,aluctr,zero);
     end
 
 endmodule
