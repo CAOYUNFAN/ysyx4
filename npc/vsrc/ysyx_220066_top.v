@@ -38,6 +38,7 @@ module ysyx_220066_top(
     endcase
   end
   always @(*) begin
+    $display("b=%h,h=%h,w=%h,q=%h",b_Rd,h_Rd,w_Rd,data_Rd_data);
     case(MemOp)
       3'b100: data_Rd={56'h0,b_Rd};
       3'b000: data_Rd={{56{b_Rd[7]}},b_Rd};
