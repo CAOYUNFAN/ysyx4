@@ -81,7 +81,6 @@ module ysyx_220066_top(
       end
       default: wmask=8'hff;
     endcase
-    if(MemWr)$display("Write to:addr=%h,data=%x,help=%h,real=%h",addr,data_Wr,data_Wr_help,data_Wr_data);
   end
   assign data_Wr_data[ 7: 0]=wmask[0]?data_Wr[ 7: 0]:data_Wr_help[ 7: 0];
   assign data_Wr_data[15: 8]=wmask[1]?data_Wr[15: 8]:data_Wr_help[15: 8];
@@ -102,5 +101,6 @@ module ysyx_220066_top(
   always @(*) begin
     for(i=1;i<32;i=i+1) dbg_regs[i]=cpu.module_regs.rf[i];
     dbg_regs[0]=0;
+    if(MemWr&&clk)$display("Write to:addr=%h,data=%x,help=%h,real=%h",addr,data_Wr,data_Wr_help,data_Wr_data);
   end
 endmodule
