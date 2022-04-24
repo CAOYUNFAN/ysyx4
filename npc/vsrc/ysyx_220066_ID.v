@@ -122,9 +122,9 @@ module ysyx_220066_Decode (
         default :begin ExtOp=3'b000;ALUBSrc=0;ALUctr=4'b0000;Branch=3'b000;err=1; end//ERROR
     endcase
 
-    always @(*) begin
-        $display("OP=%b,done=%b",OP,done);
-    end
+//    always @(*) begin
+//        $display("OP=%b,done=%b",OP,done);
+//    end
 
     assign error=err||!(OP[1:0]==2'b11);
 endmodule
