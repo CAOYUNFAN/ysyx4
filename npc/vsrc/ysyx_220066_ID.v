@@ -76,10 +76,10 @@ module ysyx_220066_Decode (
         5'b11000:begin ExtOp=3'b011;ALUBSrc=0;case(Funct3) 
             3'b000:begin                        ALUctr=4'b0010;Branch=3'b100;err=0; end//beq
             3'b001:begin                        ALUctr=4'b0010;Branch=3'b101;err=0; end//bne
-            3'b100:begin                        ALUctr=4'b0010;Branch=3'b110;err=0; end//blt
-            3'b101:begin                        ALUctr=4'b0010;Branch=3'b111;err=0; end//bge
-            3'b110:begin                        ALUctr=4'b1010;Branch=3'b110;err=0; end//bltu
-            3'b111:begin                        ALUctr=4'b1010;Branch=3'b111;err=0; end//bgeu
+            3'b100:begin                        ALUctr=4'b0011;Branch=3'b110;err=0; end//blt
+            3'b101:begin                        ALUctr=4'b0011;Branch=3'b111;err=0; end//bge
+            3'b110:begin                        ALUctr=4'b0010;Branch=3'b110;err=0; end//bltu
+            3'b111:begin                        ALUctr=4'b0010;Branch=3'b111;err=0; end//bgeu
            default:begin                        ALUctr=4'b0000;Branch=3'b000;err=1; end//ERROR
         endcase end
         5'b00000:begin ExtOp=3'b000;ALUBSrc=2;ALUctr=4'b0000;Branch=3'b000; case(Funct3) 
