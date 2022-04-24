@@ -30,9 +30,9 @@ void cpu_exec_once(){
 
 void cpu_exec(uLL n){
     while (n--){
-        if(mycpu->error||mycpu->done) return;
         oldpc=mycpu->pc;
         cpu_exec_once();
+        if(mycpu->error||mycpu->done) return;
         extern void force_update_regs();
         force_update_regs();
         trace_and_difftest();
