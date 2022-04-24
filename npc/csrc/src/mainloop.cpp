@@ -37,6 +37,7 @@ void cpu_exec(uLL n){
         force_update_regs();
         printf("1\n");
         trace_and_difftest();
+        printf("1\n");
     }
 }
 char line_read[1000];
