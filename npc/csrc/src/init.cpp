@@ -15,7 +15,6 @@ emu * mycpu=NULL;
 int difftest_port=0;
 void init_difftest(char * ref_so_file, unsigned long img_size);
 void parse_args(int argc,char * argv[]){
-  for(int i=0;i<argc;i++) printf("%s ",argv[i]);
   static const option table[] ={
     {"batch"    , no_argument      , NULL, 'b'},
     {"log"      , required_argument, NULL, 'l'},
