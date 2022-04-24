@@ -40,7 +40,7 @@ module ysyx_220066_top(
   end
 
   always @(*) begin
-    $display("addr=%lx,addr_low=%b",addr,addr[2:0]);
+    $display("addr=%h,addr_low=%b",addr,addr[2:0]);
   end
 
   wire [63:0] data_Wr_help;
