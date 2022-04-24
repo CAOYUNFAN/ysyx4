@@ -80,7 +80,6 @@ void difftest_skip_dut(int nr_ref, int nr_dut) {
 
 static void checkregs(CPU_state *ref, uLL pc) {
     if (!difftest_checkregs(ref, pc)) {
-        reg_display();
         panic("NOT the same!");
     }
 }
