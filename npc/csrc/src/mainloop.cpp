@@ -35,6 +35,7 @@ void cpu_exec(uLL n){
         cpu_exec_once();
         extern void force_update_regs();
         force_update_regs();
+        printf("1\n");
         trace_and_difftest();
     }
 }
