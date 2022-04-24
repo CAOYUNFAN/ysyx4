@@ -57,7 +57,7 @@ module ysyx_220066_cpu(
     assign addr=alu_result;
 
     always @(*) if(!rst) begin
-        $display("clk=%b,instr=%h",clk,instr);
+        $display("clk=%b,pc=%h,instr=%h",clk,pc,instr);
         //$display("rd=%h,data=%x,wen=%b",rd,result,RegWr);
     end
 endmodule
