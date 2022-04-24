@@ -20,8 +20,8 @@ module ysyx_220066_ALU(
     case (aluctr[2:0])
         3'o0: result={Wctr?{32{Add_result[31]}}:Add_result[63:32],Add_result[31:0]};
         3'o1: result=Wctr?{{32{data_sll[31]}},data_sll}:data_input<<datab_input[5:0];
-        3'o2: result={{63{1'b0}},CF};
-        3'o3: result={{63{1'b0}},OF^SF};
+        3'o2: result={{63{1'b0}},OF^SF};
+        3'o3: result={{63{1'b0}},CF};
         3'o4: result=data_input^datab_input;
         3'o5: result=~Wctr?
                     (ALctr?($signed(($signed(data_input))>>>datab_input[5:0])):data_input>>datab_input[5:0]):
