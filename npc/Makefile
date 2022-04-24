@@ -1,4 +1,4 @@
-.PHONY:sim clear sim_gdb
+.PHONY:sim clear sim_gdb find_display
 
 STUID := ysyx_220066_
 CSRC_DIR := $(NPC_HOME)/csrc/src/
@@ -37,5 +37,7 @@ sim_gdb: $(EMU_DIR)/$(EMU_TARGET)
 clear:
 	rm -rf $(EMU_DIR)
 
+find_display:
+	grep -nIR -n1 "display" vsrc/
 
 include ../Makefile
