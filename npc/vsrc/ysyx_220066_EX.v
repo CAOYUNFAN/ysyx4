@@ -21,7 +21,7 @@ module ysyx_220066_EX(
         .aluctr(ALUctr[4:0]),.zero(zero),.result(result_alu)
         );
     ysyx_220066_Multi multi(
-        .src1(src1),.src2(src2),.ALUctr(ALUctr[2:0]),.result(result_mul)
+        .src1(src1),.src2(src2),.ALUctr(ALUctr[2:0]),.is_w(ALUctr[4]),.result(result_mul)
     );
     ysyx_220066_nxtPC nxtPC(
         .nxtpc(nxtpc),.in_pc(in_pc),.BusA(src1),.Imm(imm),.Zero(zero),
