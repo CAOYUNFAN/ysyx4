@@ -13,15 +13,11 @@ void trace_and_difftest(){
 void cpu_exec_once(){
     RANGE(mycpu->pc,mem_start,mem_end);//printf("%lx\n",mycpu->pc);
     mycpu->instr_data=mem_read(mycpu->pc);
-    mycpu->data_Rd_data=mem_read(mycpu->addr);
+    mycpu->data_Wr_help=mem_read(mycpu->addr);
     mycpu->clk=1;
     mycpu->eval();
     if(mycpu->MemRd&&!mycpu->error){
         Assert(mycpu->addr>=mem_start&&mycpu->addr<mem_end,"Read Out of Bound on %p\n",(void *)mycpu->addr);
-        mycpu->data_Rd_data=mem_read(mycpu->addr);
-        #ifdef MTRACE
-        Log("Read from memory %lx:0x%lx=%ld",mycpu->addr,mycpu->data_Rd_data,mycpu->data_Rd_data);
-        #endif
     }
     if(mycpu->done) return;
     if(mycpu->MemWr&&!mycpu->error) {

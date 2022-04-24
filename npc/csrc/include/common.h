@@ -40,6 +40,7 @@ typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef unsigned long long uLL;
+typedef long long LL;
 using namespace std;
 extern char * log_file;
 

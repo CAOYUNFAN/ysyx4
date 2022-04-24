@@ -4,7 +4,7 @@ module ysyx_220066_top(
   input clk,rst,
   output [63:0] addr,
   output reg [63:0] data_Wr_data,
-  input [63:0] data_Rd_data,
+  input [63:0] data_Wr_help,
 
   output reg [63:0] dbg_regs [31:0],
 
@@ -15,21 +15,25 @@ module ysyx_220066_top(
   wire [2:0] MemOp;
   reg [63:0] data_Rd;
   reg [7:0] b_Rd;reg [15:0] h_Rd;reg [31:0] w_Rd;
-  reg [2:0] addr_;
-  always @(negedge clk) begin
-    addr_=addr[2:0];
+
+  import "DPI-C" function void pmem_read(
+  input longint raddr, output longint rdata);
+
+  reg [63:0] data_Rd_data;
+  always @(*) begin
+    pmem_read(addr,data_Rd_data);
   end
 
   always @(*) begin
-    case(addr_[2:0])
-      3'b000:begin b_Rd=data_Wr_data[ 7: 0]; h_Rd=data_Wr_data[15: 0]; w_Rd=data_Wr_data[31: 0];end
-      3'b001:begin b_Rd=data_Wr_data[15: 8]; h_Rd=data_Wr_data[15: 0]; w_Rd=data_Wr_data[31: 0];end
-      3'b010:begin b_Rd=data_Wr_data[23:16]; h_Rd=data_Wr_data[31:16]; w_Rd=data_Wr_data[31: 0];end
-      3'b011:begin b_Rd=data_Wr_data[31:24]; h_Rd=data_Wr_data[31:16]; w_Rd=data_Wr_data[31: 0];end
-      3'b100:begin b_Rd=data_Wr_data[39:32]; h_Rd=data_Wr_data[47:32]; w_Rd=data_Wr_data[63:32];end
-      3'b101:begin b_Rd=data_Wr_data[47:40]; h_Rd=data_Wr_data[47:32]; w_Rd=data_Wr_data[63:32];end
-      3'b110:begin b_Rd=data_Wr_data[55:48]; h_Rd=data_Wr_data[63:48]; w_Rd=data_Wr_data[63:32];end
-      3'b111:begin b_Rd=data_Wr_data[63:56]; h_Rd=data_Wr_data[63:48]; w_Rd=data_Wr_data[63:32];end
+    case(addr[2:0])
+      3'b000:begin b_Rd=data_Rd_data[ 7: 0]; h_Rd=data_Rd_data[15: 0]; w_Rd=data_Rd_data[31: 0];end
+      3'b001:begin b_Rd=data_Rd_data[15: 8]; h_Rd=data_Rd_data[15: 0]; w_Rd=data_Rd_data[31: 0];end
+      3'b010:begin b_Rd=data_Rd_data[23:16]; h_Rd=data_Rd_data[31:16]; w_Rd=data_Rd_data[31: 0];end
+      3'b011:begin b_Rd=data_Rd_data[31:24]; h_Rd=data_Rd_data[31:16]; w_Rd=data_Rd_data[31: 0];end
+      3'b100:begin b_Rd=data_Rd_data[39:32]; h_Rd=data_Rd_data[47:32]; w_Rd=data_Rd_data[63:32];end
+      3'b101:begin b_Rd=data_Rd_data[47:40]; h_Rd=data_Rd_data[47:32]; w_Rd=data_Rd_data[63:32];end
+      3'b110:begin b_Rd=data_Rd_data[55:48]; h_Rd=data_Rd_data[63:48]; w_Rd=data_Rd_data[63:32];end
+      3'b111:begin b_Rd=data_Rd_data[63:56]; h_Rd=data_Rd_data[63:48]; w_Rd=data_Rd_data[63:32];end
     endcase
   end
   always @(*) begin
@@ -45,11 +49,9 @@ module ysyx_220066_top(
   end
 
   always @(*) begin
-    $display("addr=%h,addr_low=%b",addr,addr_[2:0]);
+    $display("addr=%h,addr_low=%b",addr,addr[2:0]);
   end
 
-  wire [63:0] data_Wr_help;
-  assign data_Wr_help=data_Rd_data;
   wire [63:0] data_Wr;
   reg [7:0] wmask;
   always @(*) begin

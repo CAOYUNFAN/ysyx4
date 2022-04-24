@@ -1,4 +1,5 @@
 #include <memory.h>
+#include <kernel.h>
 
 static uLL mem[MEM_SIZE>>3];
 
@@ -47,4 +48,11 @@ long mem_init(char * filename){
 
 void * mem_addr(){
     return (void *)mem;
+}
+
+extern "C" void pmem_read(LL raddr,LL *rdata){
+    *rdata=mem_read(raddr);
+    #ifdef MTRACE
+    if(mycpu->MemRd) Log("Read from memory %llx:0x%llx=%lld",raddr,*rdata,*rdata);
+    #endif
 }
