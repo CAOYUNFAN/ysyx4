@@ -17,7 +17,7 @@ module ysyx_220066_top(
   reg [7:0] b_Rd;reg [15:0] h_Rd;reg [31:0] w_Rd;
   reg [2:0] addr_;
   always @(negedge clk) begin
-    addr_=addr_[2:0];
+    addr_=addr[2:0];
   end
 
   always @(*) begin
