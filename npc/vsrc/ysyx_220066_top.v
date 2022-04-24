@@ -16,6 +16,7 @@ module ysyx_220066_top(
   reg [63:0] data_Rd;
   reg [7:0] b_Rd;reg [15:0] h_Rd;reg [31:0] w_Rd;
   always @(*) begin
+    $display("ADDR=%b",addr[2:0]);
     case(addr[2:0])
       3'b000:begin b_Rd=data_Wr_data[ 7: 0]; h_Rd=data_Wr_data[15: 0]; w_Rd=data_Wr_data[31: 0];end
       3'b001:begin b_Rd=data_Wr_data[15: 8]; h_Rd=data_Wr_data[15: 0]; w_Rd=data_Wr_data[31: 0];end
