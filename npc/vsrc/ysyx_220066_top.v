@@ -47,11 +47,8 @@ module ysyx_220066_top(
       3'b010: data_Rd={{32{w_Rd[31]}},w_Rd};
       default:data_Rd=data_Rd_data;
     endcase
-    $display("b=%h,h=%h,w=%h,q=%h,final=%h",b_Rd,h_Rd,w_Rd,data_Rd_data,data_Rd);
-  end
-
-  always @(*) begin
-    $display("addr=%h,addr_low=%b",addr,addr[2:0]);
+//    $display("addr=%h,addr_low=%b",addr,addr[2:0]);
+//    $display("b=%h,h=%h,w=%h,q=%h,final=%h",b_Rd,h_Rd,w_Rd,data_Rd_data,data_Rd);
   end
 
   wire [63:0] data_Wr;
