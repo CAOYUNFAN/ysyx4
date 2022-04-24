@@ -55,7 +55,7 @@ module ysyx_220066_Adder(
         {Cout,result[63]}={1'b0,x[63]}+{1'b0,y_[63]}+{1'b0,Ctemp};
         SF=result[63];
         OF=Cout^Ctemp;
-        ZF=~|result;
+        ZF=(result==64'h0);
         CF=SUBctr^Cout;
     end
 endmodule
