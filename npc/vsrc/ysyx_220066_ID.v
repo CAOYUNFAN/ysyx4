@@ -55,16 +55,16 @@ module ysyx_220066_Decode (
     assign MemToReg=(OP[6:2]==5'b00000);
     assign MemWr=(OP[6:2]==5'b01000);
     assign MemRd=(OP[6:2]==5'b00000);
-    assign RegWr=(OP[6:2]!=5'b11000&&OP[6:2]!=5'b01000);
+    assign RegWr=(OP[6:2]!=5'b11000&&OP[6:2]!=5'b01000&&OP[6:2]!=5'b11100);
     assign ALUASrc=(OP[6:2]==5'b00101||OP[6:2]==5'b11011||OP[6:2]==5'b11001);
     reg [3:0] ALUctr;reg err;
     assign ALUctr_out[5]=(OP[6:2]==5'b01110)||(OP[6:2]==5'b01100&&Funct7[0]);
     assign ALUctr_out[4]=OP[3]&~OP[2];
     assign ALUctr_out[3:0]=ALUctr;
-    assign done=OP[6:2]==5'b11100;
+    assign done=(OP[6:2]==5'b11100);
     always @(*)//ALUctr
     case(OP[6:2])//ExtOp:I=000,U=101,B=011,S=010,J=001
-        5'b11100:begin ExtOp=3'b000;ALUBSrc=1;ALUctr=4'b0000;Branch=3'b001;err=0;end//ebreak
+        5'b11100:begin ExtOp=3'b000;ALUBSrc=1;ALUctr=4'b0000;Branch=3'b000;err=0;end//ebreak
 
         5'b01101:begin ExtOp=3'b101;ALUBSrc=2;ALUctr=4'b1111;Branch=3'b000;err=0; end//lui
         5'b00101:begin ExtOp=3'b101;ALUBSrc=2;ALUctr=4'b0000;Branch=3'b000;err=0; end//auipc
