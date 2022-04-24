@@ -76,7 +76,7 @@ module ysyx_220066_top(
         wmask[7]=(addr[2:1]==2'o3);
       end
       3'b010:begin
-        wmask[3:0]={4{addr[2]}};
+        wmask[3:0]={4{~addr[2]}};
         wmask[7:4]={4{addr[2]}};
       end
       default: wmask=8'hff;
