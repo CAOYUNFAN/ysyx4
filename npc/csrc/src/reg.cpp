@@ -17,7 +17,7 @@ void reg_display() {
 bool difftest_checkregs(CPU_state * ref,uLL pc){
   extern CPU_state cpu;
   for(int i=0;i<32;i++) if(cpu.gpr[i]!=ref->gpr[i]) {
-    Log("DIFFERENT! %s,ref=%lx",regs[i],ref[i]);
+    Log("DIFFERENT! %s,ref=%lx",regs[i],ref->gpr[i]);
     return false;
   }
   return cpu.pc==ref->pc;
