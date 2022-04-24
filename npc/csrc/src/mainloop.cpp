@@ -11,7 +11,7 @@ void trace_and_difftest(){
 }
 
 void cpu_exec_once(){
-    RANGE(mycpu->pc,mem_start,mem_end);printf("%lx\n",mycpu->pc);
+    RANGE(mycpu->pc,mem_start,mem_end);//printf("%lx\n",mycpu->pc);
     mycpu->instr_data=mem_read(mycpu->pc);
     mycpu->data_Rd_data=mem_read(mycpu->addr);
     mycpu->clk=1;
