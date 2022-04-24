@@ -27,7 +27,7 @@ void parse_args(int argc,char * argv[]){
     switch (o) {
       case 'b': sdb_set_batch_mode(); break;
       case 'l': log_file = optarg; break;
-      case 'd': is_difftest=1;diff_so_file = optarg; printf("AA!\n"); break;
+      case 'd': is_difftest=1;diff_so_file = optarg;; break;
       case 1: size=mem_init(optarg);return;
       default:
         printf("Usage: %s [OPTION...] IMAGE [args]\n\n", argv[0]);
@@ -38,7 +38,7 @@ void parse_args(int argc,char * argv[]){
         exit(0);
     }
   }
-  size=mem_init(NULL);
+  size=mem_init(NULL);printf("%d\n",is_difftest);
   if(is_difftest) init_difftest(diff_so_file,size);
   return;
 }
