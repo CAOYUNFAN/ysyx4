@@ -32,6 +32,7 @@ void cpu_exec(uLL n){
     while (n--){
         oldpc=mycpu->pc;
         cpu_exec_once();
+        printf("%lx\n",mycpu->pc);
         if(mycpu->error||mycpu->done) return;
         extern void force_update_regs();
         force_update_regs();
