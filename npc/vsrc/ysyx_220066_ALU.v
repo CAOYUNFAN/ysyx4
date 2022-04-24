@@ -21,8 +21,8 @@ module ysyx_220066_ALU(
         3'o0: result={Wctr?{32{Add_result[31]}}:Add_result[63:32],Add_result[31:0]};
         3'o1: result=Wctr?{{32{data_sll[31]}},data_sll}:data_input<<datab_input[5:0];
         3'o2: begin
-                  result[0]=~SIGctr?(CF)
-                                   :(OF^SF);
+                  result[0]=SIGctr?(CF)
+                                  :(OF^SF);
                   result[63:1]={63{1'b0}};
               end
         3'o3: result=datab_input;
