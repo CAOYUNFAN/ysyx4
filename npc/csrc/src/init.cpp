@@ -38,8 +38,7 @@ void parse_args(int argc,char * argv[]){
         exit(0);
     }
   }
-  size=mem_init(NULL);printf("%d\n",is_difftest);
-  if(is_difftest) init_difftest(diff_so_file,size);
+  size=mem_init(NULL);
   return;
 }
 
@@ -59,5 +58,6 @@ void initialize(int argc,char * argv[]){
   extern CPU_state cpu;
   cpu.pc=0x80000000;
   parse_args(argc,argv);
+  if(is_difftest) init_difftest(diff_so_file,size);
   cpu_init();
 }
