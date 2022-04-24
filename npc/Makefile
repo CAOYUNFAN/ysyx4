@@ -14,7 +14,6 @@ CFLAGS_NPC = -I$(CSRC_INCLUDE_DIR) -g
 CFLAGS_NPC_2 = $(addprefix -CFLAGS , $(CFLAGS_NPC))
 
 DIFF = --diff=$(NEMU_HOME)/build/riscv64-nemu-interpreter-so
-ARGS += $(DIFF)
 IMG ?= 
 
 $(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES) $(CSRC_INCLUDE)
@@ -29,7 +28,7 @@ $(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES) $(CSRC_INCLUDE)
 
 sim: $(EMU_DIR)/$(EMU_TARGET)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
-	$< $(ARGS) $(IMG)
+	$< $(ARGS) $(DIFF) $(IMG)
 
 sim_gdb: $(EMU_DIR)/$(EMU_TARGET)
 	$(call git_commit, "sim_gdb RTL")
