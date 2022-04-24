@@ -53,6 +53,6 @@ void * mem_addr(){
 extern "C" void pmem_read(LL raddr,LL *rdata){
     *rdata=mem_read(raddr);
     #ifdef MTRACE
-    if(mycpu->MemRd) Log("Read from memory %llx:0x%llx=%lld",raddr&(-8uLL),*rdata,*rdata);
+    if(mycpu->MemRd) Log("Read from memory %llx:0x%llx=%lld,realaddr=%d",raddr&(-8uLL),*rdata,*rdata,((raddr-mem_start)&(MEM_SIZE-1))>>3);
     #endif
 }
