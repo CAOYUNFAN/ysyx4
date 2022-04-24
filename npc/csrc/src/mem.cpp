@@ -8,6 +8,9 @@ uLL mem_read(uLL addr){
 
 void mem_write(uLL addr,uLL data){
     RANGE(addr,mem_start,mem_end);
+    #ifdef MTRACE
+    Log("Write to memory %llx:0x%llx=%lld",addr,data,data);
+    #endif
     mem[(addr-mem_start)>>3]=data;
 }
 
