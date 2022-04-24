@@ -101,6 +101,6 @@ module ysyx_220066_top(
   always @(*) begin
     for(i=1;i<32;i=i+1) dbg_regs[i]=cpu.module_regs.rf[i];
     dbg_regs[0]=0;
-    if(MemWr&&clk)$display("Write to:addr=%h,data=%x,help=%h,real=%h",addr,data_Wr,data_Wr_help,data_Wr_data);
+    if(MemWr&&clk)$display("Write to:addr=%h,data=%x,help=%h,real=%h,wmask=%b",addr,data_Wr,data_Wr_help,data_Wr_data,wmask);
   end
 endmodule
