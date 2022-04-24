@@ -10,11 +10,17 @@ void trace_and_difftest(){
     }
 }
 
+#ifdef INSTR
+#define CC(...) Log(__VA_ARGS__)
+#else
+#define CC() (0)
+#endif 
+
 void cpu_exec_once(){
     RANGE(mycpu->pc,mem_start,mem_end);//printf("%lx\n",mycpu->pc);
     mycpu->instr_data=mem_read(mycpu->pc);
     mycpu->clk=1;
-//    Log("One cycle-UP!");
+    CC("One cycle-UP!");
     mycpu->eval();
     if(mycpu->MemRd&&!mycpu->error){
         Assert(mycpu->addr>=mem_start&&mycpu->addr<mem_end,"Read Out of Bound on %p\n",(void *)mycpu->addr);
@@ -25,9 +31,9 @@ void cpu_exec_once(){
         mem_write(mycpu->addr,mycpu->data_Wr_data);
     }
     mycpu->clk=0;
-//    Log("One cycle-DOWN!");
+    CC("One cycle-DOWN!");
     mycpu->eval();
-//    Log("One cycle-Completed!");
+    CC("One cycle-Completed!");
 }
 
 void cpu_exec(uLL n){
