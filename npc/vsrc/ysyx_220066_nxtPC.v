@@ -30,7 +30,7 @@ module ysyx_220066_nxtPC(
     wire NxtASrc,NxtBSrc;
     yxys_220066_jmp_control jmp(Zero,Result_0,Branch,NxtASrc,NxtBSrc);
     assign nxtpc=(NxtASrc?BusA:in_pc)+(NxtBSrc?Imm:64'h4);
-    always @(*) begin
+/*    always @(*) begin
         $display("nxtPC:B=%b,Result_0=%b",NxtBSrc,Result_0);
-    end
+    end*/
 endmodule
