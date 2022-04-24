@@ -7,7 +7,7 @@ module ysyx_220066_ALU(
     );
     wire ALctr,SUBctr,SIGctr,Wctr,CF,SF,OF;
     wire [63:0] Add_result;
-    ysyx_220066_ALU_decode alu_decode(aluctr[4:2],ALctr,SUBctr,SIGctr,Wctr);
+    ysyx_220066_ALU_decode alu_decode(aluctr[4:3],aluctr[1],ALctr,SUBctr,SIGctr,Wctr);
     wire [63:0] data;
     assign data[31:0]=data_input[31:0];
     assign data[63:32]=Wctr?{32{data_input[31]}}:data_input[63:32];
@@ -61,10 +61,11 @@ module ysyx_220066_Adder(
 endmodule
 
 module ysyx_220066_ALU_decode(
-    input [4:2] ALUctr,
+    input [4:3] ALUctr,
+    input ALUctr_1,
     output ALctr,SUBctr,SIGctr,Wctr
     );
-    assign SUBctr=ALUctr[3]|ALUctr[2];
+    assign SUBctr=ALUctr[3]|ALUctr_1;
     assign ALctr=ALUctr[3];
     assign SIGctr=ALUctr[3];
     assign Wctr=ALUctr[4];
