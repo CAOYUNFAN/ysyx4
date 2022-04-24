@@ -20,7 +20,7 @@ void cpu_exec_once(){
         Assert(mycpu->addr>=mem_start&&mycpu->addr<mem_end,"Read Out of Bound on %p\n",(void *)mycpu->addr);
         mycpu->data_Rd_data=mem_read(mycpu->addr);
         #ifdef MTRACE
-        Log("Read from memory %llx:0x%llx=%lld",mycpu->addr,mycpu->data_Rd_data,mycpu->data_Rd_data);
+        Log("Read from memory %lx:0x%lx=%ld",mycpu->addr,mycpu->data_Rd_data,mycpu->data_Rd_data);
         #endif
     }
     if(mycpu->done) return;
