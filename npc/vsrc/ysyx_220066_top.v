@@ -4,10 +4,8 @@ module ysyx_220066_top(
   input clk,rst,
   output [63:0] addr,
   output reg [63:0] data_Wr_data,
-  input [63:0] data_Wr_help,
 
   output reg [63:0] dbg_regs [31:0],
-
   output MemWr,MemRd,error,done,status
 );
   wire [31:0] instr;
@@ -24,6 +22,8 @@ module ysyx_220066_top(
     pmem_read(addr,data_Rd_data);
 //    $display("data=%h",data_Rd_data);
   end
+  wire [63:0] data_Wr_help;
+  assign data_Wr_help=data_Rd_data;
 
   always @(*) begin
     case(addr[2:0])
