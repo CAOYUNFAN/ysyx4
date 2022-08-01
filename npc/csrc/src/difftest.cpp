@@ -1,6 +1,6 @@
 #include <common.h>
+#include <debug.h>
 #include <kernel.h>
-#include <regs.h>
 #include <memory.h>
 
 #include <dlfcn.h>

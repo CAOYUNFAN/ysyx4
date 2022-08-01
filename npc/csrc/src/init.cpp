@@ -1,6 +1,7 @@
 #include <common.h>
+#include <debug.h>
+#include <kernel.h>
 #include <memory.h>
-#include <regs.h>
 #include <getopt.h>
 
 int is_batch=0,is_difftest=0;
@@ -9,7 +10,13 @@ void sdb_set_batch_mode(){
   return;
 }
 
-char * img_file=NULL, *log_file=NULL, * diff_so_file=NULL;
+char * img_file=NULL, * diff_so_file=NULL;
+FILE * Log_file =NULL;
+void init_log(char * log_file){
+  Log_file=fopen(log_file,"w");
+  if(!Log_file) Log("Cannot open/create file %s as log. No log file.",log_file);
+}
+
 static int size;
 emu * mycpu=NULL;
 int difftest_port=0;
@@ -26,7 +33,7 @@ void parse_args(int argc,char * argv[]){
   while ( (o = getopt_long(argc, argv, "-bhl:d:", table, NULL)) != -1) {
     switch (o) {
       case 'b': sdb_set_batch_mode(); break;
-      case 'l': log_file = optarg; break;
+      case 'l': init_log(optarg); break;
       case 'd': is_difftest=1;diff_so_file = optarg;; break;
       case 1: size=mem_init(optarg);return;
       default:

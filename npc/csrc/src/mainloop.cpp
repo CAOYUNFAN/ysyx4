@@ -1,6 +1,7 @@
 #include <common.h>
+#include <debug.h>
 #include <memory.h>
-#include <regs.h>
+#include <kernel.h>
 uLL oldpc;
 void trace_and_difftest(){
     extern int is_difftest;

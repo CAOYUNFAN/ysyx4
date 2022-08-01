@@ -1,6 +1,5 @@
 #include <common.h>
-#include <memory.h>
-using namespace std;
+#include <debug.h>
 
 int main(int argc,char * argv[]) {
   Log("Hello, ysyx!");
