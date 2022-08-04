@@ -19,18 +19,11 @@ void trace_and_difftest(){
 
 void cpu_exec_once(){
     RANGE(mycpu->pc,mem_start,mem_end);//printf("%lx\n",mycpu->pc);
-    mycpu->instr_data=mem_read(mycpu->pc);
+    mycpu->instr_data=pmem_read(mycpu->pc);
     mycpu->clk=1;
     CC("One cycle-UP!");
     mycpu->eval();
-    if(mycpu->MemRd&&!mycpu->error){
-        Assert(mycpu->addr>=mem_start&&mycpu->addr<mem_end,"Read Out of Bound on %p\n",(void *)mycpu->addr);
-    }
     if(mycpu->done) return;
-    if(mycpu->MemWr&&!mycpu->error) {
-        Assert(mycpu->addr>=mem_start&&mycpu->addr<mem_end,"Write Out of Bound on %p\n",(void *)mycpu->addr);
-        mem_write(mycpu->addr,mycpu->data_Wr_data);
-    }
     mycpu->clk=0;
     CC("One cycle-DOWN!");
     mycpu->eval();

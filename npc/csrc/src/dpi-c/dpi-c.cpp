@@ -1,6 +1,5 @@
 #include <common.h>
 #include <debug.h>
-#include <memory.h>
 #include <device.h>
 
 extern "C" void assert_check_msg(bool cond,char * msg,...){
@@ -13,23 +12,28 @@ extern "C" void assert_check_msg(bool cond,char * msg,...){
     }
 }
 
-extern "C" void pmem_read(LL raddr,LL *rdata){
-    
-    *rdata=mem_read(raddr);
-    #ifdef MTRACE
-    if(mycpu->MemRd) Log("Read from memory %llx:0x%llx=%lld,realaddr=%lld,%lld",raddr&(-8uLL),*rdata,*rdata,((raddr-mem_start)&(MEM_SIZE-1))>>3,mem[39]);
-    #endif
+extern "C" void data_read(uLL raddr,uLL *rdata){
+    for(int i=0;i<3;i++) 
+    if(raddr>=device_table[i].start&&raddr<device_table[i].end){
+        Assert(device_table[i].input,"Regs %s is unreadable! 0x%llx cannot be read.",device_table[i].name,raddr);
+        *rdata=device_table[i].input(raddr);
+        #ifdef MTRACE
+        Log("Read from memory %llx:0x%llx=%lld,realaddr=%lld,%lld",raddr&(-8uLL),*rdata,*rdata,((raddr-mem_start)&(MEM_SIZE-1))>>3,mem[39]);
+        #endif
+        return;
+    }
+    panic("Unexpected addr %llx",raddr);
 }
-/*extern "C" void pmem_write(long long waddr, long long wdata, char wmask) {
-    RANGE(waddr,mem_start,mem_end);
+
+extern "C" void data_write(uLL waddr, uLL wdata, u8 wmask) {
     #ifdef MTRACE
     Log("Write to memory %llx:0x%llx=%lld",addr&(-8uLL),data,data);
     #endif
-    LL addr=(waddr-mem_start)>>3;
-    for(int i=0,j=0;i<8;i++,j+=8)
-    if(wmask&(1<<i)){
-        uLL temp=(wdata&((1LL<<8)-1))<<j;
-        wdata>>=8;
-        mem[addr]=(mem[addr]&((1uLL<<j)-1))|temp|(mem[addr]&(-(1uLL<<(j+1))));
+    for(int i=0;i<3;i++) 
+    if(waddr>=device_table[i].start&&waddr<device_table[i].end){
+        Assert(device_table[i].output,"Regs %s is unreadable! 0x%llx cannot be read.",device_table[i].name,waddr);
+        device_table[i].output(waddr,wdata,wmask);
+        return;
     }
-}*/
+    panic("Unexpected addr %llx",waddr);
+}

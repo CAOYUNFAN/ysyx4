@@ -5,15 +5,12 @@
 
 static uLL mem[MEM_SIZE>>3];
 
-uLL mem_read(uLL addr){
+uLL pmem_read(uLL addr){
     return mem[((addr-mem_start)&(MEM_SIZE-1))>>3];
 }
 
-void mem_write(uLL addr,uLL data,u8 mask){
+void pmem_write(uLL addr,uLL data,u8 mask){
     RANGE(addr,mem_start,mem_end);
-    #ifdef MTRACE
-    Log("Write to memory %llx:0x%llx=%lld",addr&(-8uLL),data,data);
-    #endif
     uLL &pos=mem[(addr-mem_start)>>3];
     for(u64 now=0xff;mask;mask>>=1,now<<=8) if(mask&1){
         pos=(pos&~mask)|(data&0xff);

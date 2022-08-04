@@ -3,27 +3,31 @@ module ysyx_220066_top(
   input [63:0] instr_data,
   input clk,rst,
   output [63:0] addr,
-  output reg [63:0] data_Wr_data,
+  //output reg [63:0] data_Wr_data,
 
   output reg [63:0] dbg_regs [31:0],
-  output MemWr,MemRd,error,done,status
+  output error,done,status
 );
+  wire MemWr,MemRd;
   wire [31:0] instr;
   assign instr=pc[2]?instr_data[63:32]:instr_data[31:0];
   wire [2:0] MemOp;
   reg [63:0] data_Rd;
   reg [7:0] b_Rd;reg [15:0] h_Rd;reg [31:0] w_Rd;
 
-  import "DPI-C" function void pmem_read(
-  input longint raddr, output longint rdata);
+  import "DPI-C" function void data_read(
+    input longint raddr, output longint rdata
+  );
 
   reg [63:0] data_Rd_data;
   always @(*) begin
-    pmem_read(addr,data_Rd_data);
+    if(MemRd) data_read(addr,data_Rd_data);
+    else data_Rd_data=64'b0;
 //    $display("data=%h",data_Rd_data);
   end
-  wire [63:0] data_Wr_help;
-  assign data_Wr_help=data_Rd_data;
+
+//  wire [63:0] data_Wr_help;
+//  assign data_Wr_help=data_Rd_data;
 
   always @(*) begin
     case(addr[2:0])
@@ -89,7 +93,16 @@ module ysyx_220066_top(
       end
     endcase
   end
-  assign data_Wr_data[ 7: 0]=wmask[0]?data_Wrr[ 7: 0]:data_Wr_help[ 7: 0];
+
+  import "DPI-C" function void data_write(
+    input longint waddr, output longint data, output byte mask
+  );
+
+  always @(posedge clk) begin
+    if(MemWr) data_write(addr,data_Wr,wmask);
+  end
+
+/*  assign data_Wr_data[ 7: 0]=wmask[0]?data_Wrr[ 7: 0]:data_Wr_help[ 7: 0];
   assign data_Wr_data[15: 8]=wmask[1]?data_Wrr[15: 8]:data_Wr_help[15: 8];
   assign data_Wr_data[23:16]=wmask[2]?data_Wrr[23:16]:data_Wr_help[23:16];
   assign data_Wr_data[31:24]=wmask[3]?data_Wrr[31:24]:data_Wr_help[31:24];
@@ -97,6 +110,7 @@ module ysyx_220066_top(
   assign data_Wr_data[47:40]=wmask[5]?data_Wrr[47:40]:data_Wr_help[47:40];
   assign data_Wr_data[55:48]=wmask[6]?data_Wrr[55:48]:data_Wr_help[55:48];
   assign data_Wr_data[63:56]=wmask[7]?data_Wrr[63:56]:data_Wr_help[63:56];
+*/
   ysyx_220066_cpu cpu(
     .clk(clk),.rst(rst),
     .pc(pc),.instr(instr),

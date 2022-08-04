@@ -3,6 +3,8 @@
 #define ASNI_FG_BLUE    "\33[1;34m"
 #define ASNI_FMT(str, fmt) fmt str ASNI_NONE
 
+extern void reg_display();
+
 #define _Log(...) \
     fprintf(stderr, __VA_ARGS__); 
 
@@ -31,7 +33,6 @@
             _Log2("[%s:%d %s]" format "\n", \
                 __FILE__, __LINE__, __func__, ## __VA_ARGS__);\
             \
-            extern void reg_display();\
             reg_display();\
             assert(cond); \
         } \
