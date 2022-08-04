@@ -21,7 +21,7 @@ module ysyx_220066_top(
 
   reg [63:0] data_Rd_data;
   always @(*) begin
-    if(MemRd) data_read(addr,data_Rd_data);
+    if(!rst&MemRd) data_read(addr,data_Rd_data);
     else data_Rd_data=64'b0;
 //    $display("data=%h",data_Rd_data);
   end
@@ -99,7 +99,7 @@ module ysyx_220066_top(
   );
 
   always @(posedge clk) begin
-    if(MemWr) data_write(addr,data_Wr,wmask);
+    if(!rst&MemWr) data_write(addr,data_Wr,wmask);
   end
 
 /*  assign data_Wr_data[ 7: 0]=wmask[0]?data_Wrr[ 7: 0]:data_Wr_help[ 7: 0];
