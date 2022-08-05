@@ -99,7 +99,7 @@ module ysyx_220066_top(
     input longint waddr, output longint data, output byte mask
   );
 
-  always @(posedge clk) begin
+  always @(negedge clk) begin
     if(!rst&MemWr) data_write(addr,data_Wr,wmask);
   end
 
