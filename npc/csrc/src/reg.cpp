@@ -17,7 +17,6 @@ extern FILE * Log_file;
     printf("%8s 0x%016lx %ld\n",name,data,data);\
     if(Log_file){\
       fprintf(Log_file,"%8s 0x%016lx %ld\n",name,data,data);\
-      fflush(Log_file);\      
     }\
   }while(0)
   
