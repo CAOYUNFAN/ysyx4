@@ -21,7 +21,7 @@ module ysyx_220066_top(
 
   reg [63:0] data_Rd_data;
   always @(*) begin
-    data_read(addr,{7'b0,MemRd},data_Rd_data);
+    data_read(addr,{7'b0,MemRd&!rst},data_Rd_data);
   end
 
 //  wire [63:0] data_Wr_help;
