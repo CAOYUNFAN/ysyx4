@@ -112,7 +112,7 @@ module ysyx_220066_top(
   );
 
   import "DPI-C" function void data_write(
-    input longint waddr, output longint data, output byte mask
+    input longint waddr, input longint data, input byte mask
   );
 
   always @(negedge clk) begin
