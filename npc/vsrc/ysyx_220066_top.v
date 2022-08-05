@@ -21,8 +21,8 @@ module ysyx_220066_top(
 
   reg [63:0] data_Rd_data;
   always @(*) begin
-    if(!rst&MemRd) data_read(addr,data_Rd_data);
-    else data_Rd_data=64'b0;
+    if(!rst&&MemRd) data_read(addr,data_Rd_data);
+    else data_Rd_data=64'h11451411;
 //    $display("data=%h",data_Rd_data);
   end
 
