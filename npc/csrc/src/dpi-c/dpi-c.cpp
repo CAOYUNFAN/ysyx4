@@ -8,7 +8,7 @@ extern "C" void assert_check_msg(bool cond,char * msg,...){
         va_start(ap,msg);
         vprintf(msg,ap);
         va_end(ap);
-        assert(0);
+        assert(0); 
     }
 }
 
@@ -18,7 +18,7 @@ extern "C" void data_read(uLL raddr,uLL *rdata){
         Assert(device_table[i].input,"Regs %s is unreadable! 0x%llx cannot be read.",device_table[i].name,raddr);
         *rdata=device_table[i].input(raddr);
         #ifdef MTRACE
-        Log("Read from memory %llx:0x%llx=%lld,realaddr=%lld,%lld",raddr&(-8uLL),*rdata,*rdata,((raddr-mem_start)&(MEM_SIZE-1))>>3,mem[39]);
+        Log("Read from memory %llx : 0x%llx == %lld",raddr,*rdata,*rdata);
         #endif
         return;
     }
@@ -27,7 +27,7 @@ extern "C" void data_read(uLL raddr,uLL *rdata){
 
 extern "C" void data_write(uLL waddr, uLL wdata, u8 wmask) {
     #ifdef MTRACE
-    Log("Write to memory %llx:0x%llx=%lld",addr&(-8uLL),data,data);
+    Log("Write to memory %llx:0x%llx=%lld,wmask=%x",waddr,wdata,wdata,wmask);
     #endif
     for(int i=0;i<3;i++) 
     if(waddr>=device_table[i].start&&waddr<device_table[i].end){
