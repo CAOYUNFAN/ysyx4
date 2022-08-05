@@ -94,14 +94,6 @@ module ysyx_220066_top(
     endcase
   end
 
-  import "DPI-C" function void data_write(
-    input longint waddr, output longint data, output byte mask
-  );
-
-  always @(negedge clk) begin
-    $display("pc=%h,addr=%h,MemOp=%h,wmask=%h",pc,addr,MemOp,wmask);
-    if(!rst&MemWr) data_write(addr,data_Wr,wmask);
-  end
 
 /*  assign data_Wr_data[ 7: 0]=wmask[0]?data_Wrr[ 7: 0]:data_Wr_help[ 7: 0];
   assign data_Wr_data[15: 8]=wmask[1]?data_Wrr[15: 8]:data_Wr_help[15: 8];
@@ -118,6 +110,16 @@ module ysyx_220066_top(
     .addr(addr),.MemOp(MemOp),.MemRd(MemRd),
     .data_Rd(data_Rd),.data_Wr(data_Wr),.MemWr(MemWr),.error(error),.done(done)
   );
+
+  import "DPI-C" function void data_write(
+    input longint waddr, output longint data, output byte mask
+  );
+
+  always @(negedge clk) begin
+    if(!rst&&MemWr)$display("pc=%h,addr=%h,MemOp=%h,wmask=%h",pc,addr,MemOp,wmask);
+    if(!rst&&MemWr) data_write(addr,data_Wr,wmask);
+  end
+  
   assign status=cpu.module_regs.rf[10][0];
   integer i;
   always @(*) begin
