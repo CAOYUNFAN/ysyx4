@@ -16,14 +16,12 @@ module ysyx_220066_top(
   reg [7:0] b_Rd;reg [15:0] h_Rd;reg [31:0] w_Rd;
 
   import "DPI-C" function void data_read(
-    input longint raddr, output longint rdata
+    input longint raddr,input byte memrd, output longint rdata
   );
 
   reg [63:0] data_Rd_data;
   always @(*) begin
-    if(!rst&&MemRd) data_read(addr,data_Rd_data);
-    else data_Rd_data=64'h11451411;
-//    $display("data=%h",data_Rd_data);
+    data_read(addr,{7'b0,MemRd},data_Rd_data);
   end
 
 //  wire [63:0] data_Wr_help;
