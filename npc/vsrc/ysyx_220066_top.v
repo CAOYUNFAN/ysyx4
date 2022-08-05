@@ -92,6 +92,7 @@ module ysyx_220066_top(
         data_Wrr=data_Wr;
       end
     endcase
+    if(clk&&!rst&&MemWr) $display("pc=%h,addr=%h,MemOp=%h,wmask=%h",pc,addr,MemOp,wmask);
   end
 
   import "DPI-C" function void data_write(
