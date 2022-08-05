@@ -36,7 +36,6 @@ long mem_init(char * filename){
         default_img();
         return 16;
     }
-    Log("Openfile %s",filename);
     fseek(fp,0,SEEK_END);
     long size=ftell(fp);
     Log("Imgfile is %s. size=%ld",filename,size);
