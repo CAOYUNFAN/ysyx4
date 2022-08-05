@@ -18,7 +18,7 @@ extern "C" void data_read(uLL raddr,uLL *rdata){
         Assert(device_table[i].input,"Regs %s is unreadable! 0x%llx cannot be read.",device_table[i].name,raddr);
         *rdata=device_table[i].input(raddr);
         #ifdef MTRACE
-        Log("Read from memory %llx : 0x%llx == %lld",raddr,*rdata,*rdata);
+        //Log("Read from memory %llx : 0x%llx == %lld",raddr,*rdata,*rdata);
         #endif
         return;
     }

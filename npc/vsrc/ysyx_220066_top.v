@@ -116,10 +116,10 @@ module ysyx_220066_top(
   );
 
   always @(negedge clk) begin
-    if(!rst&&MemWr)$display("pc=%h,addr=%h,MemOp=%h,wmask=%h",pc,addr,MemOp,wmask);
+    if(!rst&&MemWr)$display("pc=%h,addr=%h,MemOp=%h,wmask=%h,data=%h",pc,addr,MemOp,wmask,data_Wr);
     if(!rst&&MemWr) data_write(addr,data_Wr,wmask);
   end
-  
+
   assign status=cpu.module_regs.rf[10][0];
   integer i;
   always @(*) begin
