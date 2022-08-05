@@ -33,7 +33,7 @@ long mem_init(char * filename){
     }
     FILE * fp=fopen(filename,"rb");
     if(fp==NULL){
-        default_img();
+        default_img(); 
         return 16;
     }
     fseek(fp,0,SEEK_END);
