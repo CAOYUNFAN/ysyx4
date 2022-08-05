@@ -15,7 +15,7 @@ CFLAGS_NPC_2 = $(addprefix -CFLAGS , $(CFLAGS_NPC))
 
 DIFF = --diff=$(NEMU_HOME)/build/riscv64-nemu-interpreter-so
 IMG ?= 
-ARGS ?= -l $(NPC_HOME)/emu/log.txt
+ARGS ?= --log=$(NPC_HOME)/emu/log.txt
 
 $(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES) $(CSRC_INCLUDE)
 	@echo "Verilator VSRC_FILES > EMU_DIR"
