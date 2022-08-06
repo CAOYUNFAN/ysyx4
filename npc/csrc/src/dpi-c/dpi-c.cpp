@@ -12,7 +12,7 @@ extern "C" void assert_check_msg(bool cond,char * msg,...){
     }
 }
 
-extern "C" void data_read(uLL raddr,u8 memread,uLL *rdata){ 
+extern "C" void data_read(uLL raddr,u8 memread,uLL *rdata){
     if(!memread) return;
     for(int i=0;i<3;i++) 
     if(raddr>=device_table[i].start&&raddr<device_table[i].end){
