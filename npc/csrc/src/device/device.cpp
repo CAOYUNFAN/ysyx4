@@ -9,6 +9,7 @@
 #define RTC_ADDR        (DEVICE_BASE + 0x0000048)
 
 uLL boottime=0;
+extern void difftest_skip_ref();
 
 uLL inner_gettime(){
     timespec time;
@@ -17,10 +18,12 @@ uLL inner_gettime(){
 }
 
 uLL timer (uLL addr){
+    difftest_skip_ref();
     return inner_gettime()-boottime;
 }
 
 void kputc(uLL addr,uLL data,u8 mask){
+    difftest_skip_ref();
     Assert(mask==0x1,"Unexpected mask %x",mask);
     putchar(data);
 }

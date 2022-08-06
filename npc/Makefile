@@ -13,7 +13,7 @@ EMU_TARGET := emu
 CFLAGS_NPC = -I$(CSRC_INCLUDE_DIR) -g #-DMTRACE #-DINSTR #
 CFLAGS_NPC_2 = $(addprefix -CFLAGS , $(CFLAGS_NPC))
 
-DIFF = #--diff=$(NEMU_HOME)/build/riscv64-nemu-interpreter-so
+DIFF = --diff=$(NEMU_HOME)/build/riscv64-nemu-interpreter-so
 IMG ?= 
 ARGS ?= --log=$(NPC_HOME)/emu/log.txt
 
