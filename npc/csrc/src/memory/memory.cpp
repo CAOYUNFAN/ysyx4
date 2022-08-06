@@ -13,12 +13,10 @@ uLL pmem_read(uLL addr){
 void pmem_write(uLL addr,uLL data,u8 mask){
     RANGE(addr,mem_start,mem_end);
     uLL &pos=mem[(addr-mem_start)>>3];
-    for(u64 now=0xff;mask;mask>>=1,now<<=8) if(mask&1){
-        pos=(pos&~now)|(data&0xff);
+    for(u64 now=0xff,id=0;mask;mask>>=1,now<<=8,id+=8) if(mask&1){
+        pos=(pos&~now)|((data&0xff)<<id);
         data>>=8;
-        Log("pos=%llx,data=%llx,now=%llx,~now=%llx,mask=%x",pos,data,now,~now,mask);
     }
-    Log("Later:%llx,%llx",addr,pos);
 }
 
 void default_img(){
