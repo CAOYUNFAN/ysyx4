@@ -10,5 +10,6 @@ int main(int argc,char * argv[]) {
   extern void device_init();
   device_init();
   work();
+  Log("Exit normally!");
   return 0;
 }
