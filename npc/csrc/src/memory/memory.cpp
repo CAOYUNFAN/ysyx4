@@ -6,6 +6,7 @@
 static uLL mem[MEM_SIZE>>3];
 
 uLL pmem_read(uLL addr){
+    RANGE(addr,mem_start,mem_end);
     return mem[(addr-mem_start)>>3];
 }
 
@@ -16,6 +17,7 @@ void pmem_write(uLL addr,uLL data,u8 mask){
         pos=(pos&~mask)|(data&0xff);
         data>>=8;
     }
+    Log("Later:%llx,%llx",addr,pos);
 }
 
 void default_img(){
