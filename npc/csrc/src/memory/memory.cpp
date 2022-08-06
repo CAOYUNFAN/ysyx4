@@ -16,7 +16,7 @@ void pmem_write(uLL addr,uLL data,u8 mask){
     for(u64 now=0xff;mask;mask>>=1,now<<=8) if(mask&1){
         pos=(pos&~now)|(data&0xff);
         data>>=8;
-        Log("pos=%llx,data=%llx,now=%llx,mask=%x",pos,data,now,mask);
+        Log("pos=%llx,data=%llx,now=%llx,~now=%x,mask=%x",pos,data,now,~now,mask);
     }
     Log("Later:%llx,%llx",addr,pos);
 }
