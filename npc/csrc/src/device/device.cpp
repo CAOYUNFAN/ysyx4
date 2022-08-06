@@ -21,7 +21,7 @@ uLL timer (uLL addr){
 }
 
 void kputc(uLL addr,uLL data,u8 mask){
-    Assert(mask==0x0,"Unexpected mask %x",mask);
+    Assert(mask==0x1,"Unexpected mask %x",mask);
     putchar(data);
 }
 
