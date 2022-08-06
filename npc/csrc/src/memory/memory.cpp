@@ -6,7 +6,7 @@
 static uLL mem[MEM_SIZE>>3];
 
 uLL pmem_read(uLL addr){
-    return mem[((addr-mem_start)&(MEM_SIZE-1))>>3];
+    return mem[(addr-mem_start)>>3];
 }
 
 void pmem_write(uLL addr,uLL data,u8 mask){
