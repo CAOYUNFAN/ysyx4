@@ -112,8 +112,8 @@ module ysyx_220066_Decode (
         5'b01100:begin //add..
             ExtOp=3'b000;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
             ALUctr[3]=Funct7[5];
-            $display("Funct7=%h",Funct7);
             err=(Funct7!=7'b0000000&&Funct7!=7'b0100000&&Funct7!=7'b0000001);
+            $display("Funct7=%h,err=%h",Funct7,err);
         end
         5'b01110:begin //addw..
             ExtOp=3'b000;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
