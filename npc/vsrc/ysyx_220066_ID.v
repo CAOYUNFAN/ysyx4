@@ -30,9 +30,9 @@ module ysyx_220066_ID (
         .instr(instr[31:7]),.ExtOp(ExtOp),.imm(imm)
     );
 
-/*    always @(*) begin
-        $display("Instr=%h,imm=%h",instr,imm);
-    end*/
+    always @(*) begin
+        $display("Instr=%h,error=%h",instr,error);
+    end
 
 endmodule
 
@@ -125,7 +125,7 @@ module ysyx_220066_Decode (
     assign error=err||!(OP[1:0]==2'b11);
 
     always @(*) begin
-        $display("Funct7=%h,err=%h,error=%h",Funct7,err,error);
+//        $display("Funct7=%h,err=%h,error=%h",Funct7,err,error);
 //        $display("OP=%b,done=%b",OP,done);
     end
 
