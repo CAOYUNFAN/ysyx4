@@ -52,7 +52,10 @@ void cpu_exec(uLL n){
         oldpc=mycpu->pc;
         cpu_exec_once();
         //printf("%lx %d\n",mycpu->pc,mycpu->done);
-        if(mycpu->error||mycpu->done) return;
+        if(mycpu->error||mycpu->done) {
+          statistics();
+          return;
+        }
         extern void force_update_regs();
         force_update_regs();
         trace_and_difftest();
