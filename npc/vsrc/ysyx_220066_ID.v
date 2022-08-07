@@ -113,7 +113,6 @@ module ysyx_220066_Decode (
             ExtOp=3'b000;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
             ALUctr[3]=Funct7[5];
             err=(Funct7!=7'b0000000&&Funct7!=7'b0100000&&Funct7!=7'b0000001);
-            $display("Funct7=%h,err=%h",Funct7,err);
         end
         5'b01110:begin //addw..
             ExtOp=3'b000;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
@@ -123,11 +122,13 @@ module ysyx_220066_Decode (
         default :begin ExtOp=3'b000;ALUBSrc=0;ALUctr=4'b0000;Branch=3'b000;err=1; end//ERROR
     endcase
 
-//    always @(*) begin
-//        $display("OP=%b,done=%b",OP,done);
-//    end
-
     assign error=err||!(OP[1:0]==2'b11);
+
+    always @(*) begin
+        $display("Funct7=%h,err=%h,error=%h",Funct7,err,error);
+//        $display("OP=%b,done=%b",OP,done);
+    end
+
 endmodule
 
 module ysyx_220066_IMM (
