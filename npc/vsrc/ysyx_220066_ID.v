@@ -31,7 +31,7 @@ module ysyx_220066_ID (
     );
 
     always @(*) begin
-        $display("Instr=%h,error=%h",instr,error);
+//        $display("Instr=%h,error=%h",instr,error);
     end
 
 endmodule
@@ -102,7 +102,7 @@ module ysyx_220066_Decode (
         5'b00100:begin //addi.. 
             ExtOp=3'b000;ALUBSrc=2;ALUctr[2:0]=Funct3;Branch=3'b000;
             ALUctr[3]=Funct7[5]&&(Funct3==3'b101);
-            err=(Funct3==3'b001&&Funct7[6:1]!=6'b000000)||(Funct3==3'b101&&(Funct7[6:1]!=6'b000000||Funct7[6:1]!=6'b010000)); 
+            err=(Funct3==3'b001&&Funct7[6:1]!=6'b000000)||(Funct3==3'b101&&(Funct7[6:1]!=6'b000000&&Funct7[6:1]!=6'b010000)); 
         end
         5'b00110:begin //addiw..
             ExtOp=3'b000;ALUBSrc=2;ALUctr[2:0]=Funct3;Branch=3'b000;
@@ -125,7 +125,7 @@ module ysyx_220066_Decode (
     assign error=err||!(OP[1:0]==2'b11);
 
     always @(*) begin
-        $display("Funct7=%h,err=%h,error=%h",Funct7,err,error);
+//        $display("Funct7=%h,err=%h,error=%h",Funct7,err,error);
 //        $display("OP=%b,done=%b",OP,done);
     end
 
