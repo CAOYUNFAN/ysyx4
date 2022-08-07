@@ -34,6 +34,8 @@ extern int exit_code;
 void statistics(){
   if(mycpu->error) {
     Log("Error has happened. NPC aborted.");
+    extern void reg_dispaly();
+    reg_display();
     exit_code=1;
   }
   else{
