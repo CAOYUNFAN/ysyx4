@@ -30,7 +30,24 @@ void cpu_exec_once(){
     CC("One cycle-Completed!");
 }
 
+extern int exit_code;
+void statistics(){
+  if(mycpu->error) {
+    Log("Error has happened. NPC aborted.");
+    exit_code=1;
+  }
+  else{
+    if(mycpu->dbg_regs[10]) Log("Npc hit bad trap.");
+    else Log("Npc hit good trap.");
+    exit_code=mycpu->dbg_regs[10];
+  }
+}
+
 void cpu_exec(uLL n){
+    if(mycpu->error||mycpu->done){
+      Log("Simulation has ended. Please restart the system mannually");
+      return;
+    }
     while (n--){
         oldpc=mycpu->pc;
         cpu_exec_once();
