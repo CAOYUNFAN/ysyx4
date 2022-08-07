@@ -19,6 +19,7 @@ uLL inner_gettime(){
 
 uLL timer (uLL addr){
     difftest_skip_ref();
+    Log("timer!");
     return inner_gettime()-boottime;
 }
 
