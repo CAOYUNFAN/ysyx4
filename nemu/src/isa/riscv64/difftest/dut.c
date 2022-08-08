@@ -23,18 +23,6 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   CHECK(mcause)
   CHECK(mtvec)
   
-  if(cpu.mepc!=ref_r->mepc) {
-    Log("Difftest: different on mepc,ref=%lx",ref_r->mepc);
-    return false;
-  }
-  if(cpu.mstatus!=ref_r->mepc) {
-    Log("Difftest: different on mepc,ref=%lx",ref_r->mepc);
-    return false;
-  }
-  if(cpu.mepc!=ref_r->mepc) {
-    Log("Difftest: different on mepc,ref=%lx",ref_r->mepc);
-    return false;
-  }
   return true;
 }
 
