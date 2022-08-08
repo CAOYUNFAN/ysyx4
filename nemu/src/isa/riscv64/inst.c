@@ -47,7 +47,7 @@ static void decode_operand(Decode *s, word_t *dest, word_t *src1, word_t *src2, 
 static int now=0;
 #endif
 
-word_t * getcsr(uint32_t csr){
+static inline word_t * getcsr(uint32_t csr){
   switch (csr) {
     case 0x341: return &cpu.mepc;
     case 0x300: return &cpu.mstatus;
@@ -64,6 +64,11 @@ word_t * getcsr(uint32_t csr){
 
 #define csr *getcsr(BITS(s->isa.inst.val,31,20))
 #define zimm ((uint64_t)((uint32_t)BITS(s->isa.inst.val,19,15)))
+
+static inline word_t mret(){
+  cpu.mstatus=(cpu.mstatus&~(word_t)((1<<3)|(1<<7)))|((word_t)(1<<7))|((cpu.mstatus>>7&1)<<3);
+  return cpu.mepc;
+}
 
 static int decode_exec(Decode *s) {
   word_t dest = 0, src1 = 0, src2 = 0;
@@ -147,6 +152,7 @@ static int decode_exec(Decode *s) {
 
   INSTPAT("0000000 00001 00000 000 00000 11100 11", ebreak  ,N  , NEMUTRAP(s->pc, R(10))); // R(10) is $a0
   INSTPAT("0000000 00000 00000 000 00000 11100 11", ecall   ,N  , s->dnpc=isa_raise_intr(11,s->pc));
+  INSTPAT("0011000 00010 00000 000 00000 11100 11", mret    ,N  , mret());
   INSTPAT("??????? ????? ????? 001 ????? 11100 11", csrrw   ,I  , R(dest)=csr , csr = src1);
   INSTPAT("??????? ????? ????? 010 ????? 11100 11", csrrs   ,I  , R(dest)=csr , csr|= src1);
   INSTPAT("??????? ????? ????? 011 ????? 11100 11", csrrc   ,I  , R(dest)=csr , csr&=~src1);
