@@ -66,7 +66,7 @@ static inline word_t * getcsr(uint32_t csr){
 #define zimm ((uint64_t)((uint32_t)BITS(s->isa.inst.val,19,15)))
 
 static inline word_t mret(){
-  Log("mret:mstatus=%lx",cpu.mstatus);
+//  Log("mret:mstatus=%lx",cpu.mstatus);
   cpu.mstatus=(cpu.mstatus&~(word_t)((1<<3)|(1<<7)))|((word_t)(1<<7))|((cpu.mstatus>>7&1)<<3);
   return cpu.mepc;
 }
