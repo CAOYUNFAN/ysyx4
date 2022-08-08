@@ -9,11 +9,18 @@ const char *regs[] = {
 };
 
 #define Cao_show_reg(name,data) printf("%8s 0x%016lx %ld\n",name,data,data)
+#define Cao_show_2(name) Cao_show_reg(str(name),cpu.name)
 
 void isa_reg_display() {
 	for(int i=0;i<32;++i) 
 	Cao_show_reg(regs[i],gpr(i));
 	Cao_show_reg("pc",cpu.pc);
+
+	Cao_show_2(mepc);
+	Cao_show_2(mstatus);
+	Cao_show_2(mcause);
+	Cao_show_2(mtvec);
+
 /*	Cao_show_reg("mcause",sr(0x342));
 	Cao_show_reg("mstatus",sr(0x300));
 	Cao_show_reg("mie",sr(0x304));
