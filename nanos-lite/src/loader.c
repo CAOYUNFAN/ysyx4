@@ -37,12 +37,12 @@ int check_elf(const Elf_Ehdr * ehdr){
   }
   if(e_ident[EI_DATA]!=ELFDATA2LSB){
     unsigned char t=e_ident[EI_VERSION];
-    return t==ELFDATANONE||t==ELFDATA2MSB?2:1;
+    return t==ELFDATANONE||t==ELFDATA2MSB?3:1;
   }
-  if(e_ident[EI_VERSION]!=EV_CURRENT) return e_ident[EI_VERSION]==EV_NONE?2:1;
+  if(e_ident[EI_VERSION]!=EV_CURRENT) return e_ident[EI_VERSION]==EV_NONE?4:1;
   for(int i=EI_PAD;i<EI_NIDENT;i++) if(e_ident[i]!=0) return 1;
   
-  if(ehdr->e_type!=EXPECT_TYPE) return 2;
+  if(ehdr->e_type!=EXPECT_TYPE) return 5;
   return 0;
 }
 
