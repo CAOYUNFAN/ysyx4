@@ -63,7 +63,6 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     Elf_Phdr phdr;
     ramdisk_read(&phdr,addr,sizeof(Elf_Phdr));
     if(phdr.p_type==PT_LOAD){
-      Log("%lx,%lx",phdr.p_offset,phdr.p_filesz);
       ramdisk_read((void *)phdr.p_vaddr,phdr.p_offset,phdr.p_filesz);
       memset((void *)(phdr.p_vaddr+phdr.p_filesz),0,phdr.p_memsz-phdr.p_filesz);
     }
