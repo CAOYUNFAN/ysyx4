@@ -42,7 +42,8 @@ int check_elf(const Elf_Ehdr * ehdr){
   if(e_ident[EI_VERSION]!=EV_CURRENT) return e_ident[EI_VERSION]==EV_NONE?4:1;
   for(int i=EI_PAD;i<EI_NIDENT;i++) if(e_ident[i]!=0) return 1;
   
-  if(ehdr->e_type!=EXPECT_TYPE) return 5;
+  if(ehdr->e_type!=ET_EXEC) return 5;
+  if(ehdr->e_machine!=EXPECT_TYPE) return 6;
   return 0;
 }
 
