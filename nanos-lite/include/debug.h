@@ -25,6 +25,14 @@
     } \
   } while (0)
 
+#define Assert(cond,fmt,...) \
+  do{ \
+    if(!(cond)) {\
+      Log("\33[1;31m Assertion failed! " fmt, ## __VA_ARGS__);\
+      halt(1);\
+    } \
+  } while (0)
+
 #define TODO() panic("please implement me")
 
 #endif
