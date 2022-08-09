@@ -59,7 +59,7 @@ static uintptr_t loader(PCB *pcb, const char *filename) {
     ramdisk_read(&shdr,ehdr.e_shoff,sizeof(Elf_Shdr));
     total=shdr.sh_info;
   }
-  for(uintptr_t addr=ehdr.e_phoff;total;addr+=ehdr.e_phentsize) {
+  for(uintptr_t addr=ehdr.e_phoff;total;addr+=ehdr.e_phentsize,total--) {
     Elf_Phdr phdr;
     ramdisk_read(&phdr,addr,sizeof(Elf_Phdr));
     if(phdr.p_type==PT_LOAD){
