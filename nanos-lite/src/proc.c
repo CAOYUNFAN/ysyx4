@@ -21,11 +21,11 @@ void hello_fun(void *arg) {
 
 void init_proc() {
   switch_boot_pcb();
-
   Log("Initializing processes...");
 
   // load program here
-
+  extern void naive_uload(PCB *pcb, const char *filename);
+  naive_uload(NULL,NULL);
 }
 
 Context* schedule(Context *prev) {
