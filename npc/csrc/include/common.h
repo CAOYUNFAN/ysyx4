@@ -16,5 +16,5 @@ extern char * log_file;
 
 #define _contact(x,y) x ## y
 #define contact(x,y) _contact(x,y)
-#define _str(x) ##x
+#define _str(x) #x
 #define str(x) _str(x)

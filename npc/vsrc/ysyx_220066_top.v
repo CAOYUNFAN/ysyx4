@@ -2,14 +2,20 @@ module ysyx_220066_top(
   output [63:0] pc,
   input [63:0] instr_data,
   input clk,rst,
-  output [63:0] addr,
+  //output [63:0] addr,
   //output reg [63:0] data_Wr_data,
 
   output reg [63:0] dbg_regs [31:0],
+  output reg [63:0] mepc,
+  output reg [63:0] mstatus,
+  output reg [63:0] mcause,
+  output reg [63:0] mtvec,
+
   output error,done,status
 );
   wire MemWr,MemRd;
   wire [31:0] instr;
+  wire [63:0] addr;
   assign instr=pc[2]?instr_data[63:32]:instr_data[31:0];
   wire [2:0] MemOp;
   reg [63:0] data_Rd;
@@ -124,5 +130,9 @@ module ysyx_220066_top(
     for(i=1;i<32;i=i+1) dbg_regs[i]=cpu.module_regs.rf[i];
     dbg_regs[0]=0;
 //    if(MemWr&&clk)$display("Write to:addr=%h,data=%x,help=%h,real=%h,wmask=%b",addr,data_Wr,data_Wr_help,data_Wr_data,wmask);
+    mepc=cpu.csr.mepc;
+    mstatus=cpu.csr.mstatus;
+    mcause=cpu.csr.mcause;
+    mtvec=cpu.csr.mtvec;
   end
 endmodule

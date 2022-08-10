@@ -25,15 +25,9 @@ void reg_display() {
     Cao_show_reg("pc",mycpu->pc); 
 }
 
-#define CHECK(name) \
-if(cpu.name !=ref_r->name ){\
-  Log("Difftest: different on " str(name) ",ref=%lx",ref_r->name);\
-  return false;\
-}
-
 bool difftest_checkregs(CPU_state * ref,uLL pc){
 
-  for(int i=0;i<32;i++) if(mycpu->gpr[i]!=ref->gpr[i]) {
+  for(int i=0;i<32;i++) if(mycpu->dbg_regs[i]!=ref->gpr[i]) {
     Log("DIFFERENT on %s, ref=%llx",regs[i],ref->gpr[i]);
     return false;
   }

@@ -58,8 +58,6 @@ void cpu_exec(uLL n){
           statistics();
           return;
         }
-        extern void force_update_regs();
-        force_update_regs();
         trace_and_difftest();
     }
 }

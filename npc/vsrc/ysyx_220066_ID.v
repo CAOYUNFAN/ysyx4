@@ -11,6 +11,8 @@ module ysyx_220066_ID (
     output MemWr,MemRd,
     output MemToReg,
     output RegWr,
+    output csr,ecall,mret,
+    output [11:0] csr_addr,
     output [2:0] MemOp,
     output error,done
 );
@@ -19,11 +21,18 @@ module ysyx_220066_ID (
     assign rs2=instr[24:20];
     assign rd=instr[11:7];
     wire [2:0] ExtOp;
+    assign done=(instr==32'h0010_0073);
+    wire err_temp;
+    assign ecall=(instr==32'h0000_0073);
+    assign mret=(instr==32'h3020_0073);
+    assign csr_addr=instr[31:20];
+
+    assign error=err_temp||(csr&&instr[14:12]==3'b000&&(instr==32'h0010_0073||instr==32'h0000_0073||instr==32'h3020_0073));
 
     ysyx_220066_Decode decode(
         .OP(instr[6:0]),.Funct3(instr[14:12]),.Funct7(instr[31:25]),
         .ExtOp(ExtOp),.RegWr(RegWr),.ALUASrc(ALUASrc),.ALUBSrc(ALUBSrc),.ALUctr_out(ALUctr),.MemRd(MemRd),
-        .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg),.error(error),.done(done)
+        .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg),.csr(csr),.error(err_temp)
     );
 
     ysyx_220066_IMM ysyx_220066_imm(
@@ -46,32 +55,41 @@ module ysyx_220066_Decode (
     output ALUASrc,
     output [5:0] ALUctr_out,
     output reg [2:0] Branch,
-    output MemWr,done,MemRd,
+    output MemWr,MemRd,
     output MemToReg,
     output [2:0] MemOp,
+    output csr,
     output error
 );
     assign MemOp=Funct3;
     assign MemToReg=(OP[6:2]==5'b00000);
     assign MemWr=(OP[6:2]==5'b01000);
     assign MemRd=(OP[6:2]==5'b00000);
-    assign RegWr=(OP[6:2]!=5'b11000&&OP[6:2]!=5'b01000&&OP[6:2]!=5'b11100);
+    assign RegWr=(OP[6:2]!=5'b11000&&OP[6:2]!=5'b01000);
     assign ALUASrc=(OP[6:2]==5'b00101||OP[6:2]==5'b11011||OP[6:2]==5'b11001);
     reg [3:0] ALUctr;reg err;
     assign ALUctr_out[5]=((OP[6:2]==5'b01110||OP[6:2]==5'b01100)&&Funct7[0]);
     assign ALUctr_out[4]=OP[3]&~OP[2];
     assign ALUctr_out[3:0]=ALUctr;
-    assign done=(OP[6:2]==5'b11100);
+    assign csr=(OP[6:2]==5'b11100);
     always @(*)//ALUctr
     case(OP[6:2])//ExtOp:I=000,U=101,B=011,S=010,J=001
-        5'b11100:begin ExtOp=3'b000;ALUBSrc=1;ALUctr=4'b0000;Branch=3'b000;err=0;end//ebreak
-
+        5'b11100:begin ExtOp=3'b000;ALUBSrc=1;ALUctr=4'b1111;Branch=3'b000; case(Funct3)
+            3'b000,//ecall,ebreak,mret
+            3'b001,//csrrw
+            3'b101,//csrrwi
+            3'b010,//csrrs
+            3'b110,//csrrsi
+            3'b011,//csrrc
+            3'b111: begin                                                  err=0; end//csrrci
+           default: begin                                                  err=1; end 
+        endcase end//csr
         5'b01101:begin ExtOp=3'b101;ALUBSrc=2;ALUctr=4'b1111;Branch=3'b000;err=0; end//lui
         5'b00101:begin ExtOp=3'b101;ALUBSrc=2;ALUctr=4'b0000;Branch=3'b000;err=0; end//auipc
         5'b11011:begin ExtOp=3'b001;ALUBSrc=1;ALUctr=4'b0000;Branch=3'b001;err=0; end//jal
         5'b11001:begin ExtOp=3'b000;ALUBSrc=1;ALUctr=4'b0000;Branch=3'b010; case(Funct3)
-            3'b000:begin                                                err=0; end//jalr
-           default:begin                                                err=1; end//ERROR
+            3'b000:begin                                                   err=0; end//jalr
+           default:begin                                                   err=1; end//ERROR
         endcase end
         5'b11000:begin ExtOp=3'b011;ALUBSrc=0;case(Funct3) 
             3'b000:begin                        ALUctr=4'b0010;Branch=3'b100;err=0; end//beq

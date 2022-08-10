@@ -62,8 +62,6 @@ void cpu_init(){
 
 void initialize(int argc,char * argv[]){
   mycpu = new emu;
-  extern CPU_state cpu;
-  cpu.pc=0x80000000;
   parse_args(argc,argv);
   if(is_difftest) init_difftest(diff_so_file,size);
   cpu_init();
