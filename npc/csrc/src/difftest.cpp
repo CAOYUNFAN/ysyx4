@@ -15,7 +15,7 @@ void (*ref_difftest_raise_intr)(uint64_t NO) = NULL;
 extern int is_difftest;
 
 void init_difftest(char * ref_so_file, unsigned long img_size){
-    assert(ref_so_file != NULL);Log("%s",ref_so_file);
+    assert(ref_so_file != NULL);
 
     void *handle;
     handle = dlopen(ref_so_file, RTLD_LAZY | RTLD_DEEPBIND );
