@@ -23,7 +23,7 @@ static debug_module_config_t difftest_dm_config = {
   .support_impebreak = true
 };
 
-#define MAP_CSR(f)
+#define MAP_CSR(f)\
   f(mepc) f(mstatus) f(mcause) f(mtvec)
 
 struct diff_context_t {
