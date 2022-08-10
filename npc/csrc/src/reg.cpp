@@ -32,18 +32,33 @@ if(cpu.name !=ref_r->name ){\
 }
 
 bool difftest_checkregs(CPU_state * ref,uLL pc){
-  extern CPU_state cpu;
-  for(int i=0;i<32;i++) if(cpu.gpr[i]!=ref->gpr[i]) {
-    Log("DIFFERENT! %s,ref=%llx",regs[i],ref->gpr[i]);
+
+  for(int i=0;i<32;i++) if(mycpu->gpr[i]!=ref->gpr[i]) {
+    Log("DIFFERENT on %s, ref=%llx",regs[i],ref->gpr[i]);
     return false;
   }
-  if(pc)
-  return cpu.pc==ref->pc;
+  if(pc!=ref->pc) {
+    Log("DIFFERENT on pc, ref=%llx",ref->pc);
+    return false;
+  }
+  #define CHECK(name) \
+  if(mycpu-> name !=ref-> name ){\
+    Log("DIFFERENT on " str(name) ", ref=%llx",ref-> name);\
+    return false;\
+  }
+
+  CSR_MAP(CHECK)
+
+  return true;
 }
 
-void force_update_regs(){
-  extern CPU_state cpu;
+CPU_state * current_cpu(){
+  static CPU_state cpu;
   for(int i=0;i<32;i++) cpu.gpr[i]=mycpu->dbg_regs[i];
   cpu.pc=mycpu->pc;
-  return;
+
+  #define SET_REGS(name) cpu. name = mycpu -> name ;
+  CSR_MAP(SET_REGS)
+
+  return &cpu;
 }

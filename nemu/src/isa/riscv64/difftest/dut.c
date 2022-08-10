@@ -18,10 +18,7 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
     return false;
   }
   
-  CHECK(mepc)
-  CHECK(mstatus)
-  CHECK(mcause)
-  CHECK(mtvec)
+  MAP_ALLCSR(CHECK)
   
   return true;
 }

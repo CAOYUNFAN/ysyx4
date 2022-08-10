@@ -3,10 +3,17 @@
 
 #include <common.h>
 
+#define MAP_ALLCSR(f) \
+  f(mepc) f(mstatus) f(mcause) f(mtvec)
+
 typedef struct {
   word_t gpr[32];
   vaddr_t pc;
-  word_t mepc,mstatus,mcause,mtvec;
+  
+  #define def_csr(name) word_t name ;
+
+  MAP_ALLCSR(def_csr)
+
 } riscv64_CPU_state;
 
 // decode

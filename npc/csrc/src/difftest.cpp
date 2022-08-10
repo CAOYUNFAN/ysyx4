@@ -13,7 +13,6 @@ void (*ref_difftest_raise_intr)(uint64_t NO) = NULL;
 #define RESET_VECTOR 0x80000000
 
 extern int is_difftest;
-CPU_state cpu;
 
 void init_difftest(char * ref_so_file, unsigned long img_size){
     assert(ref_so_file != NULL);Log("%s",ref_so_file);
@@ -44,7 +43,7 @@ void init_difftest(char * ref_so_file, unsigned long img_size){
 
     ref_difftest_init(0);
     ref_difftest_memcpy(RESET_VECTOR, mem_addr(), img_size, DIFFTEST_TO_REF);
-    ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+    ref_difftest_regcpy(current_cpu(), DIFFTEST_TO_REF);
 }
 
 static bool is_skip_ref = false;
@@ -102,7 +101,7 @@ void difftest_step(uLL pc, uLL npc) {
 
     if (is_skip_ref) {
         // to skip the checking of an instruction, just copy the reg state to reference design
-        ref_difftest_regcpy(&cpu, DIFFTEST_TO_REF);
+        ref_difftest_regcpy(current_cpu(), DIFFTEST_TO_REF);
         is_skip_ref = false;
         return;
     }
