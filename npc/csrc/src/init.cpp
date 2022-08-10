@@ -63,6 +63,6 @@ void cpu_init(){
 void initialize(int argc,char * argv[]){
   mycpu = new emu;
   parse_args(argc,argv);
-  if(is_difftest) init_difftest(diff_so_file,size);
   cpu_init();
+  if(is_difftest) init_difftest(diff_so_file,size);
 }
