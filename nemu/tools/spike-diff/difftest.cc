@@ -47,7 +47,7 @@ void sim_t::diff_step(uint64_t n) {
   step(n);
 }
 
-#define reg(name,to,from) to->name=from->name;
+#define modifyreg(name,to,from) to->name=from->name;
 
 void sim_t::diff_get_regs(void* diff_context) {
   struct diff_context_t* ctx = (struct diff_context_t*)diff_context;
@@ -56,7 +56,7 @@ void sim_t::diff_get_regs(void* diff_context) {
   }
   ctx->pc = state->pc;
 
-  #define get_reg(name) reg(name,ctx,state)
+  #define get_reg(name) modifyreg(name,ctx,state)
   
   MAP_CSR(get_reg)
 
@@ -69,10 +69,10 @@ void sim_t::diff_set_regs(void* diff_context) {
   }
   state->pc = ctx->pc;
 
-  #define set_reg(name) reg(name,state,ctx)
+  #define set_reg(name) modifyreg(name,state,ctx)
 
   MAP_CSR(set_reg)
-  
+
 }
 
 void sim_t::diff_memcpy(reg_t dest, void* src, size_t n) {
