@@ -19,7 +19,7 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc) {
   }
   
   CHECK(mepc)
-//  CHECK(mstatus)
+  CHECK(mstatus)
   CHECK(mcause)
   CHECK(mtvec)
   
