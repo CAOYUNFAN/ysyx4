@@ -28,7 +28,7 @@ module ysyx_220066_csr (
         12'h300: begin csr_data=mstatus; err=0; end
         12'h342: begin csr_data=mcause; err=0; end
         12'h305: begin csr_data=mtvec; err=0; end
-        default: begin csr_data=64'h0; err=~wen; end
+        default: begin csr_data=64'h0; err=wen; end
     endcase
 
     always @(posedge clk) begin
@@ -57,6 +57,10 @@ module ysyx_220066_csr (
                 end
             end
         end
+    end
+
+    always@(*) begin
+//        $display();
     end
 endmodule
 
