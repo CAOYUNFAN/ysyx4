@@ -23,10 +23,15 @@ static debug_module_config_t difftest_dm_config = {
   .support_impebreak = true
 };
 
+#define MAP_CSR(f)
+  f(mepc) f(mstatus) f(mcause) f(mtvec)
+
 struct diff_context_t {
   word_t gpr[32];
   word_t pc;
-  word_t mepc,mstatus,mcause,mtvec;
+  #define def_csr(name) word_t name ;
+
+  MAP_CSR(def_csr)
 };
 
 static sim_t* s = NULL;
@@ -42,16 +47,19 @@ void sim_t::diff_step(uint64_t n) {
   step(n);
 }
 
+#define reg(name,to,from) to->name=from->name;
+
 void sim_t::diff_get_regs(void* diff_context) {
   struct diff_context_t* ctx = (struct diff_context_t*)diff_context;
   for (int i = 0; i < NXPR; i++) {
     ctx->gpr[i] = state->XPR[i];
   }
   ctx->pc = state->pc;
-  ctx->mepc=state->mepc;
-  ctx->mstatus=state->mstatus;
-  ctx->mcause=state->mcause;
-  ctx->mtvec=state->mtvec;
+
+  #define get_reg(name) reg(name,ctx,state)
+  
+  MAP_CSR(get_reg)
+
 }
 
 void sim_t::diff_set_regs(void* diff_context) {
@@ -60,10 +68,11 @@ void sim_t::diff_set_regs(void* diff_context) {
     state->XPR.write(i, (sword_t)ctx->gpr[i]);
   }
   state->pc = ctx->pc;
-  state->mepc=ctx->mepc;
-  state->mstatus=ctx->mstatus;
-  state->mcause=ctx->mcause;
-  state->mtvec=ctx->mtvec;
+
+  #define set_reg(name) reg(name,state,ctx)
+
+  MAP_CSR(set_reg)
+  
 }
 
 void sim_t::diff_memcpy(reg_t dest, void* src, size_t n) {
