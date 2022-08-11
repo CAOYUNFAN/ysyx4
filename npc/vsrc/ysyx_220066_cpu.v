@@ -86,7 +86,7 @@ module ysyx_220066_cpu(
     assign addr=alu_result;
 
     always @(*) if(!rst) begin
-//        $display("clk=%b,pc=%h,instr=%h,src1=%h,csr_wr_darta=%h",clk,pc,instr,src1,csr_wrdata);
+        $display("clk=%b,pc=%h,instr=%h",clk,pc,instr);
 //        if(clk) $display("iscsr?%b,Funct3=%b,csrwen=",iscsr,instr[14:12],csr_wen&&~error_temp);
     end
 endmodule
