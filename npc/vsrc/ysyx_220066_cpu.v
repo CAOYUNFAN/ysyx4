@@ -75,7 +75,7 @@ module ysyx_220066_cpu(
     );
 
     ysyx_220066_csrwork csrwork(
-        .csr_data(csr_data),.rs1(src1),.zimm(rs1),.ALUctr(ALUctr[2:0]),.data(csr_wrdata)
+        .csr_data(csr_data),.rs1(src1),.zimm(rs1),.csrctl(instr[14:12]),.data(csr_wrdata)
     );
 
     assign data_Wr=src2;
@@ -86,7 +86,7 @@ module ysyx_220066_cpu(
     assign addr=alu_result;
 
     always @(*) if(!rst) begin
-        $display("clk=%b,pc=%h,instr=%h,src1=%h,csr_wr_darta=%h",clk,pc,instr,src1,csr_wrdata);
+//        $display("clk=%b,pc=%h,instr=%h,src1=%h,csr_wr_darta=%h",clk,pc,instr,src1,csr_wrdata);
 //        if(clk) $display("iscsr?%b,Funct3=%b,csrwen=",iscsr,instr[14:12],csr_wen&&~error_temp);
     end
 endmodule

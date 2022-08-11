@@ -68,13 +68,13 @@ module ysyx_220066_csrwork(
     input [63:0] csr_data,
     input [63:0] rs1,
     input [4:0] zimm,
-    input [2:0] ALUctr,
+    input [2:0] csrctl,
     
     output reg [63:0] data
 );
     wire [63:0] data2;
-    assign data2=ALUctr[2]?{59'b0,zimm}:rs1;
-    always @(*) case(ALUctr[1:0])
+    assign data2=csrctl[2]?{59'b0,zimm}:rs1;
+    always @(*) case(csrctl[1:0])
         2'b01: data=data2;
         2'b10: data=csr_data|data2;
         2'b11: data=csr_data&~data2;
@@ -82,6 +82,6 @@ module ysyx_220066_csrwork(
     endcase
 
     always@(*) begin
-        $display("ALUctr=%h,csr_data=%h,data2=%h,data=%h",ALUctr,csr_data,data2,data);
+//        $display("csrctl=%h,csr_data=%h,data2=%h,data=%h",csrctl,csr_data,data2,data);
     end
 endmodule
