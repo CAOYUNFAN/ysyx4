@@ -28,6 +28,6 @@ module ysyx_220066_EX(
         .Result_0(result[0]),.Branch(Branch)
         );
     always @(*) begin
-        $display("EX:src1=%h,src2=%h,result=%h,ALUctr=%b",src1,ALUBsrc[1]?imm:(ALUBsrc[0]?64'h4:src2),result,ALUctr);
+        $display("EX:src1=%h,ALUBsrc=%h,src2=%h,imm=%h,result=%h,ALUctr=%b",src1,ALUBsrc,src2,imm,result,ALUctr);
     end
 endmodule
