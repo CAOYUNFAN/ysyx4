@@ -69,7 +69,7 @@ module ysyx_220066_cpu(
     wire [63:0] alu_result;
 
     ysyx_220066_EX module_ex(
-        .src1(src1),.src2(src2),.imm(iscsr?imm:csr_data),.in_pc(pc),
+        .src1(src1),.src2(src2),.imm(iscsr?csr_data:imm),.in_pc(pc),
         .ALUAsrc(ALUAsrc),.ALUBsrc(ALUBsrc),.ALUctr(ALUctr),.Branch(Branch),
         .result(alu_result),.nxtpc(nxtpc)
     );
