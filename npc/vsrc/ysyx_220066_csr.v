@@ -80,4 +80,8 @@ module ysyx_220066_csrwork(
         2'b11: data=csr_data&~data2;
         default: data=64'h114514;
     endcase
+
+    always@(*) begin
+        $display("ALUctr=%h,csr_data=%h,data2=%h,data=%h",ALUctr,csr_data,data2,data);
+    end
 endmodule
