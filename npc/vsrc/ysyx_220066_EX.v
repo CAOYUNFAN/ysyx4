@@ -27,7 +27,7 @@ module ysyx_220066_EX(
         .nxtpc(nxtpc),.in_pc(in_pc),.BusA(src1),.Imm(imm),.Zero(zero),
         .Result_0(result[0]),.Branch(Branch)
         );
-/*    always @(*) begin
-        $display("EX:result=%h,ALUctr=%h",result,ALUctr);
-    end*/
+    always @(*) begin
+        $display("EX:result=%h,ALUctr=%b",result,ALUctr);
+    end
 endmodule
