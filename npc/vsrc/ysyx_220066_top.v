@@ -1,6 +1,6 @@
 module ysyx_220066_top(
   output [63:0] pc,
-  input [63:0] instr_data,
+//  input [63:0] instr_data,
   input clk,rst,
   //output [63:0] addr,
   //output reg [63:0] data_Wr_data,
@@ -14,9 +14,7 @@ module ysyx_220066_top(
   output error,done,status
 );
   wire MemWr,MemRd;
-  wire [31:0] instr;
   wire [63:0] addr;
-  assign instr=pc[2]?instr_data[63:32]:instr_data[31:0];
   wire [2:0] MemOp;
   reg [63:0] data_Rd;
   reg [7:0] b_Rd;reg [15:0] h_Rd;reg [31:0] w_Rd;
@@ -30,6 +28,12 @@ module ysyx_220066_top(
     data_read(addr,{7'b0,MemRd&!rst&clk},data_Rd_data);
   end
 
+  reg [63:0] instr_data;
+  always@(*) begin
+    data_read(pc,8'b1,instr_data);
+  end
+  wire [31:0] instr;
+  assign instr=pc[2]?instr_data[63:32]:instr_data[31:0];
 //  wire [63:0] data_Wr_help;
 //  assign data_Wr_help=data_Rd_data;
 

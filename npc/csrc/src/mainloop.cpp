@@ -17,9 +17,7 @@ void trace_and_difftest(){
 #define CC(...) (0)
 #endif 
 
-void cpu_exec_once(){
-    RANGE(mycpu->pc,mem_start,mem_end);//printf("%lx\n",mycpu->pc);
-    mycpu->instr_data=pmem_read(mycpu->pc);
+inline void cpu_exec_once(){
     mycpu->clk=1;
     CC("One cycle-UP!");
     mycpu->eval();
