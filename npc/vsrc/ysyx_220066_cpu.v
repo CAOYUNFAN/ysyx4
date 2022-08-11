@@ -87,6 +87,6 @@ module ysyx_220066_cpu(
 
     always @(*) if(!rst) begin
 //        $display("clk=%b,pc=%h,instr=%h,MemToReg=%b,rd=%h,result=%h",clk,pc,instr,MemToReg,rd,result);
-        if(clk) $display("iscsr?%b,Funct3=%b,csrwen=",iscsr,instr[14:12],csr_wen&&~error_temp);
+//        if(clk) $display("iscsr?%b,Funct3=%b,csrwen=",iscsr,instr[14:12],csr_wen&&~error_temp);
     end
 endmodule
