@@ -48,7 +48,7 @@ module ysyx_220066_csr (
                         12'h305: mtvec=in_data;
                         default: begin end
                     endcase
-                    $display("csr_addr=%h,in_data=%h",csr_addr,in_data);
+                    //$display("csr_addr=%h,in_data=%h",csr_addr,in_data);
                 end else begin
                     if(raise_intr) begin
                         //$display("raise_intr,wen=%b",wen);
