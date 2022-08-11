@@ -51,7 +51,7 @@ module ysyx_220066_csr (
                     $display("csr_addr=%h,in_data=%h",csr_addr,in_data);
                 end else begin
                     if(raise_intr) begin
-                        $display("raise_intr,wen=%b",wen);
+                        //$display("raise_intr,wen=%b",wen);
                         mcause = NO;
                         mepc = pc;
                         mstatus[12:11]=2'b11;
