@@ -85,7 +85,8 @@ module ysyx_220066_cpu(
     );
     assign addr=alu_result;
 
-    always @(*) if(!rst&&MemRd) begin
+    always @(*) if(!rst) begin
 //        $display("clk=%b,pc=%h,instr=%h,MemToReg=%b,rd=%h,result=%h",clk,pc,instr,MemToReg,rd,result);
+        if(clk) $display("iscsr?%b",iscsr);
     end
 endmodule
