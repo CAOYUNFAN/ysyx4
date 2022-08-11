@@ -60,7 +60,7 @@ module ysyx_220066_csr (
     end
 
     always@(*) begin
-//        $display();
+        if(wen&&clk&&!rst) $display("csr_addr=%h,in_data=%h",csr_addr,in_data);
     end
 endmodule
 
