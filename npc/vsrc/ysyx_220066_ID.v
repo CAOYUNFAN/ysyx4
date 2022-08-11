@@ -74,7 +74,7 @@ module ysyx_220066_Decode (
     assign csr=(OP[6:2]==5'b11100);
     always @(*)//ALUctr
     case(OP[6:2])//ExtOp:I=000,U=101,B=011,S=010,J=001
-        5'b11100:begin ExtOp=3'b000;ALUBSrc=1;ALUctr=4'b1111;Branch=3'b000; case(Funct3)
+        5'b11100:begin ExtOp=3'b000;ALUBSrc=2;ALUctr=4'b1111;Branch=3'b000; case(Funct3)
             3'b000,//ecall,ebreak,mret
             3'b001,//csrrw
             3'b101,//csrrwi
