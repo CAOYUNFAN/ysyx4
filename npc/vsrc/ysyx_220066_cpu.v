@@ -50,7 +50,7 @@ module ysyx_220066_cpu(
         .clk(~clk),.wdata(result),.waddr(rd),.wen(RegWr&&~error_temp)
     );
     wire csr_wen;
-    assign csr_wen=iscsr&&(instr[14:12]==3'b000);
+    assign csr_wen=iscsr&&(instr[14:12]!=3'b000);
 
     assign NO=ecall?64'd11:64'd0;
     
