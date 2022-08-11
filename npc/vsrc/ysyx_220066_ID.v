@@ -27,7 +27,7 @@ module ysyx_220066_ID (
     assign mret=(instr==32'h3020_0073);
     assign csr_addr=instr[31:20];
 
-    assign error=err_temp||(csr&&instr[14:12]==3'b000&&(instr!=32'h0010_0073||instr!=32'h0000_0073||instr!=32'h3020_0073));
+    assign error=err_temp||(csr&&instr[14:12]==3'b000&&(instr!=32'h0010_0073&&instr!=32'h0000_0073&&instr!=32'h3020_0073));
 
     ysyx_220066_Decode decode(
         .OP(instr[6:0]),.Funct3(instr[14:12]),.Funct7(instr[31:25]),
