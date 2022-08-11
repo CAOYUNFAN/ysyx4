@@ -40,13 +40,16 @@ module ysyx_220066_csr (
                 mstatus[3]=mstatus[7];
                 mstatus[7]=1'b1;
             end else begin
-                if(wen) case(csr_addr)
-                    12'h341: mepc=in_data;
-                    12'h300: mstatus=in_data;
-                    12'h342: mcause=in_data;
-                    12'h305: mtvec=in_data;
-                    default: begin end
-                endcase else begin
+                if(wen) begin 
+                    case(csr_addr)
+                        12'h341: mepc=in_data;
+                        12'h300: mstatus=in_data;
+                        12'h342: mcause=in_data;
+                        12'h305: mtvec=in_data;
+                        default: begin end
+                    endcase
+                    $display("csr_addr=%h,in_data=%h",csr_addr,in_data);
+                end else begin
                     if(raise_intr) begin
                         mcause = NO;
                         mepc = pc;
@@ -59,9 +62,6 @@ module ysyx_220066_csr (
         end
     end
 
-    always@(*) begin
-        if(clk&&!rst) $display("wen?%b,csr_addr=%h,in_data=%h",wen,csr_addr,in_data);
-    end
 endmodule
 
 module ysyx_220066_csrwork(
