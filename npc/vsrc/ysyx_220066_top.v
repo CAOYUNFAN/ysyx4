@@ -30,7 +30,7 @@ module ysyx_220066_top(
 
   reg [63:0] instr_data;
   always@(*) begin
-    data_read(pc,8'b1,instr_data);
+    data_read(pc,{7'b0,!rst},instr_data);
   end
   wire [31:0] instr;
   assign instr=pc[2]?instr_data[63:32]:instr_data[31:0];
