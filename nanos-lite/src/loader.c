@@ -1,4 +1,5 @@
 #include <proc.h>
+#include <fs.h>
 #include <elf.h>
 
 #ifdef __LP64__
@@ -47,23 +48,30 @@ int check_elf(const Elf_Ehdr * ehdr){
   return 0;
 }
 
-extern size_t ramdisk_read(void *buf, size_t offset, size_t len);
+#define safe_read(buf,offset,len)\
+  do{\
+    assert(fs_lseek(fd,(offset),SEEK_SET)==(offset));\
+    assert(fs_read(fd,(buf),(len))==(len));\
+  } while (0)
+
 static uintptr_t loader(PCB *pcb, const char *filename) {
+  int fd=fs_open(filename,0,0);
+
   Elf_Ehdr ehdr;
-  ramdisk_read(&ehdr,0,sizeof(Elf_Ehdr));
+  safe_read(&ehdr,0,sizeof(Elf_Ehdr));
   int ret=check_elf(&ehdr);
   if(ret!=0) panic("Error %d exists when loading programs.",ret);
   size_t total=ehdr.e_phnum;
   if(total==PN_XNUM){
     Elf_Shdr shdr;
-    ramdisk_read(&shdr,ehdr.e_shoff,sizeof(Elf_Shdr));
+    safe_read(&shdr,ehdr.e_shoff,sizeof(Elf_Shdr));
     total=shdr.sh_info;
   }
   for(uintptr_t addr=ehdr.e_phoff;total;addr+=ehdr.e_phentsize,total--) {
     Elf_Phdr phdr;
-    ramdisk_read(&phdr,addr,sizeof(Elf_Phdr));
+    safe_read(&phdr,addr,sizeof(Elf_Phdr));
     if(phdr.p_type==PT_LOAD){
-      ramdisk_read((void *)phdr.p_vaddr,phdr.p_offset,phdr.p_filesz);
+      safe_read((void *)phdr.p_vaddr,phdr.p_offset,phdr.p_filesz);
       memset((void *)(phdr.p_vaddr+phdr.p_filesz),0,phdr.p_memsz-phdr.p_filesz);
     }
   }
