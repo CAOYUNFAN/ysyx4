@@ -8,7 +8,7 @@ Context * do_yield(Context * c){
 }
 
 Context * do_exit(Context * c){
-  halt(0);
+  halt(c->GPR2);
   return c;
 }
 
