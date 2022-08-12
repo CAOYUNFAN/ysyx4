@@ -1,10 +1,17 @@
-struct device_regs{
-    const char * name;
-    u64 start,end;
-    void (*output) (uLL addr,uLL data,u8 mask);
-    uLL (*input) (uLL addr);
+class device_regs{
+    protected:
+        const char * name;
+        uLL start,end;
+        inline void log_output(){
+            Log("device %s is mapped to [ 0x%llx , 0x%llx )",name,start,end);
+        }
+    public:
+        inline bool in_range(uLL addr) {return addr>=start&&addr<end;}
+        virtual void init(){panic("TODO!");}
+        virtual uLL input(uLL addr) {panic("device_reg %s cannot be read!",name);return 114514;}
+        virtual void output(uLL addr,uLL data,u8 mask) {panic("device_reg %s cannot be write!",name);}
 };
 
-extern const device_regs device_table[];
+extern device_regs * device_table[];
 
 void device_init();

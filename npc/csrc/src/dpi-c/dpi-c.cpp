@@ -13,13 +13,11 @@ extern "C" void assert_check_msg(bool cond,char * msg,...){
 }
 
 extern "C" void data_read(uLL raddr,u8 memread,uLL *rdata){ 
-    if(!memread) return;
-    for(int i=0;i<3;i++) 
-    if(raddr>=device_table[i].start&&raddr<device_table[i].end){
-        Assert(device_table[i].input,"Regs %s is unreadable! 0x%llx cannot be read.",device_table[i].name,raddr);
-        *rdata=device_table[i].input(raddr);
+    if(!memread) {*rdata=0x114514;return;}
+    for(int i=0;i<3;i++) if(device_table[i]->in_range(raddr)){
+        *rdata=device_table[i]->input(raddr);
         #ifdef MTRACE
-        Log("Read from memory %llx : 0x%llx == %lld",raddr,*rdata,*rdata);
+        Log("read from addr %llx: %llx",raddr,*rdata);
         #endif
         return;
     }
@@ -31,10 +29,6 @@ extern "C" void data_write(uLL waddr, uLL wdata, u8 wmask) {
     Log("Write to memory %llx:0x%llx=%lld,wmask=%x",waddr,wdata,wdata,wmask);
     #endif
     for(int i=0;i<3;i++) 
-    if(waddr>=device_table[i].start&&waddr<device_table[i].end){
-        Assert(device_table[i].output,"Regs %s is unreadable! 0x%llx cannot be read.",device_table[i].name,waddr);
-        device_table[i].output(waddr,wdata,wmask);
-        return;
-    }
+    if(device_table[i]->in_range(waddr)) device_table[i]->output(waddr,wdata,wmask);
     panic("Unexpected addr %llx",waddr);
 }

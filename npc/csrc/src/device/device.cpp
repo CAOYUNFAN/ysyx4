@@ -11,32 +11,50 @@
 uLL boottime=0;
 extern void difftest_skip_ref();
 
-uLL inner_gettime(){
-    timespec time;
-    clock_gettime(CLOCK_MONOTONIC_COARSE,&time);
-    return time.tv_sec*1000000+time.tv_nsec/1000;
-}
+class main_memory:public device_regs{
+    public:
+        void init(){name="main_memory";start=mem_start;end=mem_end;log_output();}
+        uLL input(uLL addr){return pmem_read(addr);}
+        void output(uLL addr,uLL data,u8 mask){pmem_write(addr,data,mask);}
+}memory;
 
-uLL timer (uLL addr){
-    difftest_skip_ref();
-//    Log("timer!");
-    return inner_gettime()-boottime;
-}
+class RTC:public device_regs{
+    private:
+        uLL boottime;
+        uLL inner_gettime(){
+            timespec time;
+            clock_gettime(CLOCK_MONOTONIC_COARSE,&time);
+            return time.tv_sec*1000000+time.tv_nsec/1000;
+        }
+    public:
+        void init(){
+            boottime=inner_gettime();
+            name="RTC";start=RTC_ADDR;end=RTC_ADDR+8;
+            log_output();
+        }
+        uLL input(uLL addr){
+            difftest_skip_ref();
+            return inner_gettime()-boottime;
+        }
+}rtc;
 
-void kputc(uLL addr,uLL data,u8 mask){
-    difftest_skip_ref();
-    Assert(mask==0x1,"Unexpected mask %x",mask);
-    putchar(data);
-}
+class SERIAL:public device_regs{
+    public:
+        void init(){
+            name="SERIAL";start=SERIAL_PORT;end=SERIAL_PORT+1;
+            log_output();
+        }
+        void output(uLL addr,uLL data,u8 mask){
+            difftest_skip_ref();
+            Assert(mask==0x1,"Unexpected mask %x",mask);
+            putchar(data);
+        }
+}serial;
 
-const device_regs device_table[]={
-    {"memory"   ,mem_start  ,mem_end        ,pmem_write ,pmem_read  },
-    {"RTC"      ,RTC_ADDR   ,RTC_ADDR   +8  ,NULL       ,timer      },
-    {"SERIAL"   ,SERIAL_PORT,SERIAL_PORT+1  ,kputc      ,NULL       },
-
-    {NULL,0,0,NULL,NULL}
+device_regs * device_table[]={
+    &memory,&rtc,&serial
 };
 
 void device_init(){
-    boottime=inner_gettime();
+    for(int i=0;i<3;i++) device_table[i]->init();
 }
