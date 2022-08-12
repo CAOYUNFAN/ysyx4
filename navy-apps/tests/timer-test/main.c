@@ -25,9 +25,9 @@ int main(){
     printf("timer_test start!\n");
     int now=get_time(),i=0;
     while (1){
-        while(get_time()-now<gap/100000);
+        while(get_time()-now<gap/1000);
         now=get_time();
-        printf("timer test:%d time, " fmt,i,now/gap,now%gap);
+        printf("timer test:%d time, " fmt "\n",i,now/gap,now%gap);
         i++;
     }
 }
