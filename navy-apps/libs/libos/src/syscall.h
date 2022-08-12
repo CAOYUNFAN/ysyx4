@@ -24,13 +24,4 @@ enum {
   SYS_gettimeofday
 };
 
-struct timeval{
-  long tv_sec,tv_usec;
-};
-
-struct timezone{
-  int tz_minuteswest;		/* Minutes west of GMT.  */
-  int tz_dsttime;		/* Nonzero if DST is ever in effect.  */
-};
-
 #endif

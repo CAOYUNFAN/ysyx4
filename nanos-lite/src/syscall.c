@@ -16,6 +16,14 @@ int sys_brk(void * addr){
   return 0;
 }
 
+struct timeval{
+  long tv_sec,tv_usec;
+};
+struct timezone{
+  int tz_minuteswest;		/* Minutes west of GMT.  */
+  int tz_dsttime;		/* Nonzero if DST is ever in effect.  */
+};
+
 uintptr_t sys_gettimeofday(struct timeval *tv,struct timezone * tz){
   uint64_t time=io_read(AM_TIMER_UPTIME).us;
   if(tv){
