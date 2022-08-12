@@ -8,7 +8,7 @@ extern "C" void assert_check_msg(bool cond,char * msg,...){
         va_start(ap,msg);
         vprintf(msg,ap); 
         va_end(ap);
-        assert(0); 
+        assert(0);
     }
 }
 
@@ -28,7 +28,9 @@ extern "C" void data_write(uLL waddr, uLL wdata, u8 wmask) {
     #ifdef MTRACE
     Log("Write to memory %llx:0x%llx=%lld,wmask=%x",waddr,wdata,wdata,wmask);
     #endif
-    for(int i=0;i<3;i++) 
-    if(device_table[i]->in_range(waddr)) device_table[i]->output(waddr,wdata,wmask);
+    for(int i=0;i<3;i++) if(device_table[i]->in_range(waddr)){
+        device_table[i]->output(waddr,wdata,wmask);
+        return;
+    }
     panic("Unexpected addr %llx",waddr);
 }
