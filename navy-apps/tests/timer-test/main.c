@@ -23,7 +23,7 @@ int get_time(){
 
 int main(){
     printf("timer_test start!\n");
-    int now=get_time(),i=0;
+    int now=get_time(),i=0x0;
     while (1){
         while(get_time()-now<gap);
         now=get_time();
