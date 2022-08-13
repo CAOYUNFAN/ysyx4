@@ -220,12 +220,14 @@ static int cmd_save(char * args){
   fwrite(magic5,1,sizeof(magic5),fd);
   fwrite(guest_to_host(RESET_VECTOR),1,CONFIG_MSIZE,fd);
   fclose(fd);
+  Log("Img save to %s",args);
   return 0;
 }
 
 static inline bool check_img(FILE * fd){
-  Log("%ld %ld",ftell(fd),MAGIC_LEN+sizeof(CPU_state)+CONFIG_MSIZE);
+  fseek(fd,0,SEEK_END);
   if(ftell(fd)!=MAGIC_LEN+sizeof(CPU_state)+CONFIG_MSIZE) return 0;
+  fseek(fd,0,SEEK_SET);
   Log("1");
   unsigned char * buf=malloc(MAGIC_LEN);
   
@@ -258,6 +260,8 @@ static int cmd_load(char * args){
     assert(fread(&cpu,sizeof(CPU_state),1,fd)==1);
     fseek(fd,sizeof(magic5),SEEK_CUR);
     assert(fread(guest_to_host(RESET_VECTOR),1,CONFIG_MSIZE,fd)==CONFIG_MSIZE);
+    Log("Load img from %s; difftest is turned off for restart.",args);
+    cmd_detach(NULL);
   }else Log("file %s is not a suitable img!",args);
   fclose(fd);
   return 0;
