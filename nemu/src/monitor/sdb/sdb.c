@@ -226,6 +226,7 @@ static int cmd_save(char * args){
 
 static inline bool check_img(FILE * fd){
   fseek(fd,0,SEEK_END);
+  Log("%ld %ld",ftell(fd),MAGIC_LEN+sizeof(CPU_state)+CONFIG_MSIZE);
   if(ftell(fd)!=MAGIC_LEN+sizeof(CPU_state)+CONFIG_MSIZE) return 0;
   fseek(fd,0,SEEK_SET);
   Log("1");
