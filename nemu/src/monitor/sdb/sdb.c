@@ -229,7 +229,6 @@ static inline bool check_img(FILE * fd){
   Log("%ld %ld",ftell(fd),MAGIC_LEN+sizeof(CPU_state)+CONFIG_MSIZE);
   if(ftell(fd)!=MAGIC_LEN+sizeof(CPU_state)+CONFIG_MSIZE) return 0;
   fseek(fd,0,SEEK_SET);
-  Log("1");
   unsigned char * buf=malloc(MAGIC_LEN);
   
   #define check_file(id,offset)\
@@ -237,10 +236,8 @@ static inline bool check_img(FILE * fd){
   for(int i=0;i<sizeof(concat(magic,id));i++) if(buf[i]!=concat(magic,id)[i]) return 0;
   
   check_file(1,0);
-  Log("1");
   assert(fread(buf,1,strlen(magic2),fd)==strlen(magic2));
   for(int i=0;magic2[i];i++) if(buf[i]!=magic2[i]) return 0;
-  Log("1");
   check_file(3,0)
   check_file(4,0)
   check_file(5,sizeof(CPU_state))
@@ -255,7 +252,7 @@ static int cmd_load(char * args){
     return 0;
   }
   if(check_img(fd)){
-    fseek(fd,sizeof(magic1)+strlen(magic2)+1+sizeof(magic3)+sizeof(magic4),SEEK_SET);
+    fseek(fd,sizeof(magic1)+strlen(magic2)+sizeof(magic3)+sizeof(magic4),SEEK_SET);
     assert(fread(&cpu,sizeof(CPU_state),1,fd)==1);
     fseek(fd,sizeof(magic5),SEEK_CUR);
     assert(fread(guest_to_host(RESET_VECTOR),1,CONFIG_MSIZE,fd)==CONFIG_MSIZE);
