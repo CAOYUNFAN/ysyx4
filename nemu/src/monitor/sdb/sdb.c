@@ -224,6 +224,7 @@ static int cmd_save(char * args){
 }
 
 static inline bool check_img(FILE * fd){
+  Log("%ld %ld",ftell(fd),MAGIC_LEN+sizeof(CPU_state)+CONFIG_MSIZE);
   if(ftell(fd)!=MAGIC_LEN+sizeof(CPU_state)+CONFIG_MSIZE) return 0;
   Log("1");
   unsigned char * buf=malloc(MAGIC_LEN);
