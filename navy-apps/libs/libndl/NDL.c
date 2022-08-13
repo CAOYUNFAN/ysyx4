@@ -13,13 +13,13 @@ static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
 static int canvas_w = 0, canvas_h = 0;
 static int dev_events;
-static char buf[256];
-static char buf2[128];
+static char buf[256],buf2[128];
 struct NDL_dispinfo{
   unsigned char present,has_accel;
   int width,height,vmemsz;
 };
 static struct NDL_dispinfo dispinfo;
+static FILE * dev_fb;
 
 uint32_t NDL_GetTicks() {
   struct timeval tv;
@@ -49,6 +49,10 @@ void NDL_OpenCanvas(int *w, int *h) {
     }
     close(fbctl);
   }else{
+    if(*w==0&&*h==0){
+      *w=dispinfo.width;
+      *h=dispinfo.height;
+    }
     canvas_w=*w;
     canvas_h=*h;
     return;
@@ -56,6 +60,15 @@ void NDL_OpenCanvas(int *w, int *h) {
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
+  x+=(screen_w-canvas_w)/2;y+=(screen_h-canvas_h)/2;
+  uint32_t offset=(y*screen_w+x)*sizeof(uint32_t);
+  for(int i=0;i<h;i++){
+    fseek(dev_fb,offset,SEEK_SET);
+    fwrite(pixels,sizeof(uint32_t),w,dev_fb);
+    pixels+=w;
+    offset+=screen_w*sizeof(uint32_t);
+  }
+  fflush(dev_fb);
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples) {
@@ -74,7 +87,7 @@ int NDL_QueryAudio() {
 
 static inline void init_dispinfo(){
   FILE * disp_info=fopen("/proc/dispinfo","r");
-  fread(buf,1,256,disp_info);
+  fread(buf,1,128,disp_info);
   fclose(disp_info);
   char * ch=buf;
   while (*ch){
@@ -88,8 +101,8 @@ static inline void init_dispinfo(){
     while(*ch&&*ch!='\n') ch++;
     ch++;
   }
-  printf("%s\n",buf);
-  printf("dispinfo:%d,%d,%d\n",dispinfo.width,dispinfo.height,dispinfo.vmemsz);
+//  printf("%s\n",buf);
+//  printf("dispinfo:%d,%d,%d\n",dispinfo.width,dispinfo.height,dispinfo.vmemsz);
 }
 
 int NDL_Init(uint32_t flags) {
@@ -97,9 +110,11 @@ int NDL_Init(uint32_t flags) {
     evtdev = 3;
   }
   dev_events=open("/dev/events",O_RDONLY);
+  dev_fb=fopen("/dev/fb","w");
   init_dispinfo();  
   return 0;
 }
 
 void NDL_Quit() {
+  fclose(dev_fb);
 }

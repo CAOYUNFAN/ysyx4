@@ -10,7 +10,7 @@ VSRC_FILES := $(shell find $(VSRC_DIR) -name "*.v")
 EMU_DIR := $(NPC_HOME)/emu
 EMU_TOP_MODULE :=$(STUID)top
 EMU_TARGET := emu
-CFLAGS_NPC = -I$(CSRC_INCLUDE_DIR) -g #-DMTRACE #-DINSTR
+CFLAGS_NPC = -I$(CSRC_INCLUDE_DIR) -g -O2 #-DMTRACE #-DINSTR
 CFLAGS_NPC_2 = $(addprefix -CFLAGS , $(CFLAGS_NPC))
 
 DIFF = --diff=$(NEMU_HOME)/build/riscv64-nemu-interpreter-so
