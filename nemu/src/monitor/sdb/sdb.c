@@ -46,6 +46,8 @@ static int cmd_w(char *args);
 static int cmd_d(char *args);
 static int cmd_attach(char * args){difftest_attach();return 0;}
 static int cmd_detach(char * args){difftest_detach();return 0;}
+static int cmd_save(char * args);
+static int cmd_load(char * args);
 
 static struct {
   const char *name;
@@ -63,7 +65,9 @@ static struct {
   {"w","When the value of expression expr changes, program execution is suspended",cmd_w},
   {"d","Delete the monitoring point with sequence number n",cmd_d},
   {"attach","start difftest mode (only when difftest is enabled)",cmd_attach},
-  {"detach","stop difftest",cmd_detach}
+  {"detach","stop difftest",cmd_detach},
+  {"save","save img [pathname]",cmd_save},
+  {"load","load img [pathname]",cmd_load}
   /* TODO: Add more commands */
 
 };
@@ -194,4 +198,65 @@ void init_sdb() {
 
   /* Initialize the watchpoint pool. */
   init_wp_pool();
+}
+
+#include <memory/paddr.h>
+#define MAGIC_NAME(name) "ee" str(name)
+const unsigned char magic1[]={0x11,0x45,0x14,'R','S','I','C','V','6','4'};
+const char * magic2= MAP_ALLCSR(MAGIC_NAME) ;
+const unsigned char magic3[]={0x19,0x19,0x81,0x00};
+const unsigned char magic4[]={'C','P','U'};
+const unsigned char magic5[]={'M','E','M','O','R','Y'};
+#define MAGIC_LEN (sizeof(magic1)+strlen(magic2)+1+sizeof(magic3)+sizeof(magic4)+sizeof(magic5))
+
+static int cmd_save(char * args){
+  FILE * fd=fopen(args,"w");
+  assert(fd);
+  fwrite(magic1,1,sizeof(magic1),fd);
+  fprintf(fd,"%s",magic2);
+  fwrite(magic3,1,sizeof(magic3),fd);
+  fwrite(magic4,1,sizeof(magic4),fd);
+  fwrite(&cpu,sizeof(CPU_state),1,fd);
+  fwrite(magic5,1,sizeof(magic5),fd);
+  fwrite(guest_to_host(RESET_VECTOR),1,CONFIG_MSIZE,fd);
+  fclose(fd);
+  return 0;
+}
+
+static inline bool check_img(FILE * fd){
+  if(ftell(fd)!=MAGIC_LEN+sizeof(CPU_state)+CONFIG_MSIZE) return 0;
+  unsigned char * buf=malloc(MAGIC_LEN);
+  
+  #define check_file(id,offset)\
+  fseek(fd,offset,SEEK_CUR);assert(fread(buf,1,sizeof(concat(magic,id)),fd)==sizeof(concat(magic,id)));\
+  for(int i=0;i<sizeof(concat(magic,id));i++) if(buf[i]!=concat(magic,id)[i]) return 0;
+  
+  check_file(1,0);
+
+  assert(fread(buf,1,strlen(magic2)+1,fd)==strlen(magic2)+1);
+  int i=0;
+  for(;magic2[i];i++) if(buf[i]!=magic2[i]) return 0;
+  if(buf[i]!=0) return 0;
+
+  check_file(3,0)
+  check_file(4,0)
+  check_file(5,sizeof(CPU_state))
+  free(buf);
+  return 1;
+}
+
+static int cmd_load(char * args){
+  FILE * fd=fopen(args,"r");
+  if(!fd){
+    Log("file %s cannot be open!",args);
+    return 0;
+  }
+  if(check_img(fd)){
+    fseek(fd,sizeof(magic1)+strlen(magic2)+1+sizeof(magic3)+sizeof(magic4),SEEK_SET);
+    assert(fread(&cpu,sizeof(CPU_state),1,fd)==1);
+    fseek(fd,sizeof(magic5),SEEK_CUR);
+    assert(fread(guest_to_host(RESET_VECTOR),1,CONFIG_MSIZE,fd)==CONFIG_MSIZE);
+  }else Log("file %s is not a suitable img!",args);
+  fclose(fd);
+  return 0;
 }
