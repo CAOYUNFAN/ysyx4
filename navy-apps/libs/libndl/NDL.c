@@ -16,7 +16,7 @@ static int dev_events;
 static char buf[256],buf2[128];
 struct NDL_dispinfo{
   unsigned char present,has_accel;
-  int width,height,vmemsz;
+  int vmemsz;
 };
 static struct NDL_dispinfo dispinfo;
 static FILE * dev_fb;
@@ -50,8 +50,8 @@ void NDL_OpenCanvas(int *w, int *h) {
     close(fbctl);
   }else{
     if(*w==0&&*h==0){
-      *w=dispinfo.width;
-      *h=dispinfo.height;
+      *w=screen_w;
+      *h=screen_h;
     }
     canvas_w=*w;
     canvas_h=*h;
@@ -63,7 +63,7 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
   x+=(screen_w-canvas_w)/2;y+=(screen_h-canvas_h)/2;
   uint32_t offset=(y*screen_w+x)*sizeof(uint32_t);
   for(int i=0;i<h;i++){
-    printf("%d",offset);
+    printf("x=%d,y=%d,offset=%d",x,y,offset);
     fseek(dev_fb,offset,SEEK_SET);
     fwrite(pixels,sizeof(uint32_t),w,dev_fb);
     pixels+=w;
@@ -96,14 +96,14 @@ static inline void init_dispinfo(){
     sscanf(ch,"%s : %d",buf2,&data);
     if(strcmp(buf2,"PRESENT")==0) dispinfo.present=data;
     else if(strcmp(buf2,"HAS_ACCEL")==0) dispinfo.has_accel=data;
-    else if(strcmp(buf2,"WIDTH")==0) dispinfo.width=data;
-    else if(strcmp(buf2,"HEIGHT")==0) dispinfo.height=data;
+    else if(strcmp(buf2,"WIDTH")==0) screen_w=data;
+    else if(strcmp(buf2,"HEIGHT")==0) screen_h=data;
     else if(strcmp(buf2,"VMEMSZ")==0) dispinfo.vmemsz=data;
     while(*ch&&*ch!='\n') ch++;
     ch++;
   }
 //  printf("%s\n",buf);
-//  printf("dispinfo:%d,%d,%d\n",dispinfo.width,dispinfo.height,dispinfo.vmemsz);
+  printf("dispinfo:%d,%d,%d\n",screen_w,screen_h,dispinfo.vmemsz);
 }
 
 int NDL_Init(uint32_t flags) {
