@@ -207,7 +207,7 @@ const char * magic2= MAP_ALLCSR(MAGIC_NAME) ;
 const unsigned char magic3[]={0x19,0x19,0x81,0x00};
 const unsigned char magic4[]={'C','P','U'};
 const unsigned char magic5[]={'M','E','M','O','R','Y'};
-#define MAGIC_LEN (sizeof(magic1)+strlen(magic2)+1+sizeof(magic3)+sizeof(magic4)+sizeof(magic5))
+#define MAGIC_LEN (sizeof(magic1)+strlen(magic2)+sizeof(magic3)+sizeof(magic4)+sizeof(magic5))
 
 static int cmd_save(char * args){
   FILE * fd=fopen(args,"w");
@@ -238,10 +238,8 @@ static inline bool check_img(FILE * fd){
   
   check_file(1,0);
   Log("1");
-  assert(fread(buf,1,strlen(magic2)+1,fd)==strlen(magic2)+1);
-  int i=0;
-  for(;magic2[i];i++) if(buf[i]!=magic2[i]) return 0;
-  if(buf[i]!=0) return 0;
+  assert(fread(buf,1,strlen(magic2),fd)==strlen(magic2));
+  for(int i=0;magic2[i];i++) if(buf[i]!=magic2[i]) return 0;
   Log("1");
   check_file(3,0)
   check_file(4,0)
