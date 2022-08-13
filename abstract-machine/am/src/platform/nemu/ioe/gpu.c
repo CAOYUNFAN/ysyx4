@@ -28,7 +28,6 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   for(int j=0;j<ctl->w;j++)
   outl((width*(ctl->y+i)+(ctl->x+j))*4+FB_ADDR,*(data++));
   if (ctl->sync) {
-    putstr("should update!\n");
     outl(SYNC_ADDR, 1);
   }
 }
