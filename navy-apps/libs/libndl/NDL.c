@@ -88,7 +88,8 @@ static inline void init_dispinfo(){
     while(*ch&&*ch!='\n') ch++;
     ch++;
   }
-  printf("dispinfo:%d,%d,%d",dispinfo.width,dispinfo.height,dispinfo.vmemsz);
+  printf("%s\n",buf);
+  printf("dispinfo:%d,%d,%d\n",dispinfo.width,dispinfo.height,dispinfo.vmemsz);
 }
 
 int NDL_Init(uint32_t flags) {
