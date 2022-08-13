@@ -11,7 +11,15 @@
 static int evtdev = -1;
 static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
+static int canvas_w = 0, canvas_h = 0;
 static int dev_events;
+static char buf[256];
+static char buf2[128];
+struct NDL_dispinfo{
+  unsigned char present,has_accel;
+  int width,height,vmemsz;
+};
+static struct NDL_dispinfo dispinfo;
 
 uint32_t NDL_GetTicks() {
   struct timeval tv;
@@ -40,6 +48,10 @@ void NDL_OpenCanvas(int *w, int *h) {
       if (strcmp(buf, "mmap ok") == 0) break;
     }
     close(fbctl);
+  }else{
+    canvas_w=*w;
+    canvas_h=*h;
+    return;
   }
 }
 
@@ -60,11 +72,31 @@ int NDL_QueryAudio() {
   return 0;
 }
 
+static inline void init_dispinfo(){
+  FILE * disp_info=fopen("/proc/dispinfo","r");
+  fread(buf,1,256,disp_info);
+  fclose(disp_info);
+  char * ch=buf;
+  while (*ch){
+    int data;
+    sscanf(ch,"%s : %d",buf2,&data);
+    if(strcmp(buf2,"PRESENT")==0) dispinfo.present=data;
+    else if(strcmp(buf2,"HAS_ACCEL")==0) dispinfo.has_accel=data;
+    else if(strcmp(buf2,"WIDTH")==0) dispinfo.width=data;
+    else if(strcmp(buf2,"HEIGHT")==0) dispinfo.height=data;
+    else if(strcmp(buf2,"VMEMSZ")==0) dispinfo.vmemsz=data;
+    while(*ch&&*ch!='\n') ch++;
+    ch++;
+  }
+  printf("dispinfo:%d,%d,%d",dispinfo.width,dispinfo.height,dispinfo.vmemsz);
+}
+
 int NDL_Init(uint32_t flags) {
   if (getenv("NWM_APP")) {
     evtdev = 3;
   }
   dev_events=open("/dev/events",O_RDONLY);
+  init_dispinfo();  
   return 0;
 }
 

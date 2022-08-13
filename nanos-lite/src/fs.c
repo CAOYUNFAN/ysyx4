@@ -1,4 +1,5 @@
 #include <fs.h>
+#include <device.h>
 
 typedef size_t (*ReadFn) (void *buf, size_t offset, size_t len);
 typedef size_t (*WriteFn) (const void *buf, size_t offset, size_t len);
@@ -12,7 +13,7 @@ typedef struct {
   size_t open_offset;
 } Finfo;
 
-enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_EVENTS, FD_FB};
+enum {FD_STDIN, FD_STDOUT, FD_STDERR, FD_EVENTS, FD_DISPINFO, FD_FB};
 
 size_t invalid_read(void *buf, size_t offset, size_t len) {
   panic("should not reach here");
@@ -25,14 +26,13 @@ size_t invalid_write(const void *buf, size_t offset, size_t len) {
 }
 
 /* This is the information about all files in disk. */
-extern size_t serial_write(const void *buf, size_t offset, size_t len);
-extern size_t events_read(void *buf, size_t offset, size_t len);
 
 static Finfo file_table[] __attribute__((used)) = {
   [FD_STDIN]  = {"stdin", 0, 0, invalid_read, invalid_write},
   [FD_STDOUT] = {"stdout", 0, 0, invalid_read, serial_write},
   [FD_STDERR] = {"stderr", 0, 0, invalid_read, serial_write},
   [FD_EVENTS] = {"/dev/events", 0, 0, events_read, invalid_write},
+  [FD_DISPINFO]={"/proc/dispinfo", 0, 0, dispinfo_read, invalid_write},
 #include "files.h"
 };
 
@@ -93,8 +93,7 @@ size_t fs_lseek(int fd, size_t offset, int whence){
     default:return -1;
   }
 
-  if(file->open_offset>=0&&file->open_offset<=file->size) return file->open_offset;
-  return -1;
+  return file->open_offset;
 }
 
 int fs_close(int fd){
