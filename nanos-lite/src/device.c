@@ -35,6 +35,7 @@ size_t dispinfo_read(void *buf, size_t offset, size_t len) {
   if(len>dispinfo_len-offset) len=dispinfo_len-offset;
   if(len<0) len=0;
   strncpy(buf,dispinfo+offset,len);
+  Log("%s",buf);
   return len;
 }
 
