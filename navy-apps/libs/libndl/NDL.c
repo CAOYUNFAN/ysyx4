@@ -102,7 +102,7 @@ static inline void init_dispinfo(){
     ch++;
   }
 //  printf("%s\n",buf);
-  printf("dispinfo:%d,%d,%d\n",screen_w,screen_h,dispinfo.vmemsz);
+//  printf("dispinfo:%d,%d,%d\n",screen_w,screen_h,dispinfo.vmemsz);
 }
 
 int NDL_Init(uint32_t flags) {
