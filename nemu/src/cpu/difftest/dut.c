@@ -13,6 +13,7 @@ void (*ref_difftest_raise_intr)(uint64_t NO) = NULL;
 
 #ifdef CONFIG_DIFFTEST
 
+static int difftest_enabled=1;
 static bool is_skip_ref = false;
 static int skip_dut_nr_inst = 0;
 // this is used to let ref skip instructions which
