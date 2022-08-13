@@ -32,10 +32,10 @@ static char dispinfo[256];
 static int dispinfo_len;
 
 size_t dispinfo_read(void *buf, size_t offset, size_t len) {
+  Log("len=%d,offset=%d,all=%d",len,offset,dispinfo_len);
   if(len>dispinfo_len-offset) len=dispinfo_len-offset;
   if(len<0) len=0;
   strncpy(buf,dispinfo+offset,len);
-  Log("buf=%s\ndispinfo=%s\nlen=%d",buf,dispinfo,len);
   return len;
 }
 
@@ -53,5 +53,5 @@ void init_device() {
   now+=sprintf(now,"WIDTH : %d\n",ev.width);
   now+=sprintf(now,"HEIGHT : %d\n",ev.height);
   now+=sprintf(now,"VMEMSZ : %d\n",ev.vmemsz);
-  dispinfo_len=strlen(now);
+  dispinfo_len=strlen(now)+1;
 }
