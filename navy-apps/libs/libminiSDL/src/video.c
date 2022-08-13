@@ -7,12 +7,82 @@
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect) {
   assert(dst && src);
   assert(dst->format->BitsPerPixel == src->format->BitsPerPixel);
+  int sx,sy,sw,sh,dx,dy;
+  if(srcrect==NULL) sx=sy=0,sw=src->w,sh=src->h;
+  else sx=srcrect->x,sy=srcrect->y,sw=srcrect->w,sh=srcrect->h;
+  if(dstrect==NULL) dx=dy=0;
+  else dx=dstrect->x,dy=dstrect->y;
+  
+//  printf("%d %d %d %d %d %d\n",sx,sy,sw,sh,dx,dy);
+//  printf("%d %d %d %d\n",src->w,src->h,dst->w,dst->h);
+  unsigned char * d=(unsigned char *)dst->pixels;
+  unsigned char * s=(unsigned char *)src->pixels;
+  int pp=dst->format->BytesPerPixel;
+  for(;sh;sh--,dy++,sy++){
+//    printf("Copy %d:%d-%d to %d:%d-%d\n",dy,dx,dx+sw,sy,sx,sx+sw);
+    memcpy(d+dy*dst->pitch+dx*pp,s+sy*src->pitch+sx*pp,sw*pp);
+  }
+  return;
 }
 
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color) {
+  int x0,y0,w0,h0;
+  if(dstrect==NULL) x0=y0=0,w0=dst->w,h0=dst->h;
+  else x0=dstrect->x,y0=dstrect->y,w0=dstrect->w,h0=dstrect->h;
+
+  unsigned char * pos=(unsigned char * )dst->pixels;
+  if(dst->format->BytesPerPixel==1){
+    for(int i=0;i<dst->format->palette->ncolors;++i)
+    if((dst->format->palette->colors+i)->val==color){
+      color=i;
+      break;
+    }
+    for(int i=0,y=y0;i<h0;++i,++y)
+    for(int j=0,x=x0;j<w0;++j,++x)
+    *(pos+y*dst->pitch+x*dst->format->BytesPerPixel)=(uint8_t)color;
+    return;
+  }
+
+//  printf("SDL_Fillrect,%d %d %d %d,col=%d\n",x0,y0,w0,h0,color);
+  assert(dst->format->BytesPerPixel==4);
+  for(int i=0,y=y0;i<h0;++i,++y)
+  for(int j=0,x=x0;j<w0;++j,++x)
+  *(pos+y*dst->pitch+x*dst->format->BytesPerPixel)=color;
+  return;
 }
 
 void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h) {
+//  printf("Update Rect %d %d %d %d With Source %d %d\n",x,y,w,h,s->w,s->h);
+//  NDL_OpenCanvas(&w,&h);
+  if(x==0&&y==0&&w==0&&h==0){
+    if(s->format->BytesPerPixel==4){
+      NDL_DrawRect((uint32_t *)s->pixels,x,y,s->w,s->h);
+      return;
+    }
+    w=s->w,h=s->h;
+  }
+  uint32_t * buf=malloc(w*h*sizeof(uint32_t));
+  assert(buf!=NULL);
+  if(s->format->BytesPerPixel==4){ 
+    uint32_t * temp=(uint32_t *)s->pixels;
+    for(int i=0;i<h;++i)
+    for(int j=0;j<w;++j){
+      buf[i*w+j]=*(temp+(y+i)*s->w+(x+j));
+    }
+    NDL_DrawRect(buf,x,y,w,h);
+  }else{
+    assert(s->format->BytesPerPixel==1);
+    uint8_t * temp=s->pixels;
+    uint32_t * my=(uint32_t * )s->format->palette->colors;
+    for(int i=0;i<h;++i)
+    for(int j=0;j<w;++j){
+      buf[i*w+j]=my[*(temp+(y+i)*s->w+(x+j))];
+  //    printf("%p",temp+i*s->w+j);
+    }
+    NDL_DrawRect(buf,x,y,w,h);
+  }
+  free(buf);
+  return;
 }
 
 // APIs below are already implemented.
