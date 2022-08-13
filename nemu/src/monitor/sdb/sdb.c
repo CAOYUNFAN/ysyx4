@@ -225,6 +225,7 @@ static int cmd_save(char * args){
 
 static inline bool check_img(FILE * fd){
   if(ftell(fd)!=MAGIC_LEN+sizeof(CPU_state)+CONFIG_MSIZE) return 0;
+  Log("1");
   unsigned char * buf=malloc(MAGIC_LEN);
   
   #define check_file(id,offset)\
@@ -232,12 +233,12 @@ static inline bool check_img(FILE * fd){
   for(int i=0;i<sizeof(concat(magic,id));i++) if(buf[i]!=concat(magic,id)[i]) return 0;
   
   check_file(1,0);
-
+  Log("1");
   assert(fread(buf,1,strlen(magic2)+1,fd)==strlen(magic2)+1);
   int i=0;
   for(;magic2[i];i++) if(buf[i]!=magic2[i]) return 0;
   if(buf[i]!=0) return 0;
-
+  Log("1");
   check_file(3,0)
   check_file(4,0)
   check_file(5,sizeof(CPU_state))
