@@ -44,8 +44,8 @@ static int cmd_x(char *args);
 static int cmd_p(char *args);
 static int cmd_w(char *args);
 static int cmd_d(char *args);
-static int cmd_attach(char * args);
-static int cmd_detach(char * args){difftest_enabled=0;return 0;}
+static int cmd_attach(char * args){difftest_attach();return 0;}
+static int cmd_detach(char * args){difftest_detach();return 0;}
 
 static struct {
   const char *name;
@@ -148,11 +148,6 @@ static int cmd_d(char *args){
 
 void sdb_set_batch_mode() {
   is_batch_mode = true;
-}
-
-static int cmd_attach(char * args){
-  difftest_enabled=1;
-  return 0;
 }
 
 void sdb_mainloop() {
