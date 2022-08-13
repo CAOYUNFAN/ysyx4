@@ -44,6 +44,8 @@ static int cmd_x(char *args);
 static int cmd_p(char *args);
 static int cmd_w(char *args);
 static int cmd_d(char *args);
+static int cmd_attach(char * args);
+static int cmd_detach(char * args){difftest_enabled=0;return 0;}
 
 static struct {
   const char *name;
@@ -59,7 +61,9 @@ static struct {
   {"x","Find the value of expression expr and take the result as the starting memeory address,which outputs n consecutive 4 bytes in hexadecimal form",cmd_x},
   {"p","Find the value of expression expr",cmd_p},
   {"w","When the value of expression expr changes, program execution is suspended",cmd_w},
-  {"d","Delete the monitoring point with sequence number n",cmd_d}
+  {"d","Delete the monitoring point with sequence number n",cmd_d},
+  {"attach","start difftest mode (only when difftest is enabled)",cmd_attach},
+  {"detach","stop difftest",cmd_detach}
   /* TODO: Add more commands */
 
 };
@@ -144,6 +148,11 @@ static int cmd_d(char *args){
 
 void sdb_set_batch_mode() {
   is_batch_mode = true;
+}
+
+static int cmd_attach(char * args){
+  difftest_enabled=1;
+  return 0;
 }
 
 void sdb_mainloop() {
