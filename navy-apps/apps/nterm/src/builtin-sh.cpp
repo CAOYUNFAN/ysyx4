@@ -31,6 +31,10 @@ static void sh_handle_cmd(const char *cmd) {
   int i=1;
   static char name[32];
   while((args[i]=strtok(NULL," "))!=NULL) i++;
+  for(int i=0;args[i];i++){
+    int j=strlen(args[i]);
+    while(args[i][j]==' '||args[i][j]=='\n') args[i][j]='\0',j--;
+  }
   for(int i=0;args[0][i];i++) if(args[0][i]=='='){
     strncpy(name,args[0],i);
     setenv(name,&args[0][i+1],0);
