@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <SDL.h>
+#include <string.h>
 
 char handle_key(SDL_Event *ev);
 
@@ -23,6 +24,20 @@ static void sh_prompt() {
 }
 
 static void sh_handle_cmd(const char *cmd) {
+  static char * args[32];
+  static char buf[128];
+  strcpy(buf,cmd);
+  args[0]=strtok(buf," ");
+  int i=1;
+  static char name[32];
+  while((args[i]=strtok(NULL," "))!=NULL) i++;
+  for(int i=0;args[0][i];i++) if(args[0][i]=='='){
+    strncpy(name,args[0],i);
+    setenv(name,&args[0][i+1],1);
+    return;
+  }
+  if(execvp(args[0],args)==-1) sh_printf("%s : command not found.",cmd);
+  return;
 }
 
 void builtin_sh_run() {
