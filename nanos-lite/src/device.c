@@ -51,7 +51,6 @@ static inline void dispinfo_init(){
 }
 
 size_t fb_write(const void *buf, size_t offset, size_t len) {
-  Log("print!%ld,%ld",offset,len);
   offset/=sizeof(uint32_t);len/=sizeof(uint32_t);
 
   size_t w=disp_info.width;
