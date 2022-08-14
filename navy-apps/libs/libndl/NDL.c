@@ -106,9 +106,10 @@ static inline void init_dispinfo(){
   printf("dispinfo:%d,%d,%d\n",screen_w,screen_h,dispinfo.vmemsz);
   memset(buf,0xff,sizeof(buf));
   int total=dispinfo.vmemsz;
-  for(;total>=0;total-=sizeof(buf)){
-    int size=sizeof(buf);if(size>total) size=total;
+  while(total){
+    int size=sizeof(buf);if(size>total) size=total;total-=size;
     fwrite(buf,1,size,dev_fb);
+    printf("%ld %d\n",ftell(dev_fb),size);
   }
   fflush(dev_fb);
 //  printf("%s\n",buf);
