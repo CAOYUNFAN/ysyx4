@@ -88,7 +88,7 @@ int NDL_QueryAudio() {
 }
 
 static inline void init_dispinfo(){
-  FILE * disp_info=fopen("/proc/dispinfo","r");
+  FILE * disp_info=fopen("/proc/dispinfo","rb");
   fread(buf,1,128,disp_info);
   fclose(disp_info);
   char * ch=buf;
@@ -123,7 +123,7 @@ int NDL_Init(uint32_t flags) {
     evtdev = 3;
   }
   dev_events=open("/dev/events",O_RDONLY);
-  dev_fb=fopen("/dev/fb","w");
+  dev_fb=fopen("/dev/fb","wb");
   init_dispinfo();
   return 0;
 }
