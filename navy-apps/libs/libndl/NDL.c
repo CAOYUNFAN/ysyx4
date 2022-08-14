@@ -108,6 +108,7 @@ static inline void init_dispinfo(){
   int total=dispinfo.vmemsz;
   while(total){
     int size=sizeof(buf);if(size>total) size=total;total-=size;
+    fseek(dev_fb,-total,SEEK_END);
     fwrite(buf,1,size,dev_fb);
     printf("%ld %d\n",ftell(dev_fb),size);
   }
