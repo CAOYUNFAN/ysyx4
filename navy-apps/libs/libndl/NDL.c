@@ -104,15 +104,9 @@ static inline void init_dispinfo(){
     ch++;
   }
   printf("dispinfo:%d,%d,%d\n",screen_w,screen_h,dispinfo.vmemsz);
-  memset(buf,0xff,sizeof(buf));
   int total=dispinfo.vmemsz;
-  while(total){
-    printf("%ld\n",ftell(dev_fb));
-    int size=sizeof(buf);if(size>total) size=total;total-=size;
-    fwrite(buf,1,size,dev_fb);
-    printf("%ld %d %d\n",ftell(dev_fb),size,total);
-    assert(ftell(dev_fb)+total==dispinfo.vmemsz);
-  }
+  uint32_t white=0xffffffff;
+  for(int i=0;i<dispinfo.vmemsz;i++) fwrite(&white,sizeof(white),1,dev_fb);
   fflush(dev_fb);
   printf("init ended!\n");
 //  printf("%s\n",buf);
