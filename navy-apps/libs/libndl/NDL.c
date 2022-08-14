@@ -103,12 +103,12 @@ static inline void init_dispinfo(){
     while(*ch&&*ch!='\n') ch++;
     ch++;
   }
-  printf("dispinfo:%d,%d,%d\n",screen_w,screen_h,dispinfo.vmemsz);
+/*  printf("dispinfo:%d,%d,%d\n",screen_w,screen_h,dispinfo.vmemsz);
   int total=dispinfo.vmemsz;
   uint32_t white=0xffffffff;
   for(int i=0;i<dispinfo.vmemsz;i++) fwrite(&white,sizeof(white),1,dev_fb);
   fflush(dev_fb);
-  printf("init ended!\n");
+  printf("init ended!\n");*/
 //  printf("%s\n",buf);
 }
 
