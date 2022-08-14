@@ -32,7 +32,7 @@ static void sh_handle_cmd(const char *cmd) {
   static char name[32];
   while((args[i]=strtok(NULL," "))!=NULL) i++;
   for(int i=0;args[i];i++){
-    int j=strlen(args[i]);
+    int j=strlen(args[i])-1;
     while(args[i][j]==' '||args[i][j]=='\n') args[i][j]='\0',j--;
     printf("%s\n",args[i]);
   }
