@@ -101,6 +101,8 @@ int fs_close(int fd){
   return 0;
 }
 
+extern AM_GPU_CONFIG_T disp_info;
 void init_fs() {
+  file_table[FD_FB].size=disp_info.vmemsz;
   // TODO: initialize the size of /dev/fb
 }

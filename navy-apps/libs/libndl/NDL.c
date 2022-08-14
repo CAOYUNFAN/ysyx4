@@ -107,8 +107,8 @@ static inline void init_dispinfo(){
   memset(buf,0xff,sizeof(buf));
   int total=dispinfo.vmemsz;
   while(total){
-    int size=sizeof(buf);if(size>total) size=total;total-=size;
     fseek(dev_fb,-total,SEEK_END);
+    int size=sizeof(buf);if(size>total) size=total;total-=size;
     fwrite(buf,1,size,dev_fb);
     printf("%ld %d\n",ftell(dev_fb),size);
   }
