@@ -33,7 +33,7 @@ static void sh_handle_cmd(const char *cmd) {
   while((args[i]=strtok(NULL," "))!=NULL) i++;
   for(int i=0;args[0][i];i++) if(args[0][i]=='='){
     strncpy(name,args[0],i);
-    setenv(name,&args[0][i+1],1);
+    setenv(name,&args[0][i+1],0);
     return;
   }
   if(execvp(args[0],args)==-1) sh_printf("%s : command not found.",cmd);
@@ -43,7 +43,7 @@ static void sh_handle_cmd(const char *cmd) {
 void builtin_sh_run() {
   sh_banner();
   sh_prompt();
-
+  setenv("PATH","/bin",0);
   while (1) {
     SDL_Event ev;
     if (SDL_PollEvent(&ev)) {
