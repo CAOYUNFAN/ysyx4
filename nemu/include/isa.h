@@ -38,7 +38,5 @@ word_t isa_query_intr();
 
 // difftest
 bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc);
-void difftest_attach();
-void difftest_detach();
 
 #endif

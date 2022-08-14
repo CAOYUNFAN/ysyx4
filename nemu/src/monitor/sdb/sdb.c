@@ -2,6 +2,7 @@
 #include <cpu/cpu.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <cpu/difftest.h>
 #include "sdb.h"
 
 static int is_batch_mode = false;
