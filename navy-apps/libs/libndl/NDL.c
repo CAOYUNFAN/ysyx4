@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <assert.h>
 
 static int evtdev = -1;
 static int fbdev = -1;
@@ -60,6 +61,7 @@ void NDL_OpenCanvas(int *w, int *h) {
 }
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h) {
+  assert(x+w<=canvas_w);assert(y+h<=canvas_h);
   x+=(screen_w-canvas_w)/2;y+=(screen_h-canvas_h)/2;
   uint32_t offset=(y*screen_w+x)*sizeof(uint32_t);
   for(int i=0;i<h;i++){
