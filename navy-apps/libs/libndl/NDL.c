@@ -112,7 +112,7 @@ static inline void init_dispinfo(){
     printf("%ld %d\n",ftell(dev_fb),size);
   }
   fflush(dev_fb);
-  printf("init ended!");
+  printf("init ended!\n");
 //  printf("%s\n",buf);
 }
 
