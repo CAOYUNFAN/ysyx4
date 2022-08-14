@@ -101,6 +101,13 @@ static inline void init_dispinfo(){
     while(*ch&&*ch!='\n') ch++;
     ch++;
   }
+  memset(buf,0xff,sizeof(buf));
+  int total=screen_w*screen_h*sizeof(uint32_t);
+  for(;total>=0;total-=sizeof(buf)){
+    int size=sizeof(buf);if(size>total) size=total;
+    fwrite(buf,1,total,dev_fb);
+  }
+  fflush(dev_fb);
 //  printf("%s\n",buf);
 //  printf("dispinfo:%d,%d,%d\n",screen_w,screen_h,dispinfo.vmemsz);
 }
@@ -111,7 +118,7 @@ int NDL_Init(uint32_t flags) {
   }
   dev_events=open("/dev/events",O_RDONLY);
   dev_fb=fopen("/dev/fb","w");
-  init_dispinfo();  
+  init_dispinfo();
   return 0;
 }
 
