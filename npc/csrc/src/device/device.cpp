@@ -7,6 +7,8 @@
 
 #define SERIAL_PORT     (DEVICE_BASE + 0x00003f8)
 #define RTC_ADDR        (DEVICE_BASE + 0x0000048)
+#define VGACTL_ADDR     (DEVICE_BASE + 0x0000100)
+#define FB_ADDR         (DEVICE_BASE + 0x1000000)
 
 uLL boottime=0;
 extern void difftest_skip_ref();
@@ -51,12 +53,61 @@ class SERIAL:public device_regs{
         }
 }serial;
 
-class
+class FB:public device_regs{
+    private:
+        union{
+            u8 _8[8];
+        } vmem[SCREEN_W*SCREEN_H/2];
+    public:
+        void init(){
+            name="FB";start=FB_ADDR;end=FB_ADDR+sizeof(vmem);
+            log_output();
+            memset(vmem,0,sizeof(vmem));
+            vga_update_screen(vmem);
+        }
+        void output(uLL addr,uLL data,u8 mask){
+            difftest_skip_ref();
+            addr=(addr-FB_ADDR)>>3;
+            for(int i=0;i<8;i++) if(mask&(1<<i)){
+                vmem[addr]._8[i]=data&0xff;
+                data>>=8;
+            }
+        }
+        void * pointer(){return &vmem[0];}
+}fb;
+
+class VGA_CTL:public device_regs{
+    private:
+        union{
+            u8 _8[8];
+            u16 _16[4];
+            u32 _32[2];
+            u64 _64;
+        }mem;
+    public:
+        void init(){
+            name="VGA_CTL";start=VGACTL_ADDR;end=VGACTL_ADDR+8;
+            log_output();
+            mem._16[0]=SCREEN_H;
+            mem._16[1]=SCREEN_W;
+            mem._32[1]=0;
+        }
+        uLL input(uLL addr){
+            difftest_skip_ref();
+            return mem._64;
+        }
+        void output(uLL addr,uLL data,u8 mask){
+            difftest_skip_ref();
+            assert(mask==0xf0);
+            if(data) vga_update_screen(fb.pointer());
+        }
+}vga_ctl;
 
 device_regs * device_table[]={
-    &memory,&rtc,&serial
+    &memory,&rtc,&serial,&vga_ctl,&fb
 };
 
 void device_init(){
-    for(int i=0;i<3;i++) device_table[i]->init();
+    init_vga();
+    for(int i=0;i<5;i++) device_table[i]->init();
 }

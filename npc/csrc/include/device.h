@@ -18,3 +18,5 @@ void device_init();
 
 #define SCREEN_W 400
 #define SCREEN_H 300
+void vga_update_screen(void * vmem);
+void init_vga();

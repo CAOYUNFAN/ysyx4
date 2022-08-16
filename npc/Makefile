@@ -11,7 +11,7 @@ EMU_DIR := $(NPC_HOME)/emu
 EMU_TOP_MODULE :=$(STUID)top
 EMU_TARGET := emu
 CFLAGS_NPC = -I$(CSRC_INCLUDE_DIR) -g -O2 #-DMTRACE #-DINSTR
-CFLAGS_NPC_2 = $(addprefix -CFLAGS , $(CFLAGS_NPC))
+LDFLAGS =-lSDL2 
 
 DIFF = --diff=$(NEMU_HOME)/build/riscv64-nemu-interpreter-so
 IMG ?= 
@@ -19,7 +19,7 @@ ARGS ?= --log=$(NPC_HOME)/emu/log.txt
 
 $(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES) $(CSRC_INCLUDE)
 	@echo "Verilator VSRC_FILES > EMU_DIR"
-	@verilator --cc $(CFLAGS_NPC_2)\
+	@verilator --cc $(addprefix -CFLAGS , $(CFLAGS_NPC)) $(addprefix -LDFLAGS , $(LDFLAGS))\
 		-Mdir $(@D)\
 		--top-module $(EMU_TOP_MODULE)\
 		--prefix $(EMU_TARGET)\
