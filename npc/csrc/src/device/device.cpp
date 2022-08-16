@@ -51,6 +51,8 @@ class SERIAL:public device_regs{
         }
 }serial;
 
+class
+
 device_regs * device_table[]={
     &memory,&rtc,&serial
 };
