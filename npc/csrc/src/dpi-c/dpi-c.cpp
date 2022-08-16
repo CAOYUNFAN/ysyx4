@@ -14,7 +14,7 @@ extern "C" void assert_check_msg(bool cond,char * msg,...){
 
 extern "C" void data_read(uLL raddr,u8 memread,uLL *rdata){ 
     if(!memread) {*rdata=0x114514;return;}
-    for(int i=0;i<5;i++) if(device_table[i]->in_range(raddr)){
+    for(int i=0;i<6;i++) if(device_table[i]->in_range(raddr)){
         *rdata=device_table[i]->input(raddr);
         #ifdef MTRACE
         Log("read from addr %llx: %llx",raddr,*rdata);
@@ -28,7 +28,7 @@ extern "C" void data_write(uLL waddr, uLL wdata, u8 wmask) {
     #ifdef MTRACE
     Log("Write to memory %llx:0x%llx=%lld,wmask=%x",waddr,wdata,wdata,wmask);
     #endif
-    for(int i=0;i<5;i++) if(device_table[i]->in_range(waddr)){
+    for(int i=0;i<6;i++) if(device_table[i]->in_range(waddr)){
         device_table[i]->output(waddr,wdata,wmask);
         return;
     }

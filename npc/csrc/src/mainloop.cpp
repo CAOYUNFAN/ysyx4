@@ -3,6 +3,7 @@
 #include <memory.h>
 #include <kernel.h>
 uLL oldpc;
+int global_status;
 void trace_and_difftest(){
     extern int is_difftest;
     if(is_difftest){
@@ -44,10 +45,11 @@ void statistics(){
 }
 
 void cpu_exec(uLL n){
-    if(mycpu->error||mycpu->done){
+    if(mycpu->error||mycpu->done||global_status==2){
       Log("Simulation has ended. Please restart the system mannually");
       return;
     }
+    global_status=1;
     while (n--){
         oldpc=mycpu->pc;
         cpu_exec_once();
@@ -56,7 +58,10 @@ void cpu_exec(uLL n){
           return;
         }
         trace_and_difftest();
+        extern void device_update();
+        device_update();
     }
+    global_status=0;
 }
 char line_read[1000];
 static char* rl_gets() {

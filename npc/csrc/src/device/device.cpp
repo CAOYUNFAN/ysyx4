@@ -9,6 +9,7 @@
 #define RTC_ADDR        (DEVICE_BASE + 0x0000048)
 #define VGACTL_ADDR     (DEVICE_BASE + 0x0000100)
 #define FB_ADDR         (DEVICE_BASE + 0x1000000)
+#define KBD_ADDR        (DEVICE_BASE + 0x0000060)
 
 uLL boottime=0;
 extern void difftest_skip_ref();
@@ -103,11 +104,27 @@ class VGA_CTL:public device_regs{
         }
 }vga_ctl;
 
+class KEYBOARD:public device_regs{
+    public:
+        void init(){
+            name="KEYBOARD";start=KBD_ADDR;end=KBD_ADDR+4;
+            log_output();
+        }
+        uLL input(uLL addr){
+            return key_dequeue();
+        }
+}kbd;
+
 device_regs * device_table[]={
-    &memory,&rtc,&serial,&vga_ctl,&fb
+    &memory,&rtc,&serial,&vga_ctl,&fb,&kbd
 };
 
 void device_init(){
     init_vga();
-    for(int i=0;i<5;i++) device_table[i]->init();
+    init_keymap();
+    for(int i=0;i<6;i++) device_table[i]->init();
+}
+
+void device_update(){
+    keyboard_update();
 }

@@ -20,3 +20,6 @@ void device_init();
 #define SCREEN_H 300
 void vga_update_screen(void * vmem);
 void init_vga();
+void init_keymap();
+u32 key_dequeue();
+void keyboard_update();
