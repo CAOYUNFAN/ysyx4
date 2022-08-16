@@ -35,6 +35,7 @@ static void init_screen() {
       SCREEN_W * (MUXDEF(CONFIG_VGA_SIZE_400x300, 2, 1)),
       SCREEN_H * (MUXDEF(CONFIG_VGA_SIZE_400x300, 2, 1)),
       0, &window, &renderer);
+  Log("%d %d",SCREEN_W * (MUXDEF(CONFIG_VGA_SIZE_400x300, 2, 1)),SCREEN_H * (MUXDEF(CONFIG_VGA_SIZE_400x300, 2, 1)));
   SDL_SetWindowTitle(window, title);
   texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
       SDL_TEXTUREACCESS_STATIC, SCREEN_W, SCREEN_H);

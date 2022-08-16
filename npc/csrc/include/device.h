@@ -15,3 +15,6 @@ class device_regs{
 extern device_regs * device_table[];
 
 void device_init();
+
+#define SCREEN_W 400
+#define SCREEN_H 300
