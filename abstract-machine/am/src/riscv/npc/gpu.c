@@ -10,8 +10,8 @@ static inline void outl(uintptr_t addr, uint32_t data) { *(volatile uint32_t *)a
 
 static int width,height;
 void __am_gpu_init() {
-  width=(uint32_t)inw(VGACTL_ADDR+2);
-  height=(uint32_t)inw(VGACTL_ADDR);
+  width=0;//(uint32_t)inw(VGACTL_ADDR+2);
+  height=0;//(uint32_t)inw(VGACTL_ADDR);
 }
 
 void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
