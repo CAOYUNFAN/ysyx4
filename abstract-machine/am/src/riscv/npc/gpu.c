@@ -1,10 +1,12 @@
 #include <am.h>
+#include <klib-macros.h>
 
 #define MMIO_BASE 0xa0000000
 #define VGACTL_ADDR     (MMIO_BASE   + 0x0000100)
 #define FB_ADDR         (MMIO_BASE   + 0x1000000)
 static inline uint16_t inw(uintptr_t addr) { return *(volatile uint16_t *)addr; }
 static inline uint32_t inl(uintptr_t addr) { return *(volatile uint32_t *)addr; }
+static inline void outl(uintptr_t addr, uint32_t data) { *(volatile uint32_t *)addr = data; }
 
 static int width,height;
 void __am_gpu_init() {
@@ -22,7 +24,7 @@ void __am_gpu_config(AM_GPU_CONFIG_T *cfg) {
 }
 
 void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
-  const uint32_t *data=ctl->pixels;
+  const uint32_t *data=ctl->pixels; 
   
   panic_on(ctl->x+ctl->w>width,"TOO WIDE!");
   panic_on(ctl->y+ctl->h>height,"TOO HIGH!");
@@ -31,7 +33,7 @@ void __am_gpu_fbdraw(AM_GPU_FBDRAW_T *ctl) {
   for(int j=0;j<ctl->w;j++)
   outl((width*(ctl->y+i)+(ctl->x+j))*4+FB_ADDR,*(data++));
   if (ctl->sync) {
-    outl(SYNC_ADDR, 1);
+    outl(VGACTL_ADDR + 4, 1);
   }
 }
 
