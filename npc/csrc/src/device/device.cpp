@@ -111,6 +111,7 @@ class KEYBOARD:public device_regs{
             log_output();
         }
         uLL input(uLL addr){
+            difftest_skip_ref();
             return key_dequeue();
         }
 }kbd;
