@@ -1,43 +1,81 @@
 module ysyx_220066_ID (
-    input [31:0] instr,
-    output [63:0] imm,
-    output [4:0] rs1,
-    output [4:0] rs2,
-    output [4:0] rd,
-    output [1:0] ALUBSrc,
-    output ALUASrc,
-    output [5:0] ALUctr,
-    output [2:0] Branch,
-    output MemWr,MemRd,
-    output MemToReg,
-    output RegWr,
-    output csr,ecall,mret,
-    output [11:0] csr_addr,
-    output [2:0] MemOp,
-    output error,done
-);
-    
-    assign rs1=instr[19:15];
-    assign rs2=instr[24:20];
-    assign rd=instr[11:7];
-    wire [2:0] ExtOp;
-    assign done=(instr==32'h0010_0073);
-    wire err_temp;
-    assign ecall=(instr==32'h0000_0073);
-    assign mret=(instr==32'h3020_0073);
-    assign csr_addr=instr[31:20];
+    input clk,rst,block,
+    output ready,
+    output reg valid,
 
-    assign error=err_temp||(csr&&instr[14:12]==3'b000&&(instr!=32'h0010_0073&&instr!=32'h0000_0073&&instr!=32'h3020_0073));
+    input ex_block,valid_in,
+    input [31:0] instr,
+    input [63:0] in_pc,
+    input [63:0] src1_in,
+    input [63:0] src2_in,
+    input [63:0] csr_in,
+
+    output reg [31:0] imm,
+    output reg [63:0] src1_out,
+    output reg [63:0] src2_out,
+    output reg [4:0] rd,
+    output reg [1:0] ALUBSrc,
+    output reg ALUASrc,
+    output reg [5:0] ALUctr,
+    output reg [2:0] Branch,
+    output reg MemWr,MemRd,
+    output reg RegWr,
+    output reg csr,ecall,mret,
+    output reg [2:0] MemOp,
+    output reg error,done,
+    output reg [63:0] pc
+);
+    always @(posedge clk) begin
+        if(rst) valid<=0;
+        else if(block && valid) valid <= valid;
+        else valid <= valid_in;
+    end
+
+    assign ready=~ex_block||~(block&&valid);
+    wire [2:0] ExtOp;
+    wire err_temp;
+
+    wire csr_line;
+    wire RegWr_line;
+    wire ALUASrc_line;
+    wire [1:0] ALUBSrc_line;
+    wire [5:0] ALUctr_line;
+    wire MemRd_line;
+    wire [2:0] Branch_line;
+    wire MemWr_line,MemRd_line;
+    wire [2:0] MemOp_line;
+    wire [31:0] imm_line;
 
     ysyx_220066_Decode decode(
         .OP(instr[6:0]),.Funct3(instr[14:12]),.Funct7(instr[31:25]),
-        .ExtOp(ExtOp),.RegWr(RegWr),.ALUASrc(ALUASrc),.ALUBSrc(ALUBSrc),.ALUctr_out(ALUctr),.MemRd(MemRd),
-        .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.MemToReg(MemToReg),.csr(csr),.error(err_temp)
+        .ExtOp(ExtOp),.RegWr(RegWr_line),.ALUASrc(ALUASrc_line),.ALUBSrc(ALUBSrc_line),.ALUctr_out(ALUctr_line),.MemRd(MemRd_line),
+        .Branch(Branch_line),.MemWr(MemWr_line),.MemOp(MemOp_line),.csr(csr_line),.error(err_temp)
     );
 
     ysyx_220066_IMM ysyx_220066_imm(
-        .instr(instr[31:7]),.ExtOp(ExtOp),.imm(imm)
+        .instr(instr[31:7]),.ExtOp(ExtOp),.imm(imm_line)
     );
+
+    always @(posedge clk) if(!block||!valid) begin
+        done<=(instr==32'h0010_0073);
+        ecall<=(instr==32'h0000_0073);
+        mret<=(instr==32'h3020_0073);
+        rd<=instr[11:7];
+        pc<=in_pc;
+        error<=err_temp||(csr_line&&instr[14:12]==3'b000&&(instr!=32'h0010_0073&&instr!=32'h0000_0073&&instr!=32'h3020_0073));
+        src1_out<=src1_in;
+        src2_out<=csr_line?csr_in:src2_in;
+        csr<=csr_line;
+        RegWr<=RegWr_line;
+        ALUASrc<=ALUASrc_line;
+        ALUBSrc<=ALUBSrc_line;
+        ALUctr<=ALUctr_line;
+        MemRd<=MemRd_line;
+        Branch<=Branch_line;
+        {MemWr,MemRd}<={MemWr_line,MemRd_line};
+        MemOp<=MemOp_line;
+        imm<=imm_line;
+    end
 
     always @(*) begin
 //        $display("Instr=%h,error=%h",instr,error);
@@ -56,13 +94,11 @@ module ysyx_220066_Decode (
     output [5:0] ALUctr_out,
     output reg [2:0] Branch,
     output MemWr,MemRd,
-    output MemToReg,
     output [2:0] MemOp,
     output csr,
     output error
 );
     assign MemOp=Funct3;
-    assign MemToReg=(OP[6:2]==5'b00000);
     assign MemWr=(OP[6:2]==5'b01000);
     assign MemRd=(OP[6:2]==5'b00000);
     assign RegWr=(OP[6:2]!=5'b11000&&OP[6:2]!=5'b01000);
@@ -74,7 +110,7 @@ module ysyx_220066_Decode (
     assign csr=(OP[6:2]==5'b11100);
     always @(*)//ALUctr
     case(OP[6:2])//ExtOp:I=000,U=101,B=011,S=010,J=001
-        5'b11100:begin ExtOp=3'b000;ALUBSrc=2;ALUctr=4'b1111;Branch=3'b000; case(Funct3)
+        5'b11100:begin ExtOp=3'b000;ALUBSrc=0;ALUctr=4'b1111;Branch=3'b000; case(Funct3)
             3'b000,//ecall,ebreak,mret
             3'b001,//csrrw
             3'b101,//csrrwi
@@ -152,9 +188,9 @@ endmodule
 module ysyx_220066_IMM (
     input [31:7] instr,
     input [2:0] ExtOp,
-    output [63:0] imm
+    output [31:0] imm
 );//ExtOp:I=000,U=101,B=011,S=010,J=001
-    assign imm[63:31]={33{instr[31]}};
+    assign imm[31]={instr[31]};
     assign imm[30:20]=ExtOp[2]?instr[30:20]:{11{instr[31]}};
     assign imm[19:12]=(~ExtOp[1]&ExtOp[0])?instr[19:12]:{8{instr[31]}};
     assign imm[11]   =ExtOp[2]?1'b0://U
