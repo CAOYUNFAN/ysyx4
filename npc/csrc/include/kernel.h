@@ -16,3 +16,5 @@ typedef struct {
 void reg_display();
 bool difftest_checkregs(CPU_state * ref,uLL pc);
 CPU_state * current_cpu();
+void disable_difftest();
+void enable_difftest();

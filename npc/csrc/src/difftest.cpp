@@ -83,7 +83,9 @@ static void checkregs(CPU_state *ref, uLL pc) {
     }
 }
 
+static int difftest_enabled=1;
 void difftest_step(uLL pc, uLL npc) {
+    if(!difftest_enabled) return;
     CPU_state ref_r;
 
     if (skip_dut_nr_inst > 0) {
@@ -110,4 +112,11 @@ void difftest_step(uLL pc, uLL npc) {
     ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
 
     checkregs(&ref_r, npc);
+}
+
+void disable_difftest(){difftest_enabled=0;}
+void enable_difftest(){
+    difftest_enabled=1;
+    ref_difftest_memcpy(RESET_VECTOR, mem_addr(), MEM_SIZE, DIFFTEST_TO_REF);
+    ref_difftest_regcpy(current_cpu(), DIFFTEST_TO_REF);
 }

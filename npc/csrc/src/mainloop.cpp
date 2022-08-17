@@ -78,6 +78,8 @@ static int cmd_q(char *args) {exit(0);}
 static int cmd_help(char *args);
 static int cmd_si(char *args);
 static int cmd_info(char *args);
+static int cmd_attach(char * args){enable_difftest();return 0;}
+static int cmd_detach(char * args){disable_difftest();return 0;}
 
 static struct {
   const char *name;
@@ -89,7 +91,9 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   {"si","Let the program execute N instructions in a single step and pause execution, when N is not given, it defaults to 1",cmd_si},
-  {"info"," r :print register status; w :print monitoring point information",cmd_info}
+  {"info"," r :print register status; w :print monitoring point information",cmd_info},
+  {"attach","enable dittest",cmd_attach},
+  {"detach","disable dittest",cmd_attach}
   /* TODO: Add more commands */
 
 };
