@@ -5,10 +5,17 @@ module ysyx_220066_cpu(
 
     output error,MemWr,MemRd,done,
     output [2:0] MemOp,
-    output [63:0] pc,
+    output [63:0] pc_rd,
+    output [63:0] pc_wr,
     output [63:0] addr,
     output [63:0] data_Wr
 );
+
+    wire if_valid,id_valid,ex_valid,m_valid,multi_valid,div_valid;
+    wire if_ready,id_ready,ex_ready,m_ready,multi_ready,div_ready;
+    
+    wire [63:0] if_pc;
+
     wire [63:0] nxtpc;
 
     wire error_csr,csr_jmp;
@@ -17,8 +24,8 @@ module ysyx_220066_cpu(
     wire [63:0] csr_nxtpc;
 
     ysyx_220066_IF module_if(
-        .clk(~clk),.rst(rst),
-        .nxtpc(csr_jmp?csr_nxtpc:nxtpc),.pc(pc)
+        .clk(clk),.rst(rst),.block(~id_valid),.valid(if_valid),
+        .nxtpc(csr_jmp?csr_nxtpc:nxtpc),.pc_instr(pc_rd),.pc(if_pc)
     );
 
     wire [4:0] rs1;
