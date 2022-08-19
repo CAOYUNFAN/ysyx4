@@ -45,7 +45,7 @@ void statistics(){
 }
 
 void cpu_exec(uLL n){
-    if(mycpu->error||mycpu->done||global_status==2){
+    if(mycpu->error||mycpu->done){
       Log("Simulation has ended. Please restart the system mannually");
       return;
     }

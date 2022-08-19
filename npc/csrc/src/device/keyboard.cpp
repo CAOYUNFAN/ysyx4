@@ -79,7 +79,7 @@ void keyboard_update(){
     last = now;
     SDL_Event event;
     while (SDL_PollEvent(&event)) switch (event.type) {
-        case SDL_QUIT:global_status=2;break;
+        case SDL_QUIT:exit(0);
         case SDL_KEYDOWN: case SDL_KEYUP: {
             uint8_t k = event.key.keysym.scancode;
             bool is_keydown = (event.key.type == SDL_KEYDOWN);
