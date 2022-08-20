@@ -1,10 +1,12 @@
 module ysyx_220066_csr (
     input rst,clk,
-    input [11:0] csr_addr,
+    input [11:0] csr_rd_addr,
+    input [11:0] csr_wr_addr,
     input wen,
     input [63:0] in_data,
     output reg [63:0] csr_data,
-    output reg err,//for csr instruction
+    output reg rd_err,
+    output wr_err,//for csr instruction
     
     input raise_intr,
     input [63:0] NO,
@@ -23,13 +25,19 @@ module ysyx_220066_csr (
     assign nxtpc=ret?mepc:mtvec;
     assign jmp=ret||raise_intr;
 
-    always @(*) case(csr_addr)
-        12'h341: begin csr_data=mepc; err=0; end
-        12'h300: begin csr_data=mstatus; err=0; end
-        12'h342: begin csr_data=mcause; err=0; end
-        12'h305: begin csr_data=mtvec; err=0; end
-        default: begin csr_data=64'h114514; err=wen; end
+    always @(*) case(csr_rd_addr)
+        12'h341: begin csr_data=mepc; rd_err=0; end
+        12'h300: begin csr_data=mstatus; rd_err=0; end
+        12'h342: begin csr_data=mcause; rd_err=0; end
+        12'h305: begin csr_data=mtvec; rd_err=0; end
+        default: begin csr_data=64'h0; err=1; end
     endcase
+
+    assign wr_err=wen&&
+                    (csr_wr_addr!=12'h341)&&
+                    (csr_wr_addr!=12'h300)&&
+                    (csr_wr_addr!=12'h342)&&
+                    (csr_wr_addr!=12'h305);
 
     always @(posedge clk) begin
         if(rst) begin
@@ -41,7 +49,7 @@ module ysyx_220066_csr (
                 mstatus[7]=1'b1;
             end else begin
                 if(wen) begin 
-                    case(csr_addr)
+                    case(csr_wr_addr)
                         12'h341: mepc=in_data;
                         12'h300: mstatus=in_data;
                         12'h342: mcause=in_data;

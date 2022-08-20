@@ -1,59 +1,99 @@
 module ysyx_220066_EX(
-    input clk,rst,block,in_valid,
-    output valid,ready,
+    input clk,rst,block,valid_in,error_in,
+    output valid,
 
-    input valid_in,
-    input [63:0] src1,
-    input [63:0] src2,
-    input [31:0] imm,
-    input [63:0] in_pc,
-    input ALUAsrc,
-    input [1:0] ALUBsrc,
-    input [4:0] ALUctr,
-    input [2:0] Branch,
-    input [2:0] MemOp,
-    input MemRd_in,MemWr_in,
+    input [63:0] src1_in,
+    input [63:0] src2_in,
+    input [31:0] imm_in,
+    input [63:0] csr_data_in,
+    input [63:0] pc_in,
+    input [11:0] csr_addr_in,
+    input ALUAsrc_in,done_in,csr_in,
+    input ecall_in,mret_in,
+    input [1:0] ALUBsrc_in,
+    input [4:0] ALUctr_in,
+    input [4:0] rd_in,
+    input [4:0] rs1_in,
+    input [2:0] Branch_in,
+    input [2:0] MemOp_in,
+    input MemRd_in,MemWr_in,RegWr_in,
 
     output [63:0] nxtpc,
-    output reg [63:0] result,
-    output reg [63:0] pc,
-    output reg MemRd,MemWr,
-    output reg [2:0] MemOp
+    output is_jmp,
+    output [2:0] MemOp,
+    output [4:0] rd,
+    output [4:0] rs1,
+    output [63:0] result,
+    output [63:0] pc,
+    output [63:0] src1,
+    output [11:0] csr_addr,
+    output [63:0] csr_data,
+    output MemRd,MemWr,RegWr,error,done
 );
+    reg valid_native,error_native,csr_native,ecall_native,mret_native;
+    reg [63:0] src1_native;
+    reg [63:0] src2_native;
+    reg [31:0] imm_native;
+    reg [63:0] csr_data_native;
+    reg [63:0] pc_native;
+    reg ALUAsrc_native,done_native;
+    reg [1:0] ALUBsrc_native;
+    reg [4:0] ALUctr_native;
+    reg [2:0] Branch_native;
+    reg [2:0] MemOp_native;
+    reg MemRd_native,MemWr_native,RegWr_native;
+    reg [11:0] csr_addr_native;
+    reg [4:0] rd_native;
+    reg [4:0] rs1_native;
+    
+    always @(posedge clk) if(~block) begin
+        valid_native<=valid_in;error_native<=error_in;
+        src1_native<=src1_in;src2_native=src2_in;imm_native<=imm_in;csr_data_native<=csr_data_in;
+        pc_native<=pc_in;ALUAsrc_native<=ALUAsrc_in;ALUBsrc_native<=ALUBsrc_in;
+        done_native<=done_in;ALUctr_native<=ALUctr_in;rs1_native<=rs1_in;
+        Branch_native<=Branch_in;MemOp_native<=MemOp_in;rd_native<=rd_in;
+        MemRd_native<=MemRd_in;MemWr_native<=MemWr_in;RegWr_native<=RegWr_in;
+        csr_addr_native<=csr_addr_in;csr_native<=csr;ecall_native<=ecall_in;mret_native<=mret_in;
+    end
+
+    always @(posedge clk) valid_native<=~rst&&(block?valid_native:valid_in);
+
+    assign valid=valid_native;
+    assign error=error_native;
+    assign done=done_native;
+    assign MemOp=MemOp_native;
+    assign MemRd=MemRd_native;
+    assign MemWr=MemWr_native;
+    assign pc=pc_native;
+    assign src1=src1_native;
+    assign csr_addr=csr_addr_native;
+    assign csr_data=csr_data_native;
+    assign ecall=ecall_native;
+    assign mret=mret_native;
+    assign rd=rd_native;
+    assign RegWr=RegWr_native;
+    assign rs1=rs1_native;
+
+    reg [63:0] datab;
+    always @(*) case(ALUBsrc_native)
+        2'b00:datab=src2_native;
+        2'b01:datab=64'h4;
+        2'b10:datab={{32{imm_native[31]}},imm_native};
+        2'b11:datab=csr_data_native;
+    endcase
     wire zero;
-    wire [63:0] result_alu;
-    wire [63:0] result_mul;
-    wire [63:0] imm_real;
-    assign imm_real={{32{imm[31]}},imm};
-    assign ready=~(valid&&block);
 
     ysyx_220066_ALU alu(
-        .data_input(ALUAsrc?in_pc:src1),
-        .datab_input(ALUBsrc[1]?imm_real:(ALUBsrc[0]?64'h4:src2)),
-        .aluctr(ALUctr),.zero(zero),.result(result_alu)
+        .data_input(ALUAsrc_native?pc_native:src1_native),.datab_input(datab),
+        .aluctr(ALUctr_native),.zero(zero),.result(result)
     );
 
-//    ysyx_220066_Multi multi(
-//        .src1(src1),.src2(src2),.ALUctr(ALUctr[2:0]),.is_w(ALUctr[4]),.result(result_mul)
-//    );
-
+    wire is_jmp_line;
     ysyx_220066_nxtPC nxtPC(
-        .nxtpc(nxtpc),.in_pc(in_pc),.BusA(src1),.Imm(imm_real),.Zero(zero),
-        .Result_0(result[0]),.Branch(Branch)
+        .nxtpc(nxtpc),.is_jmp(is_jmp_line),.in_pc(pc_native),.BusA(src1_native),.Imm(imm_native),.Zero(zero),
+        .Result_0(result[0]),.Branch(Branch_native)
     );
-
-    always @(posedge clk) begin
-        if(rst) valid<=0;
-        else if(~(valid&&block)) valid<=valid_in;
-    end
-
-    always @(posedge clk) if(~(valid&&block)) begin
-        result<=result_alu;
-        pc<=in_pc;
-        MemRd<=MemRd_in;
-        MemWr<=MemWr_in;
-        MemOp<=MemOp_in;
-    end
+    assign is_jmp=is_jmp_line||csr_native;
 
     always @(*) begin
 //        $display("EX:src1=%h,ALUBsrc=%h,src2=%h,imm=%h,result=%h,ALUctr=%b",src1,ALUBsrc,src2,imm,result,ALUctr);
