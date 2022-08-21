@@ -111,12 +111,12 @@ module ysyx_220066_cpu(
     );
 
     ysyx_220066_M module_m(
-        .clk(clk),.rst(rst),.ready(m_ready),.valid(ex_valid),.pc_in(ex_pc),.done_in(ex_done),
-        .valid_in(ex_valid&&(~ex_MemRd||data_Rd_valid)),.block(ex_MemRd&&~data_Rd_valid),
-        .MemRd(ex_MemRd),.ex_result(ex_result),.error_in(id_error||(ex_MemRd&&data_Rd_error)),
-        .data_Rd(data_Rd), .m_out(m_result),.RegWr(m_RegWr),.error(m_error),
-        .pc(m_pc),.done(m_done)
-    );TODO!
+        .clk(clk),.rst(rst),.ready(m_ready),.valid(m_valid),.block(wb_m_block),
+        .pc_in(module_ex.pc),.done_in(module_ex.done),.valid_in(module_ex.valid),
+        .MemRd_in(module_ex.MemRd),.ex_result(module_ex.result),.error_in(module_ex.error),
+        .data_Wr_in(module_ex.src2),.RegWr_in(module_ex.RegWr),.MemWr_in(module_ex.MemWr),
+        .MemRd_native(MemRd),.MemWr_native(MemWr),.addr(addr),.data_Wr(data_Wr)
+    );
 
     ysyx_220066_Multi module_mutli(
         .clk(clk),.rst(rst),.block(wb_multi_block),
@@ -136,7 +136,15 @@ module ysyx_220066_cpu(
         .result(div_result),.error(div_error)
     );
 
-    TODO!
+    ysyx_220066_Wb module_wb(
+        .clk(clk),.rst(rst),
+        .M_wen_in(module_m.RegWr&&module_m.valid),.M_MemRd_in(module_m.MemRd_native),
+        .M_done_in(module_m.done),.M_rd_in(module_m.rd),.M_data_in(module_m.addr),.data_Rd(data_Rd),.data_Rd_valid(data_Rd_valid),
+        .Multi_wen_in(module_mutli.valid),.Multi_data_in(module_mutli.result),.Multi_rd_in(module_mutli.rd),
+        .Div_wen_in(module_div.valid),.Div_data_in(module_div.result),.Div_rd_in(module_div.rd),
+        .rd(wb_rd),.data(wb_data),.wen(wb_wen),
+        .m_block(wb_m_block),.multi_block(wb_multi_block),.div_block(wb_div_block)
+    );
 
     always @(*) if(!rst) begin
 //        $display("clk=%b,pc=%h,instr=%h",clk,pc,instr);

@@ -26,6 +26,7 @@ module ysyx_220066_EX(
     output [63:0] result,
     output [63:0] pc,
     output [63:0] src1,
+    output [63:0] src2,
     output [11:0] csr_addr,
     output [63:0] csr_data,
     output MemRd,MemWr,RegWr,error,done
@@ -66,6 +67,7 @@ module ysyx_220066_EX(
     assign MemWr=MemWr_native;
     assign pc=pc_native;
     assign src1=src1_native;
+    assign src2=src2_native;
     assign csr_addr=csr_addr_native;
     assign csr_data=csr_data_native;
     assign ecall=ecall_native;
