@@ -53,12 +53,12 @@ void cpu_exec(uLL n){
     while (n--){
         oldpc=mycpu->pc_done;
         cpu_exec_once();
-        while(!mycpu->valid) cpu_exec_once();
-        if(mycpu->error||mycpu->done) {
+//        while(!mycpu->valid) cpu_exec_once();
+        if(mycpu->valid&&(mycpu->error||mycpu->done)) {
           statistics();
           return;
         }
-        trace_and_difftest();
+        if(mycpu->valid) trace_and_difftest();
         extern void device_update();
         device_update();
     }
