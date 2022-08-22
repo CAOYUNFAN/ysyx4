@@ -65,6 +65,7 @@ module ysyx_220066_ID (
     assign is_ex=~ALUctr_line[5];
 
     always @(*) begin
+        if(!rst&&clk) $display("ID:pc=%h,instr=%h,valid=%h",pc,error,valid);
 //        $display("Instr=%h,error=%h",instr,error);
     end
 
@@ -165,8 +166,8 @@ module ysyx_220066_Decode (
     assign error=err||!(OP[1:0]==2'b11);
 
     always @(*) begin
-//        $display("Funct7=%h,err=%h,error=%h",Funct7,err,error);
-//        $display("OP=%b,done=%b",OP,done);
+        
+        //$display("OP=%b,done=%b",OP,done);
     end
 
 endmodule
