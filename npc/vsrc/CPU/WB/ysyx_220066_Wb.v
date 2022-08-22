@@ -77,6 +77,6 @@ module ysyx_220066_Wb(
     assign valid=M_valid_native||Multi_wen_native||Div_wen_native;
 
     always @(*) begin
-        //
+        if(!rst&&clk) $display("pc=%h,valid=%b,done=%b",pc,valid,done);
     end
 endmodule
