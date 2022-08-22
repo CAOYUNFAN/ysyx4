@@ -12,16 +12,18 @@ extern "C" void assert_check_msg(bool cond,char * msg,...){
     }
 }
 
-extern "C" void data_read(uLL raddr,u8 memread,uLL *rdata){ 
-    if(!memread) {*rdata=0x114514;return;}
+extern "C" void data_read(uLL raddr,uLL *rdata,u8 * valid){ 
     for(int i=0;i<6;i++) if(device_table[i]->in_range(raddr)){
         *rdata=device_table[i]->input(raddr);
+        *valid=1;
         #ifdef MTRACE
         Log("read from addr %llx: %llx",raddr,*rdata);
         #endif
         return;
     }
-    panic("Unexpected addr %llx",raddr);
+    *rdata=0x1145141919810uLL;
+    *valid=0;
+//    panic("Unexpected addr %llx",raddr);
 }
 
 extern "C" void data_write(uLL waddr, uLL wdata, u8 wmask) {

@@ -1,5 +1,5 @@
 module ysyx_220066_top(
-  output [63:0] pc,
+  output [63:0] pc_done,
 //  input [63:0] instr_data,
   input clk,rst,
   //output [63:0] addr,
@@ -11,97 +11,17 @@ module ysyx_220066_top(
   output reg [63:0] mcause,
   output reg [63:0] mtvec,
 
-  output error,done,status
+  output error,done,valid
 );
   wire MemWr,MemRd;
   wire [63:0] addr;
   wire [2:0] MemOp;
-  reg [63:0] data_Rd;
-  reg [7:0] b_Rd;reg [15:0] h_Rd;reg [31:0] w_Rd;
-
-  import "DPI-C" function void data_read(
-    input longint raddr,input byte memrd, output longint rdata
-  );
-
-  reg [63:0] data_Rd_data;
-  always @(*) begin
-    data_read(addr,{7'b0,MemRd&!rst&clk},data_Rd_data);
-  end
-
-  reg [63:0] instr_data;
-  always@(*) begin
-    data_read(pc,{7'b0,!rst},instr_data);
-  end
-  wire [31:0] instr;
-  assign instr=pc[2]?instr_data[63:32]:instr_data[31:0];
-//  wire [63:0] data_Wr_help;
-//  assign data_Wr_help=data_Rd_data;
-
-  always @(*) begin
-    case(addr[2:0])
-      3'b000:begin b_Rd=data_Rd_data[ 7: 0]; h_Rd=data_Rd_data[15: 0]; w_Rd=data_Rd_data[31: 0];end
-      3'b001:begin b_Rd=data_Rd_data[15: 8]; h_Rd=data_Rd_data[15: 0]; w_Rd=data_Rd_data[31: 0];end
-      3'b010:begin b_Rd=data_Rd_data[23:16]; h_Rd=data_Rd_data[31:16]; w_Rd=data_Rd_data[31: 0];end
-      3'b011:begin b_Rd=data_Rd_data[31:24]; h_Rd=data_Rd_data[31:16]; w_Rd=data_Rd_data[31: 0];end
-      3'b100:begin b_Rd=data_Rd_data[39:32]; h_Rd=data_Rd_data[47:32]; w_Rd=data_Rd_data[63:32];end
-      3'b101:begin b_Rd=data_Rd_data[47:40]; h_Rd=data_Rd_data[47:32]; w_Rd=data_Rd_data[63:32];end
-      3'b110:begin b_Rd=data_Rd_data[55:48]; h_Rd=data_Rd_data[63:48]; w_Rd=data_Rd_data[63:32];end
-      3'b111:begin b_Rd=data_Rd_data[63:56]; h_Rd=data_Rd_data[63:48]; w_Rd=data_Rd_data[63:32];end
-    endcase
-  end
-  always @(*) begin
-    case(MemOp)
-      3'b100: data_Rd={56'h0,b_Rd};
-      3'b000: data_Rd={{56{b_Rd[7]}},b_Rd};
-      3'b101: data_Rd={48'h0,h_Rd};
-      3'b001: data_Rd={{48{h_Rd[15]}},h_Rd};
-      3'b110: data_Rd={32'h0,w_Rd};
-      3'b010: data_Rd={{32{w_Rd[31]}},w_Rd};
-      default:data_Rd=data_Rd_data;
-    endcase
-//    $display("addr=%h,addr_low=%b",addr,addr[2:0]);
-//    $display("b=%h,h=%h,w=%h,q=%h,final=%h",b_Rd,h_Rd,w_Rd,data_Rd_data,data_Rd);
-  end
-
+  wire [63:0] data_Rd;
+  wire [63:0] pc_rd;
   wire [63:0] data_Wr;
-  reg [7:0] wmask;
-  reg [63:0] data_Wrr;
-  always @(*) begin
-    case(MemOp)
-      3'b000:begin
-        data_Wrr={8{data_Wr[7:0]}};
-        wmask[0]=(addr[2:0]==3'o0);
-        wmask[1]=(addr[2:0]==3'o1);
-        wmask[2]=(addr[2:0]==3'o2);
-        wmask[3]=(addr[2:0]==3'o3);
-        wmask[4]=(addr[2:0]==3'o4);
-        wmask[5]=(addr[2:0]==3'o5);
-        wmask[6]=(addr[2:0]==3'o6);
-        wmask[7]=(addr[2:0]==3'o7);
-      end
-      3'b001:begin
-        data_Wrr={4{data_Wr[15:0]}};
-        wmask[0]=(addr[2:1]==2'o0);
-        wmask[1]=(addr[2:1]==2'o0);
-        wmask[2]=(addr[2:1]==2'o1);
-        wmask[3]=(addr[2:1]==2'o1);
-        wmask[4]=(addr[2:1]==2'o2);
-        wmask[5]=(addr[2:1]==2'o2);
-        wmask[6]=(addr[2:1]==2'o3);
-        wmask[7]=(addr[2:1]==2'o3);
-      end
-      3'b010:begin
-        data_Wrr={2{data_Wr[31:0]}};
-        wmask[3:0]={4{~addr[2]}};
-        wmask[7:4]={4{addr[2]}};
-      end
-      default: begin
-        wmask=8'hff;
-        data_Wrr=data_Wr;
-      end
-    endcase
-  end
-
+  wire [31:0] instr;
+  wire instr_valid,instr_error;
+  wire data_Rd_valid,data_Rd_error;
 
 /*  assign data_Wr_data[ 7: 0]=wmask[0]?data_Wrr[ 7: 0]:data_Wr_help[ 7: 0];
   assign data_Wr_data[15: 8]=wmask[1]?data_Wrr[15: 8]:data_Wr_help[15: 8];
@@ -114,29 +34,39 @@ module ysyx_220066_top(
 */
   ysyx_220066_cpu cpu(
     .clk(clk),.rst(rst),
-    .pc(pc),.instr(instr),
-    .addr(addr),.MemOp(MemOp),.MemRd(MemRd),
-    .data_Rd(data_Rd),.data_Wr(data_Wr),.MemWr(MemWr),.error(error),.done(done)
+    .pc_done(pc_done),
+    .pc_rd(pc_rd),.instr(instr),.instr_valid(instr_valid),.instr_error(instr_error),
+    .addr(addr),.MemOp(MemOp),.MemRd(MemRd),.MemWr(MemWr),
+    .data_Rd_valid(data_Rd_valid),.data_Rd_error(data_Rd_error),
+    .data_Rd(data_Rd),.data_Wr(data_Wr),.error(error),.done(done),.out_valid(valid)
   );
 
-  import "DPI-C" function void data_write(
-    input longint waddr, input longint data, input byte mask
+
+  ysyx_220066_imem imem(
+    .clk(clk),.rst(rst),
+    .pc(pc_rd),.instr(instr),
+    .error(data_Rd_error),.valid(data_Rd_valid)
   );
 
-  always @(negedge clk) begin
-//    if(!rst&&MemWr)$display("pc=%h,addr=%h,MemOp=%h,wmask=%h,data=%h",pc,addr,MemOp,wmask,data_Wr);
-    if(!rst&&MemWr) data_write(addr,data_Wr,wmask);
-  end
+  ysyx_220066_dmem_rd dmemrd(
+    .clk(clk),.rst(rst),.MemRd(MemRd),
+    .addr(addr),.MemOp(MemOp),.data(data_Rd),
+    .error(data_Rd_error),.valid(data_Rd_valid)
+  );
 
-  assign status=cpu.module_regs.rf[10][0];
+  ysyx_220066_memwr memwr(
+    .clk(clk),.rst(rst),.addr(addr),
+    .MemOp(MemOp),.data(data_Wr),.MemWr(MemWr)
+  );
+
   integer i;
   always @(*) begin
-    for(i=1;i<32;i=i+1) dbg_regs[i]=cpu.module_regs.rf[i];
+    for(i=1;i<32;i=i+1) dbg_regs[i]=cpu.module_regs.module_regs.rf[i];
     dbg_regs[0]=0;
 //    if(MemWr&&clk)$display("Write to:addr=%h,data=%x,help=%h,real=%h,wmask=%b",addr,data_Wr,data_Wr_help,data_Wr_data,wmask);
-    mepc=cpu.csr.mepc;
-    mstatus=cpu.csr.mstatus;
-    mcause=cpu.csr.mcause;
-    mtvec=cpu.csr.mtvec;
+    mepc=cpu.module_csr.mepc;
+    mstatus=cpu.module_csr.mstatus;
+    mcause=cpu.module_csr.mcause;
+    mtvec=cpu.module_csr.mtvec;
   end
 endmodule

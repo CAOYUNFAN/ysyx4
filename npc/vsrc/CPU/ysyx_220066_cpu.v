@@ -8,7 +8,7 @@ module ysyx_220066_cpu(
     output error,MemWr,MemRd,done,
     output [2:0] MemOp,
     output [63:0] pc_rd,
-    output [63:0] pc_wr,
+    output [63:0] pc_done,
     output out_valid,
     output [63:0] addr,
     output [63:0] data_Wr
@@ -16,7 +16,7 @@ module ysyx_220066_cpu(
     //ID
     wire id_rs1_valid,id_rs2_valid;
     //EX
-    wire ex_valid,ex_wen,ex_MemRd,ex_is_jmp,ex_ecall,ex_mret,ex_done;
+    wire ex_valid,ex_wen,ex_MemRd,ex_is_jmp,ex_ecall,ex_mret,ex_csr,ex_done;
     wire [4:0] ex_rd;
     wire [63:0] ex_data;
     wire [11:0] ex_csr_addr;
@@ -46,23 +46,17 @@ module ysyx_220066_cpu(
     wire [63:0] csr_nxtpc;
     wire csr_jmp;
 
-/*    assign pc_wr=m_valid?m_pc|(div_valid?div_pc:multi_pc);
-    assign out_valid=m_valid||div_valid||multi_valid;
-    assign error=(m_valid&&m_error)||(div_valid&&div_error)||(multi_valid&&multi_error);
-    assign done=m_done&&m_valid;
-    assign addr=ex_result_line;*/
-
     ysyx_220066_IF module_if(
         .clk(clk),.rst(rst),
-        .block((~ex_is_jmp&&(~instr_valid||~id_rs1_valid||~id_rs2_valid))||id_csr||ex_csr),
-        .is_jmp(ex_is_jmp||csr_jmp),.instr_valid(instr_valid),.valid(if_valid),
-        .nxtpc(csr_jmp?csr_nxtpc:ex_nxtpc),.native_pc(pc_rd),
+        .block(~ex_is_jmp&&~csr_jmp&&(~instr_valid||~id_rs1_valid||~id_rs2_valid)),
+        .is_jmp(ex_is_jmp||csr_jmp),
+        .nxtpc(csr_jmp?csr_nxtpc:ex_nxtpc),.native_pc(pc_rd)
     );
     
     ysyx_220066_Registers module_regs(
         .clk(clk),.rst(rst),.wen(wb_wen),.rd(wb_rd),.data(wb_data),
         .ex_rd(ex_rd),.ex_wen(ex_wen&&ex_valid),.ex_data(ex_data),.ex_valid(~ex_MemRd),
-        .m_rd(m_rd),.m_wen(m_wen&&m_valid),.m_data(m_result),.m_valid(~m_valid),
+        .m_rd(m_rd),.m_wen(m_wen&&m_valid),.m_data(m_data),.m_valid(~m_valid),
         .multi_rd1(mul_rd1),.multi_rd2(mul_rd2),.multi_valid1(mul_valid1),.multi_valid2(mul_valid2),.multi_result(mul_data),
         .div_rd1(div_rd1),.div_rd2(div_rd2),.div_valid1(div_valid1),.div_valid2(div_valid2),.div_result(div_data),
         .rs1(instr[19:15]),.rs1_valid(id_rs1_valid),
@@ -76,7 +70,7 @@ module ysyx_220066_cpu(
     ysyx_220066_csr module_csr(
         .rst(rst),.clk(clk),
         .csr_rd_addr(instr[31:20]),
-        .csr_wr_addr(ex_csr_addr),.in_data(ex_csr_data),.wen(ex_valid&&ex_csr&&~ex_ecall&&~ex_mret&&~ex_done),
+        .csr_wr_addr(ex_csr_addr),.in_data(ex_csr_wdata),.wen(ex_valid&&ex_csr&&~ex_ecall&&~ex_mret&&~ex_done),
         .raise_intr(raise_intr),.NO(NO),.pc(ex_pc),
         .ret(ex_mret&&ex_valid),
         .jmp(csr_jmp),.nxtpc(csr_nxtpc)
@@ -84,26 +78,23 @@ module ysyx_220066_cpu(
 
     ysyx_220066_ID module_id(
         .clk(clk),.rst(rst||ex_is_jmp||csr_jmp||~id_rs1_valid||~id_rs2_valid),.block(0),        
-        .valid_in(module_if.valid),.instr(instr),.in_pc(module_if.pc),.instr_error(instr_error),
-        .csr_error(module_csr.rd_err),.in_pc(module_if.pc)
+        .valid_in(module_if.valid),.instr(instr),.pc_in(module_if.pc),.instr_error(instr_error),
+        .csr_error(module_csr.rd_err)
     );
 
-    /*assign MemRd=id_MemRd&&id_valid;
-    assign MemWr=id_MemWr&&id_valid&&~id_error;
-    assign MemOp=id_MemOp;
-    assign data_Wr=id_src2;*/
     ysyx_220066_EX module_ex(
         .clk(clk),.rst(rst),.block(0),
         .valid_in(module_id.valid&&module_id.is_ex&&~raise_intr),
-        .valid(ex_valid),.error_in(module_id.error),
-        .src1(module_regs.rs1),.src2(module_regs.rs2),.imm(module_id.imm),.in_pc(module_id.pc),
-        .ALUAsrc(module_id.ALUAsrc),.ALUBsrc(module_id.ALUBsrc),.ALUctr(module_id.ALUctr),.Branch(module_id.Branch),
-        .MemOp(module_id.MemOp),.MemRd_in(module_id.MemRd),.MemWr_in(module_id.MemWr),.done_in(module_id.done),
-        .rd_in(module_id.rd),.RegWr_in(module_id.RegWr),.rs1_in(instr[19:15])
+        .valid(ex_valid),.error_in(module_id.error),.rd_in(module_id.rd),
+        .src1_in(module_regs.src1),.src2_in(module_regs.src2),.imm_in(module_id.imm),.pc_in(module_id.pc),
+        .csr_data_in(module_csr.csr_data),.csr_addr_in(module_id.csr_addr),.csr_in(module_id.csr),
+        .ecall_in(module_id.ecall),.mret_in(module_id.mret),
+        .ALUAsrc_in(module_id.ALUASrc),.ALUBsrc_in(module_id.ALUBSrc),.ALUctr_in(module_id.ALUctr),.Branch_in(module_id.Branch),
+        .MemOp_in(module_id.MemOp),.MemRd_in(module_id.MemRd),.MemWr_in(module_id.MemWr),.done_in(module_id.done),
+        .RegWr_in(module_id.RegWr),.rs1_in(instr[19:15]),
         
         .nxtpc(ex_nxtpc),.is_jmp(ex_is_jmp),.result(ex_data),.rd(ex_rd),.RegWr(ex_wen),
-        .MemRd(ex_MemRd),.ecall(ex_ecall),.mret(ex_mret),.done(ex_done),.csr_addr(ex_csr_addr),
-        .src1(ex_src1),.csr_data(ex_csr_data)
+        .MemRd(ex_MemRd),.ecall(ex_ecall),.mret(ex_mret),.csr_addr(ex_csr_addr),.csr(ex_csr),.done(ex_done)
     );
 
     ysyx_220066_csrwork csrwork(
@@ -115,36 +106,49 @@ module ysyx_220066_cpu(
         .pc_in(module_ex.pc),.done_in(module_ex.done),.valid_in(module_ex.valid),
         .MemRd_in(module_ex.MemRd),.ex_result(module_ex.result),.error_in(module_ex.error),
         .data_Wr_in(module_ex.src2),.RegWr_in(module_ex.RegWr),.MemWr_in(module_ex.MemWr),
-        .MemRd_native(MemRd),.MemWr_native(MemWr),.addr(addr),.data_Wr(data_Wr)
+        .MemOp_in(module_ex.MemOp),.rd_in(module_ex.rd),
+        .RegWr(m_wen),.rd(m_rd),
+        .MemRd_native(MemRd),.MemWr_native(MemWr),.MemOp_native(MemOp),.addr(addr),.data_Wr(data_Wr)
     );
+
+    assign m_MemRd=MemRd;
+    assign m_data=addr;
 
     ysyx_220066_Multi module_mutli(
         .clk(clk),.rst(rst),.block(wb_multi_block),
         .valid_in(module_id.valid&&module_id.is_Multi),.error_in(module_id.error),.pc_in(module_id.pc),
         .ready(multi_ready),
-        .valid(multi_valid2),.valid_part(multi_valid1),.rd_part(multi_rd1),.rd(multi_rd2),
-        .rs1(module_id.rs1),.rs2(module_id.rs2),.ALUctr(module_id.ALUctr[1:0]),.is_w(module_id.ALUctr[4]),.rd_in(id_rd),
-        .result(multi_result),.error(multi_error)
+        .valid(mul_valid2),.valid_part(mul_valid1),.rd_part(mul_rd1),.rd(mul_rd2),
+        .src1_in(module_regs.src1),.src2_in(module_regs.src2),.ALUctr_in(module_id.ALUctr[1:0]),.is_w_in(module_id.ALUctr[4]),.rd_in(module_id.rd),
+        .result(mul_data)
     );
 
     ysyx_220066_Div module_div(
         .clk(clk),.rst(rst),.block(wb_div_block),
-        .valid_in(module_id.valid&&id_is_Div),error_in(module_id.error),.pc_in(module_id.pc),
+        .valid_in(module_id.valid&&module_id.is_Div),.error_in(module_id.error),.pc_in(module_id.pc),
         .ready(div_ready),
         .valid(div_valid2),.valid_part(div_valid1),.rd_part(div_rd1),.rd(div_rd2),
-        .rs1(module_id.rs1),.rs2(module_id.rs2),.ALUctr(module_id.ALUctr[1:0]),is_w(Amodule_id.LUctr[4]),.rd_in(id_rd),
-        .result(div_result),.error(div_error)
+        .src1_in(module_regs.src1),.src2_in(module_regs.src2),.ALUctr_in(module_id.ALUctr[1:0]),.is_w_in(module_id.ALUctr[4]),.rd_in(module_id.rd),
+        .result(div_data)
     );
 
     ysyx_220066_Wb module_wb(
         .clk(clk),.rst(rst),
+        .M_valid_in(module_m.valid),.data_Rd_error(data_Rd_error),
         .M_wen_in(module_m.RegWr&&module_m.valid),.M_MemRd_in(module_m.MemRd_native),
-        .M_done_in(module_m.done),.M_rd_in(module_m.rd),.M_data_in(module_m.addr),.data_Rd(data_Rd),.data_Rd_valid(data_Rd_valid),
+        .M_done_in(module_m.done&&module_m.valid),.M_rd_in(module_m.rd),.M_data_in(module_m.addr),
+        .data_Rd(data_Rd),.data_Rd_valid(data_Rd_valid),
+        .M_error_in(module_m.error),.M_pc_in(module_m.pc),
         .Multi_wen_in(module_mutli.valid),.Multi_data_in(module_mutli.result),.Multi_rd_in(module_mutli.rd),
+        .Multi_error_in(module_mutli.error),.Multi_pc_in(module_mutli.pc),
         .Div_wen_in(module_div.valid),.Div_data_in(module_div.result),.Div_rd_in(module_div.rd),
+        .Div_error_in(module_div.valid),.Div_pc_in(module_div.pc),
         .rd(wb_rd),.data(wb_data),.wen(wb_wen),
-        .m_block(wb_m_block),.multi_block(wb_multi_block),.div_block(wb_div_block)
+        .m_block(wb_m_block),.multi_block(wb_multi_block),.div_block(wb_div_block),
+        .pc(pc_done),.done(done),.valid(out_valid)
     );
+
+    assign error=module_wb.error||module_csr.wr_err;
 
     always @(*) if(!rst) begin
 //        $display("clk=%b,pc=%h,instr=%h",clk,pc,instr);

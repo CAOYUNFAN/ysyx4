@@ -1,28 +1,28 @@
 module ysyx_220066_ID (
     input clk,rst,block,
-    output valid,
 
     input valid_in,instr_error,csr_error,
     input [31:0] instr,
-    input [63:0] in_pc,
-
-    output [31:0] imm,
-    output [4:0] rd,
-    output [1:0] ALUBSrc,
-    output ALUASrc,
-    output [4:0] ALUctr,
-    output is_Multi,
-    output is_Div,
-    output is_ex,
-    output [2:0] Branch,
-    output MemWr,MemRd,
-    output RegWr,
-    output csr,ecall,mret,
-    output [2:0] MemOp,
-    output [11:0] csr_addr,
-    output error,done,
-    output [63:0] pc
+    input [63:0] pc_in
 );
+    wire valid;
+
+    wire [31:0] imm;
+    wire [4:0] rd;
+    wire [1:0] ALUBSrc;
+    wire ALUASrc;
+    wire [4:0] ALUctr;
+    wire is_Multi;
+    wire is_Div;
+    wire is_ex;
+    wire [2:0] Branch;
+    wire MemWr,MemRd;
+    wire RegWr;
+    wire csr,ecall,mret;
+    wire [2:0] MemOp;
+    wire [11:0] csr_addr;
+    wire error,done;
+    wire [63:0] pc;
 
     reg valid_native;
     reg [63:0] pc_native;
@@ -74,13 +74,12 @@ module ysyx_220066_Decode (
     input [6:0] OP,
     input [2:0] Funct3,
     input [6:0] Funct7,
-    output [2:0] ExtOp,
-    outputWr,
-    output [1:0] ALUBSrc,
+    output reg [2:0] ExtOp,
+    output reg [1:0] ALUBSrc,
     output ALUASrc,
     output [5:0] ALUctr_out,
-    output [2:0] Branch,
-    output MemWr,MemRd,
+    output reg [2:0] Branch,
+    output MemWr,MemRd,RegWr,
     output [2:0] MemOp,
     output csr,
     output error

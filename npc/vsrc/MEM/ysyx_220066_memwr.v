@@ -2,7 +2,7 @@ module ysyx_220066_memwr (
     input clk,rst,MemWr,
     input [63:0] addr,
     input [2:0] MemOp,
-    input [63:0] data,
+    input [63:0] data
 );
     reg [7:0] wmask;
     always @(*) case (MemOp)

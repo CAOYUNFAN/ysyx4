@@ -2,10 +2,9 @@ module ysyx_220066_memrd (
     input clk,rst,MemRd,
     input [63:0] addr,
     output reg [63:0] data,
-    output ready,error,
+    output error,
     output reg valid
 );
-    assign ready=1;
     import "DPI-C" function void data_read(
         input longint raddr, output longint rdata, output byte valid
     );
@@ -24,12 +23,12 @@ module ysyx_220066_imem (
 
     input [63:0] pc,
     output [31:0] instr,
-    output ready,error,valid
+    output error,valid
 );
     wire [63:0] instr_long;
     ysyx_220066_memrd imem(
         .clk(clk),.rst(rst),.MemRd(1),
-        .ready(ready),.error(error),.valid(valid),
+        .error(error),.valid(valid),
         .addr(pc),.data(instr_long)
     );
 
@@ -41,12 +40,12 @@ module ysyx_220066_dmem_rd (
     input [63:0] addr,
     input [2:0] MemOp,
     output reg [63:0] data,
-    output error,ready,valid
+    output error,valid
 );
     wire [63:0] basic_data;
     ysyx_220066_memrd dmemrd(
         .clk(clk),.rst(rst),.MemRd(MemRd),
-        .ready(ready),.error(error),.valid(valid),
+        .error(error),.valid(valid),
         .addr(addr),.data(basic_data)
     );
 

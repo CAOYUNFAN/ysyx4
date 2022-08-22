@@ -1,5 +1,5 @@
 module ysyx_220066_Multi(
-    input clk,block,valid_in,error_in,
+    input clk,rst,block,valid_in,error_in,
     output ready,
     output valid,
 
@@ -8,27 +8,28 @@ module ysyx_220066_Multi(
     input [63:0] pc_in,
     input [4:0] rd_in,
     input [1:0] ALUctr_in,
-    input is_w_in,done_in,
+    input is_w_in,
 
     output valid_part,
     output [4:0] rd_part,
 
     output [63:0] result,
-    output [63:0] pc,
-    output [4:0] rd,
-    output error,done
+    output [4:0] rd
 );
+    wire [63:0] pc;
+    wire error;
+
     reg [63:0] src1_native;
     reg [63:0] src2_native;
     reg [63:0] pc_native;
     reg [4:0] rd_native;
     reg [1:0] ALUctr_native;
-    reg is_w_native,valid_native,error_native,done_native;
+    reg is_w_native,valid_native,error_native;
 
     reg [63:0] result_middle;
     reg [63:0] pc_middle;
     reg [4:0] rd_middle;
-    reg error_middle,valid_middle,done_middle;
+    reg error_middle,valid_middle;
 
     always @(posedge clk) if(~block) begin
         src1_native<=src1_in;
@@ -37,7 +38,6 @@ module ysyx_220066_Multi(
         rd_native<=rd_in;
         ALUctr_native<=ALUctr_in;
         is_w_native<=is_w_in;error_native<=error_in;
-        done_native<=done_in;
     end
 
     always @(posedge clk) begin
@@ -65,7 +65,6 @@ module ysyx_220066_Multi(
         error_middle<=error_native;
         pc_middle<=pc_native;
         rd_middle<=rd_native;
-        done_middle<=done_native;
     end
 
     assign valid_part=valid_native;
@@ -76,7 +75,6 @@ module ysyx_220066_Multi(
     assign pc=pc_middle;
     assign rd=rd_middle;
     assign error=error_middle;
-    assign done=done_middle;
 
     always @(*) begin
         //

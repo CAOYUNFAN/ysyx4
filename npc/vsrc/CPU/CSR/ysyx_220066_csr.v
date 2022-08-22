@@ -3,10 +3,7 @@ module ysyx_220066_csr (
     input [11:0] csr_rd_addr,
     input [11:0] csr_wr_addr,
     input wen,
-    input [63:0] in_data,
-    output reg [63:0] csr_data,
-    output reg rd_err,
-    output wr_err,//for csr instruction
+    input [63:0] in_data,//for csr instruction
     
     input raise_intr,
     input [63:0] NO,
@@ -17,6 +14,10 @@ module ysyx_220066_csr (
     output jmp,
     output [63:0] nxtpc
 );
+    reg [63:0] csr_data;
+    reg rd_err;
+    wire wr_err;
+
     reg [63:0] mepc;
     reg [63:0] mstatus;
     reg [63:0] mcause;
@@ -30,7 +31,7 @@ module ysyx_220066_csr (
         12'h300: begin csr_data=mstatus; rd_err=0; end
         12'h342: begin csr_data=mcause; rd_err=0; end
         12'h305: begin csr_data=mtvec; rd_err=0; end
-        default: begin csr_data=64'h0; err=1; end
+        default: begin csr_data=64'h0; rd_err=1; end
     endcase
 
     assign wr_err=wen&&

@@ -20,17 +20,19 @@ module ysyx_220066_EX(
 
     output [63:0] nxtpc,
     output is_jmp,
-    output [2:0] MemOp,
     output [4:0] rd,
-    output [4:0] rs1,
     output [63:0] result,
-    output [63:0] pc,
-    output [63:0] src1,
-    output [63:0] src2,
     output [11:0] csr_addr,
-    output [63:0] csr_data,
-    output MemRd,MemWr,RegWr,error,done
+    output MemRd,RegWr,ecall,mret,csr,done
 );
+    wire [2:0] MemOp;
+    wire [4:0] rs1;
+    wire [63:0] src1;
+    wire [63:0] src2;
+    wire [63:0] pc;
+    wire [63:0] csr_data;
+    wire MemWr,error;
+
     reg valid_native,error_native,csr_native,ecall_native,mret_native;
     reg [63:0] src1_native;
     reg [63:0] src2_native;
@@ -54,7 +56,7 @@ module ysyx_220066_EX(
         done_native<=done_in;ALUctr_native<=ALUctr_in;rs1_native<=rs1_in;
         Branch_native<=Branch_in;MemOp_native<=MemOp_in;rd_native<=rd_in;
         MemRd_native<=MemRd_in;MemWr_native<=MemWr_in;RegWr_native<=RegWr_in;
-        csr_addr_native<=csr_addr_in;csr_native<=csr;ecall_native<=ecall_in;mret_native<=mret_in;
+        csr_addr_native<=csr_addr_in;csr_native<=csr_in;ecall_native<=ecall_in;mret_native<=mret_in;
     end
 
     always @(posedge clk) valid_native<=~rst&&(block?valid_native:valid_in);
@@ -75,12 +77,16 @@ module ysyx_220066_EX(
     assign rd=rd_native;
     assign RegWr=RegWr_native;
     assign rs1=rs1_native;
+    assign csr=csr_native;
+
+    wire [63:0] imm_use;
+    assign imm_use={{32{imm_native[31]}},imm_native};
 
     reg [63:0] datab;
     always @(*) case(ALUBsrc_native)
         2'b00:datab=src2_native;
         2'b01:datab=64'h4;
-        2'b10:datab={{32{imm_native[31]}},imm_native};
+        2'b10:datab=imm_use;
         2'b11:datab=csr_data_native;
     endcase
     wire zero;
@@ -92,7 +98,7 @@ module ysyx_220066_EX(
 
     wire is_jmp_line;
     ysyx_220066_nxtPC nxtPC(
-        .nxtpc(nxtpc),.is_jmp(is_jmp_line),.in_pc(pc_native),.BusA(src1_native),.Imm(imm_native),.Zero(zero),
+        .nxtpc(nxtpc),.is_jmp(is_jmp_line),.in_pc(pc_native),.BusA(src1_native),.Imm(imm_use),.Zero(zero),
         .Result_0(result[0]),.Branch(Branch_native)
     );
     assign is_jmp=is_jmp_line||csr_native;

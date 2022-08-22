@@ -8,7 +8,7 @@ void trace_and_difftest(){
     extern int is_difftest;
     if(is_difftest){
         extern void difftest_step(uLL,uLL);
-        difftest_step(oldpc,mycpu->pc);
+        difftest_step(oldpc,mycpu->pc_done);
     }
 }
 
@@ -51,8 +51,9 @@ void cpu_exec(uLL n){
     }
     global_status=1;
     while (n--){
-        oldpc=mycpu->pc;
+        oldpc=mycpu->pc_done;
         cpu_exec_once();
+        while(!mycpu->valid) cpu_exec_once();
         if(mycpu->error||mycpu->done) {
           statistics();
           return;
