@@ -101,6 +101,7 @@ module ysyx_220066_cpu(
         .csr_data(module_ex.csr_data),.rs1(module_ex.src1),.zimm(module_ex.rs1),.csrctl(module_ex.MemOp),.data(ex_csr_wdata)
     );
 
+    wire MemWr_line;
     ysyx_220066_M module_m(
         .clk(clk),.rst(rst),.ready(m_ready),.valid(m_valid),.block(wb_m_block),
         .pc_in(module_ex.pc),.done_in(module_ex.done),.valid_in(module_ex.valid),
@@ -108,9 +109,9 @@ module ysyx_220066_cpu(
         .data_Wr_in(module_ex.src2),.RegWr_in(module_ex.RegWr),.MemWr_in(module_ex.MemWr),
         .MemOp_in(module_ex.MemOp),.rd_in(module_ex.rd),
         .RegWr(m_wen),.rd(m_rd),
-        .MemRd_native(MemRd),.MemWr_native(MemWr),.MemOp_native(MemOp),.addr(addr),.data_Wr(data_Wr)
+        .MemRd_native(MemRd),.MemWr_native(MemWr_line),.MemOp_native(MemOp),.addr(addr),.data_Wr(data_Wr)
     );
-
+    assign MemWr=MemWr_line&&module_m.valid;
     assign m_MemRd=MemRd;
     assign m_data=addr;
 
