@@ -15,4 +15,8 @@ module ysyx_220066_IF (
 
     assign pc=native_pc;
     assign valid=~is_jmp;
+
+    always @(*) begin
+        if(!rst&&clk) $display("IF:pc=%h,valid=%b",pc,valid);
+    end
 endmodule
