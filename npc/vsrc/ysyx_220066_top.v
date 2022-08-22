@@ -48,15 +48,15 @@ module ysyx_220066_top(
     .error(data_Rd_error),.valid(data_Rd_valid)
   );
 
+  ysyx_220066_memwr memwr(
+    .clk(clk),.rst(rst),.addr(addr),
+    .MemOp(MemOp),.data(data_Wr),.MemWr(MemWr)
+  );
+
   ysyx_220066_dmem_rd dmemrd(
     .clk(clk),.rst(rst),.MemRd(MemRd),
     .addr(addr),.MemOp(MemOp),.data(data_Rd),
     .error(data_Rd_error),.valid(data_Rd_valid)
-  );
-
-  ysyx_220066_memwr memwr(
-    .clk(clk),.rst(rst),.addr(addr),
-    .MemOp(MemOp),.data(data_Wr),.MemWr(MemWr)
   );
 
   integer i;
