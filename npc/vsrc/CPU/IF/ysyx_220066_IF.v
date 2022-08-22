@@ -10,13 +10,13 @@ module ysyx_220066_IF (
     always @(posedge clk) begin
         if(rst) native_pc<=64'h8000_0000;
         else if(block) native_pc<=native_pc;
-        else native_pc<=is_jmp?nxtpc:pc+4;
+        else native_pc<=is_jmp?nxtpc:native_pc+4;
     end
 
     assign pc=native_pc;
     assign valid=~is_jmp;
 
     always @(*) begin
-        if(!rst&&clk) $display("IF:pc=%h,valid=%b",pc,valid);
+        if(!rst&&~clk) $display("IF:pc=%h,valid=%b",pc,valid);
     end
 endmodule

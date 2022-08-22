@@ -65,7 +65,7 @@ module ysyx_220066_ID (
     assign is_ex=~ALUctr_line[5];
 
     always @(*) begin
-        if(!rst&&clk) $display("ID:pc=%h,instr=%h,valid=%h",pc,instr,valid);
+        if(!rst&&~clk) $display("ID:pc=%h,instr=%h,valid=%h",pc,instr,valid);
 //        $display("Instr=%h,error=%h",instr,error);
     end
 
