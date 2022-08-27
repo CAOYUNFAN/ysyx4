@@ -33,7 +33,6 @@ extern int exit_code;
 void statistics(){
   if(mycpu->error) {
     Log("Error has happened. NPC aborted.");
-    extern void reg_dispaly();
     reg_display();
     exit_code=1;
   }
@@ -52,8 +51,14 @@ void cpu_exec(uLL n){
     global_status=1;
     while (n--){
         oldpc=mycpu->pc_nxt;
+        int tt=0;
         cpu_exec_once();
-//        while(!mycpu->valid) cpu_exec_once();
+        while(!mycpu->valid&&tt<10) cpu_exec_once(),++tt;
+        if(!mycpu->valid){
+          Log("npc run too much cycles!");
+          reg_display();
+          exit(1);
+        }
         if(mycpu->valid&&(mycpu->error||mycpu->done)) {
           statistics();
           return;
