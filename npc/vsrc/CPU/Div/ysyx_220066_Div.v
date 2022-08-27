@@ -4,7 +4,7 @@ module ysyx_220066_Div(
     
     input [63:0] src1_in,
     input [63:0] src2_in,
-    input [63:0] pc_in,
+    input [63:0] nxtpc_in,
     input [4:0] rd_in,
     input [1:0] ALUctr_in,
     input is_w_in,error_in,
@@ -15,25 +15,25 @@ module ysyx_220066_Div(
     output [63:0] result,
     output [4:0] rd
 );
-    wire [63:0] pc;
+    wire [63:0] nxtpc;
     wire error;
 
     reg [63:0] src1_native;
     reg [63:0] src2_native;
-    reg [63:0] pc_native;
+    reg [63:0] nxtpc_native;
     reg [4:0] rd_native;
     reg [1:0] ALUctr_native;
     reg is_w_native,valid_native,error_native;
 
     reg [63:0] result_middle;
-    reg [63:0] pc_middle;
+    reg [63:0] nxtpc_middle;
     reg [4:0] rd_middle;
     reg error_middle,valid_middle;
 
     always @(posedge clk) if(~block) begin
         src1_native<=src1_in;
         src2_native<=src2_in;
-        pc_native<=pc_in;
+        nxtpc_native<=nxtpc_in;
         rd_native<=rd_in;
         ALUctr_native<=ALUctr_in;
         is_w_native<=is_w_in;error_native<=error_in;
@@ -67,7 +67,7 @@ module ysyx_220066_Div(
             2'b10:result_middle<=is_w_native?{{32{rem[31]}},rem}:$signed(src1_native)%$signed(src2_native);
             2'b11:result_middle<=is_w_native?{{32{rem_u[31]}},rem_u}:src1_native%src2_native;
         endcase
-        pc_middle<=pc_native;
+        nxtpc_middle<=nxtpc_native;
         error_middle<=error_native||(src2_native==64'b0);
         rd_middle<=rd_native;
     end
@@ -77,7 +77,7 @@ module ysyx_220066_Div(
 
     assign result=result_middle;
     assign valid=valid_middle;
-    assign pc=pc_middle;
+    assign nxtpc=nxtpc_middle;
     assign rd=rd_middle;
     assign error=error_middle;
 

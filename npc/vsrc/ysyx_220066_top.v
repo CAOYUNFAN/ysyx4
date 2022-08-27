@@ -1,5 +1,5 @@
 module ysyx_220066_top(
-  output [63:0] pc_done,
+  output [63:0] pc_nxt,
 //  input [63:0] instr_data,
   input clk,rst,
   //output [63:0] addr,
@@ -34,7 +34,7 @@ module ysyx_220066_top(
 */
   ysyx_220066_cpu cpu(
     .clk(clk),.rst(rst),
-    .pc_done(pc_done),
+    .pc_nxt(pc_nxt),
     .pc_rd(pc_rd),.instr(instr),.instr_valid(instr_valid),.instr_error(instr_error),
     .addr(addr),.MemOp(MemOp),.MemRd(MemRd),.MemWr(MemWr),
     .data_Rd_valid(data_Rd_valid),.data_Rd_error(data_Rd_error),

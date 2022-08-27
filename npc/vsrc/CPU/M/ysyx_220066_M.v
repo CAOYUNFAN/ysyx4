@@ -5,7 +5,7 @@ module ysyx_220066_M (
     input RegWr_in,MemRd_in,MemWr_in,done_in,
     input [63:0] ex_result,
     input [63:0] data_Wr_in,
-    input [63:0] pc_in,
+    input [63:0] nxtpc_in,
     input [2:0] MemOp_in,
     input [4:0] rd_in,
     input error_in,
@@ -17,7 +17,7 @@ module ysyx_220066_M (
     output RegWr
 );
     wire error,done;
-    wire [63:0] pc;
+    wire [63:0] nxtpc;
 
     reg valid_native;
     always @(posedge clk) valid_native<=~rst&&valid_in;
@@ -25,7 +25,7 @@ module ysyx_220066_M (
     assign ready=~block;
 
     reg done_native,error_native,RegWr_native;
-    reg [63:0] pc_native;
+    reg [63:0] nxtpc_native;
     reg [4:0] rd_native;
 
     always @(posedge clk) if(!block) begin
@@ -35,7 +35,7 @@ module ysyx_220066_M (
         done_native<=done_in;
         addr<=ex_result;
         error_native<=error_in;
-        pc_native<=pc_in;
+        nxtpc_native<=nxtpc_in;
         data_Wr<=data_Wr_in;
         MemOp_native<=MemOp_in;
         rd_native<=rd_in;
@@ -44,7 +44,7 @@ module ysyx_220066_M (
     assign valid=valid_native;
     assign done=done_native;
     assign error=error_native;
-    assign pc=pc_native;
+    assign nxtpc=nxtpc_native;
     assign RegWr=RegWr_native;
     assign rd=rd_native;
 endmodule

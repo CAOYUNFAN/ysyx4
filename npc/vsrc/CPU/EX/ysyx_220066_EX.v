@@ -29,7 +29,6 @@ module ysyx_220066_EX(
     wire [4:0] rs1;
     wire [63:0] src1;
     wire [63:0] src2;
-    wire [63:0] pc;
     wire [63:0] csr_data;
     wire MemWr,error;
 
@@ -67,7 +66,6 @@ module ysyx_220066_EX(
     assign MemOp=MemOp_native;
     assign MemRd=MemRd_native;
     assign MemWr=MemWr_native;
-    assign pc=pc_native;
     assign src1=src1_native;
     assign src2=src2_native;
     assign csr_addr=csr_addr_native;
