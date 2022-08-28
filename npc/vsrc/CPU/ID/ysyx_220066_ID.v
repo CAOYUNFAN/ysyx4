@@ -1,9 +1,10 @@
 module ysyx_220066_ID (
     input clk,rst,block,
 
-    input valid_in,instr_error,csr_error,
+    input valid_in,instr_error,csr_error,rs1_valid,rs2_valid,
     input [31:0] instr,
-    input [63:0] pc_in
+    input [63:0] pc_in,
+    output reg rs_block
 );
     wire valid;
 
@@ -32,8 +33,6 @@ module ysyx_220066_ID (
     end
 
     always @(posedge clk) valid_native<=~rst&&(block?valid_native:valid_in);
-    
-    assign valid=valid_native;
 
     wire [2:0] ExtOp;
     wire err_temp;
@@ -63,6 +62,14 @@ module ysyx_220066_ID (
     assign is_Multi=ALUctr_line[5]&&~ALUctr_line[4];
     assign is_Div=ALUctr_line[5]&&ALUctr_line[4];
     assign is_ex=~ALUctr_line[5];
+
+    always @(*) case(ExtOp[1:0])
+        2'b00:rs_block=~rs1_valid;
+        2'b10,2'b11:rs_block=~rs1_valid||~rs2_valid;
+        default:rs_block=0;
+    endcase
+
+    assign valid=valid_native&&~rs_block;
 
     always @(*) begin
         if(~rst&&~clk) $display("ID:pc=%h,instr=%h,valid=%h,MemWr=%b",pc,instr,valid,MemWr);
@@ -151,12 +158,12 @@ module ysyx_220066_Decode (
             err=(Funct3!=3'b000)&&(Funct3!=3'b001||Funct7!=7'b0000000)&&(Funct3!=3'b101||(Funct7!=7'b0000000&&Funct7!=7'b0100000)); 
         end
         5'b01100:begin //add..
-            ExtOp=3'b000;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
+            ExtOp=3'b010;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
             ALUctr[3]=Funct7[5];
             err=(Funct7!=7'b0000000&&Funct7!=7'b0100000&&Funct7!=7'b0000001);
         end
         5'b01110:begin //addw..
-            ExtOp=3'b000;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
+            ExtOp=3'b010;ALUBSrc=0;ALUctr[2:0]=Funct3;Branch=3'b000;
             ALUctr[3]=Funct7[5];
             err=(Funct7!=7'b0000000&&Funct7!=7'b0100000&&!(Funct3==3'b000||Funct3==3'b001||Funct3==3'b101))&&(Funct7!=7'b0000001||Funct3==3'b001||Funct3==3'b010||Funct3==3'b011);
         end
