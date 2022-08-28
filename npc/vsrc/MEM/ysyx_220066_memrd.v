@@ -52,9 +52,17 @@ module ysyx_220066_dmem_rd (
         .addr(addr),.data(basic_data)
     );
 
+    reg [2:0] addr_low;
+    reg [2:0] MemOp_native;
+
+    always @(posedge clk) begin
+        addr_low<=addr[2:0];
+        MemOp_native<=MemOp;
+    end
+
     reg [7:0] b_Rd;reg [15:0] h_Rd;reg [31:0] w_Rd;
     always @(*) begin
-        case(addr[2:0])
+        case(addr_low)
             3'b000:begin b_Rd=basic_data[ 7: 0]; h_Rd=basic_data[15: 0]; w_Rd=basic_data[31: 0];end
             3'b001:begin b_Rd=basic_data[15: 8]; h_Rd=basic_data[15: 0]; w_Rd=basic_data[31: 0];end
             3'b010:begin b_Rd=basic_data[23:16]; h_Rd=basic_data[31:16]; w_Rd=basic_data[31: 0];end
@@ -67,7 +75,7 @@ module ysyx_220066_dmem_rd (
     end
 
     always @(*) begin
-        case(MemOp)
+        case(MemOp_native)
         3'b100: data={56'h0,b_Rd};
         3'b000: data={{56{b_Rd[7]}},b_Rd};
         3'b101: data={48'h0,h_Rd};
