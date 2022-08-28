@@ -72,7 +72,7 @@ module ysyx_220066_ID (
     assign valid=valid_native&&~rs_block;
 
     always @(*) begin
-        if(~rst&&~clk) $display("ID:pc=%h,instr=%h,valid=%h,MemWr=%b",pc,instr,valid,MemWr);
+        if(~rst&&~clk) $display("ID:pc=%h,instr=%h,valid=%h,MemWr=%b,rs_block=%b",pc,instr,valid,MemWr,rs_block);
 //        $display("Instr=%h,error=%h",instr,error);
     end
 
