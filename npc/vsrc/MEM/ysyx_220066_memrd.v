@@ -32,7 +32,10 @@ module ysyx_220066_imem (
         .addr(pc),.data(instr_long)
     );
 
-    assign instr=pc[2]?instr_long[63:32]:instr_long[31:0];
+    reg pc_2;
+    always @(posedge clk) pc_2<=pc[2];
+
+    assign instr=pc_2?instr_long[63:32]:instr_long[31:0];
 endmodule
 
 module ysyx_220066_dmem_rd (
