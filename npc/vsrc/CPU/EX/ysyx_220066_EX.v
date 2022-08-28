@@ -47,9 +47,11 @@ module ysyx_220066_EX(
     reg [11:0] csr_addr_native;
     reg [4:0] rd_native;
     reg [4:0] rs1_native;
+
+    always @(posedge clk) valid_native<=~rst&&(block?valid_native:valid_in);
     
     always @(posedge clk) if(~block) begin
-        valid_native<=valid_in;error_native<=error_in;
+        error_native<=error_in;
         src1_native<=src1_in;src2_native=src2_in;imm_native<=imm_in;csr_data_native<=csr_data_in;
         pc_native<=pc_in;ALUAsrc_native<=ALUAsrc_in;ALUBsrc_native<=ALUBsrc_in;
         done_native<=done_in;ALUctr_native<=ALUctr_in;rs1_native<=rs1_in;
@@ -57,8 +59,6 @@ module ysyx_220066_EX(
         MemRd_native<=MemRd_in;MemWr_native<=MemWr_in;RegWr_native<=RegWr_in;
         csr_addr_native<=csr_addr_in;csr_native<=csr_in;ecall_native<=ecall_in;mret_native<=mret_in;
     end
-
-    always @(posedge clk) valid_native<=~rst&&(block?valid_native:valid_in);
 
     assign valid=valid_native;
     assign error=error_native;
@@ -102,6 +102,6 @@ module ysyx_220066_EX(
     assign is_jmp=(is_jmp_line||csr_native)&&valid_native;
 
     always @(*) begin
-        if(~rst&&~clk) $display("EX:nxtpc=%h,valid=%b",nxtpc,valid);
+        if(~rst&&~clk) $display("EX:nxtpc=%h,valid=%b,is_jmp=%b,is_csr=%b",nxtpc,valid,is_jmp,csr_native);
     end
 endmodule
