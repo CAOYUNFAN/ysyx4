@@ -79,6 +79,6 @@ module ysyx_220066_Wb(
     assign valid=M_valid_native||Multi_wen_native||Div_wen_native;
 
     always @(*) begin
-        if(!rst&&~clk) $display("WB:nxtpc=%h,valid=%b,done=%b,error=%b",nxtpc,valid,done,error);
+        if(!rst&&~clk) $display("WB:nxtpc=%h,valid=%b,done=%b,error=%b,Multi_native=%b,Div_native=%b",nxtpc,valid,done,error,Multi_wen_native,Div_wen_native);
     end
 endmodule
