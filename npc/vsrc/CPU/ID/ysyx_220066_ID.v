@@ -64,8 +64,8 @@ module ysyx_220066_ID (
     assign is_ex=~ALUctr_line[5];
 
     always @(*) case(ExtOp[1:0])
-        2'b00:rs_block=~rs1_valid&&~jmp;
-        2'b10,2'b11:rs_block=(~rs1_valid||~rs2_valid)&&~jmp;
+        2'b00:rs_block=~rs1_valid&&~jmp&&valid_native;
+        2'b10,2'b11:rs_block=(~rs1_valid||~rs2_valid)&&~jmp&&valid_native;
         default:rs_block=0;
     endcase
 
