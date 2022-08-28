@@ -3,13 +3,13 @@ module ysyx_220066_memrd (
     input [63:0] addr,
     output reg [63:0] data,
     output error,
-    output reg valid
+    output valid
 );
     import "DPI-C" function void data_read(
         input longint raddr, output longint rdata, output byte valid
     );
     
-    always @(posedge clk) valid<=~rst;
+    assign valid=1;
     reg [7:0] error_native;
     always @(posedge clk) begin
         data_read(addr,data,error_native);
