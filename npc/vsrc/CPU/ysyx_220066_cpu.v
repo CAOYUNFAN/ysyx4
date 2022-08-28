@@ -49,7 +49,7 @@ module ysyx_220066_cpu(
 
     ysyx_220066_IF module_if(
         .clk(clk),.rst(rst),
-        .block(~ex_is_jmp&&~csr_jmp&&(~instr_valid||~id_rs_block)),
+        .block(~ex_is_jmp&&~csr_jmp&&(~instr_valid||id_rs_block)),
         .is_jmp(ex_is_jmp||csr_jmp),
         .nxtpc(csr_jmp?csr_nxtpc:ex_nxtpc),.native_pc(pc_rd)
     );
