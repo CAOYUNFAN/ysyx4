@@ -45,7 +45,7 @@ module ysyx_220066_top(
   ysyx_220066_imem imem(
     .clk(clk),.rst(rst),
     .pc(pc_rd),.instr(instr),
-    .error(data_Rd_error),.valid(instr_valid)
+    .error(instr_error),.valid(instr_valid)
   );
 
   ysyx_220066_memwr memwr(
