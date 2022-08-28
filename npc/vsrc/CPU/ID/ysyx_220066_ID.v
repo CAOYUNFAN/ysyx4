@@ -1,7 +1,7 @@
 module ysyx_220066_ID (
     input clk,rst,block,
 
-    input valid_in,instr_error,csr_error,rs1_valid,rs2_valid,
+    input valid_in,instr_error,csr_error,rs1_valid,rs2_valid,jmp,
     input [31:0] instr,
     input [63:0] pc_in,
     output reg rs_block
@@ -64,12 +64,12 @@ module ysyx_220066_ID (
     assign is_ex=~ALUctr_line[5];
 
     always @(*) case(ExtOp[1:0])
-        2'b00:rs_block=~rs1_valid;
-        2'b10,2'b11:rs_block=~rs1_valid||~rs2_valid;
+        2'b00:rs_block=~rs1_valid&&~jmp;
+        2'b10,2'b11:rs_block=(~rs1_valid||~rs2_valid)&&~jmp;
         default:rs_block=0;
     endcase
 
-    assign valid=valid_native&&~rs_block;
+    assign valid=valid_native&&~rs_block&&~jmp;
 
     always @(*) begin
         if(~rst&&~clk) $display("ID:pc=%h,instr=%h,valid=%h,MemWr=%b,rs_block=%b",pc,instr,valid,MemWr,rs_block);

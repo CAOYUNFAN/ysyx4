@@ -78,8 +78,8 @@ module ysyx_220066_cpu(
     );
 
     ysyx_220066_ID module_id(
-        .clk(clk),.rst(rst||(ex_is_jmp&&ex_valid)||csr_jmp||~id_rs1_valid||~id_rs2_valid),.block(0),
-        .rs1_valid(id_rs1_valid),.rs2_valid(id_rs2_valid),      
+        .clk(clk),.rst(rst),.block(0),
+        .rs1_valid(id_rs1_valid),.rs2_valid(id_rs2_valid),.jmp((ex_is_jmp&&ex_valid)||csr_jmp),      
         .valid_in(module_if.valid),.instr(instr),.pc_in(module_if.pc),.instr_error(instr_error),
         .csr_error(module_csr.rd_err),.rs_block(id_rs_block)
     );
