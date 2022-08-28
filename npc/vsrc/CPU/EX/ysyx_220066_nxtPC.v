@@ -31,8 +31,8 @@ module ysyx_220066_nxtPC(
     wire NxtASrc,NxtBSrc;
     yxys_220066_jmp_control jmp(Zero,Result_0,Branch,NxtASrc,NxtBSrc);
     assign nxtpc=(NxtASrc?BusA:in_pc)+(NxtBSrc?Imm:64'h4);
-    assign is_jmp=~NxtASrc&&~NxtBSrc;
-/*    always @(*) begin
-        $display("nxtPC:B=%b,Result_0=%b",NxtBSrc,Result_0);
-    end*/
+    assign is_jmp=(~NxtASrc)&&(~NxtBSrc);
+    always @(*) begin
+        $display("nxtPC:A=%b,B=%b",NxtASrc,NxtBSrc);
+    end
 endmodule
