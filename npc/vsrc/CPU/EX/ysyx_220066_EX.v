@@ -102,6 +102,6 @@ module ysyx_220066_EX(
     assign is_jmp=(is_jmp_line||csr_native)&&valid_native;
 
     always @(*) begin
-//        $display("EX:src1=%h,ALUBsrc=%h,src2=%h,imm=%h,result=%h,ALUctr=%b",src1,ALUBsrc,src2,imm,result,ALUctr);
+        if(~rst&&~clk) $display("EX:nxtpc=%h,valid=%b",nxtpc,valid);
     end
 endmodule

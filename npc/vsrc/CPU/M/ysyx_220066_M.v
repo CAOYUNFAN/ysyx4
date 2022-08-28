@@ -47,4 +47,8 @@ module ysyx_220066_M (
     assign nxtpc=nxtpc_native;
     assign RegWr=RegWr_native;
     assign rd=rd_native;
+
+    always @(*) begin
+        if(~rst&&~clk) $display("M:nxtpc=%h,valid=%b",nxtpc,valid);
+    end
 endmodule
