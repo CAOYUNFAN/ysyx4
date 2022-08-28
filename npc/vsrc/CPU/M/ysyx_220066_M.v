@@ -49,6 +49,6 @@ module ysyx_220066_M (
     assign rd=rd_native;
 
     always @(*) begin
-        if(~rst&&~clk) $display("M:nxtpc=%h,valid=%b,Memrd=%b",nxtpc,valid,MemRd_native);
+        if(~rst&&~clk) $display("M:nxtpc=%h,valid=%b,Memrd=%b,MemWr=%b",nxtpc,valid,MemRd_native,MemWr_native);
     end
 endmodule
