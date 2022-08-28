@@ -102,6 +102,6 @@ module ysyx_220066_EX(
     assign is_jmp=(is_jmp_line||csr_native)&&valid_native;
 
     always @(*) begin
-        if(~rst&&~clk) $display("EX:nxtpc=%h,valid=%b,is_jmp=%b,is_csr=%b",nxtpc,valid,is_jmp,csr_native);
+        if(~rst&&~clk) $display("EX:nxtpc=%h,valid=%b,is_jmp=%b,is_csr=%b,MemWr=%b",nxtpc,valid,is_jmp,csr_native,MemWr_native);
     end
 endmodule
