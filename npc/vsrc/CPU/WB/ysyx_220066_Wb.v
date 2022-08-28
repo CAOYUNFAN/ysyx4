@@ -40,7 +40,7 @@ module ysyx_220066_Wb(
     reg [63:0] Multi_nxtpc_native;
     reg [63:0] Div_nxtpc_native;    
     always @(posedge clk) begin
-        M_wen_native<=M_wen_in;M_MemRd_native<=M_MemRd_in;M_done_native<=M_done_in;
+        M_wen_native<=M_wen_in&&M_valid_in;M_MemRd_native<=M_MemRd_in;M_done_native<=M_done_in;
         M_rd_native<=M_rd_in;M_data_native<=M_data_in;M_nxtpc_native<=M_nxtpc_in;M_valid_native<=M_valid_in;
         M_error_native<=M_error_in;
 
@@ -57,7 +57,7 @@ module ysyx_220066_Wb(
     assign multi_block=Multi_wen_native&&(Div_wen_native||(M_wen_native&&(M_MemRd_native||~data_Rd_valid)));
 
     always @(*) begin
-        if(M_wen_native&&(data_Rd_valid||~M_MemRd_native)) begin
+        if(M_valid_native&&(data_Rd_valid||~M_MemRd_native)) begin
             data=M_MemRd_native?data_Rd:M_data_native;
             rd=M_rd_native;
             nxtpc=M_nxtpc_native;
@@ -79,6 +79,6 @@ module ysyx_220066_Wb(
     assign valid=M_valid_native||Multi_wen_native||Div_wen_native;
 
     always @(*) begin
-        if(!rst&&~clk) $display("WB:nxtpc=%h,valid=%b,done=%b,error=%b,Multi_native=%b,Div_native=%b",nxtpc,valid,done,error,Multi_wen_native,Div_wen_native);
+        if(!rst&&~clk) $display("WB:nxtpc=%h,valid=%b,done=%b,error=%b,",nxtpc,valid,done,error);
     end
 endmodule
