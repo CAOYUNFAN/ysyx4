@@ -15,14 +15,14 @@ extern "C" void assert_check_msg(bool cond,char * msg,...){
 extern "C" void data_read(uLL raddr,uLL *rdata,u8 * valid){ 
     for(int i=0;i<6;i++) if(device_table[i]->in_range(raddr)){
         *rdata=device_table[i]->input(raddr);
-        *valid=1;
+        *valid=0;
         #ifdef MTRACE
         Log("read from addr %llx: %llx",raddr,*rdata);
         #endif
         return;
     }
     *rdata=0x1145141919810uLL;
-    *valid=0;
+    *valid=1;
 //    panic("Unexpected addr %llx",raddr);
 }
 
