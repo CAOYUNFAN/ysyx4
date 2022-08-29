@@ -116,6 +116,6 @@ module ysyx_220066_EX(
     assign result=ALUctr_native[5]?mul_result:result_line;
 
     always @(*) begin
-        if(~rst&&~clk) $display("EX:nxtpc=%h,src1=%h,valid=%b,result=%h,is_jmp=%b,is_csr=%b,MemWr=%b,error=%b,done=%b",nxtpc,src1_native,valid,result,is_jmp,csr_native,MemWr_native,error,done);
+        if(~rst&&~clk) $display("EX:nxtpc=%h,src2=%h,valid=%b,result=%h,is_jmp=%b,is_csr=%b,MemWr=%b,error=%b,done=%b",nxtpc,src2_native,valid,result,is_jmp,csr_native,MemWr_native,error,done);
     end
 endmodule
