@@ -13,7 +13,6 @@ extern "C" void assert_check_msg(bool cond,char * msg,...){
 }
 
 extern "C" void data_read(uLL raddr,uLL *rdata,u8 * valid){
-    assert(device_table[0]->in_range(0x80000000uLL));
     for(int i=0;i<6;i++) if(device_table[i]->in_range(raddr)){
         *rdata=device_table[i]->input(raddr);
         *valid=0;
