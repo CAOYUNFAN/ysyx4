@@ -153,7 +153,7 @@ module ysyx_220066_cpu(
         out_valid<=module_wb.valid;
         done<=~rst&&module_wb.done;
         error<=module_wb.error||module_csr.wr_err;
-        $display("error:%b %b %b",error,module_csr.wr_err,module_wb.error);
+        $display("error:%b %b",error,module_wb.error);
     end
 
     always @(*) if(!rst) begin
