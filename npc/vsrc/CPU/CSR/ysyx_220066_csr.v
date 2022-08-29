@@ -72,6 +72,10 @@ module ysyx_220066_csr (
         end
     end
 
+    always @(*) begin
+        if(~rst&&~clk&&wen) $display("CSR:write %h",csr_wr_addr); 
+    end 
+
 endmodule
 
 module ysyx_220066_csrwork(
