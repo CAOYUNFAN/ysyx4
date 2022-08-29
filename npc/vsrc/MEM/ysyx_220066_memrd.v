@@ -2,7 +2,7 @@ module ysyx_220066_memrd (
     input clk,rst,MemRd,
     input [63:0] addr,
     output reg [63:0] data,
-    output error,
+    output reg error,
     output valid
 );
     import "DPI-C" function void data_read(
@@ -11,11 +11,17 @@ module ysyx_220066_memrd (
     
     assign valid=1;
     reg [7:0] error_native;
-    always @(posedge clk) begin
-        data_read(addr,data,error_native);
-        $display("memrd:addr=%h,err=%b",addr,error_native[0]);
+    reg [63:0] data_temp;
+
+    always @(negedge clk ) begin
+        data_read(addr,data_temp,error_native);
     end
-    assign error=error_native[0];
+
+    always @(posedge clk) begin
+        data<=data_temp;
+        error<=error_native[0];
+        //$display("memrd:addr=%h,err=%b",addr,error_native[0]);
+    end
 endmodule
 
 
