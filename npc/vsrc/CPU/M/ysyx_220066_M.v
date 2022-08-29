@@ -12,7 +12,7 @@ module ysyx_220066_M (
     output reg MemRd_native,MemWr_native,
     output reg [2:0] MemOp_native,
     output reg [63:0] addr,
-    output reg [63:0] data_Wr,
+    output [63:0] data_Wr,
     output [4:0] rd,
     output RegWr
 );
@@ -27,6 +27,7 @@ module ysyx_220066_M (
     reg done_native,error_native,RegWr_native;
     reg [63:0] nxtpc_native;
     reg [4:0] rd_native;
+    reg [63:0] data_Wr_native;
 
     always @(posedge clk) if(!block) begin
         MemRd_native<=MemRd_in;
@@ -36,7 +37,7 @@ module ysyx_220066_M (
         addr<=ex_result;
         error_native<=error_in;
         nxtpc_native<=nxtpc_in;
-        data_Wr<=data_Wr_in;
+        data_Wr_native<=data_Wr_in;
         MemOp_native<=MemOp_in;
         rd_native<=rd_in;
     end
@@ -47,6 +48,7 @@ module ysyx_220066_M (
     assign nxtpc=nxtpc_native;
     assign RegWr=RegWr_native;
     assign rd=rd_native;
+    assign data_Wr=data_Wr_native;
 
     always @(*) begin
         if(~rst&&~clk) $display("M:nxtpc=%h,valid=%b,Memrd=%b,MemWr=%b,data_wr=%h,in=%h,error=%b",nxtpc,valid,MemRd_native,MemWr_native,data_Wr,data_Wr_in,error);
