@@ -15,12 +15,13 @@ module ysyx_220066_memrd (
 
     always @(negedge clk ) begin
         data_read(addr,data_temp,error_native);
+        $display("memrd:addr=%h,err=%b",addr,error_native[0]);
     end
 
     always @(posedge clk) begin
         data<=data_temp;
         error<=error_native[0];
-        //$display("memrd:addr=%h,err=%b",addr,error_native[0]);
+        $display("memrd:addr=%h,err=%b",addr,error_native[0]);
     end
 endmodule
 
