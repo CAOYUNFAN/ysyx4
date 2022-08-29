@@ -7,8 +7,6 @@ int main(int argc,char * argv[]) {
   extern void initialize(int argc,char * argv[]);
   initialize(argc,argv);
   extern void work();
-  extern void device_init();
-  device_init();
   Log("Initialization completed!");
   work();
   Log("Simulation ended!");

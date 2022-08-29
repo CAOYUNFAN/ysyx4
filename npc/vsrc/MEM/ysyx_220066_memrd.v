@@ -13,7 +13,7 @@ module ysyx_220066_memrd (
     reg [7:0] error_native;
     reg [63:0] data_temp;
 
-    always @(*) begin
+    always @(negedge clk) begin
         data_read(addr,data_temp,error_native);
         $display("ALL memrd:addr=%h,data=%h",addr,data_temp);
     end
