@@ -3,7 +3,8 @@ module ysyx_220066_Multi_dummy(
     input [63:0] src2,
     input [2:0] ALUctr,
     input is_w,
-    output reg [63:0] result
+    output reg [63:0] result,
+    output error
 );
     wire [63:0] mul_low;
     assign mul_low=src1*src2;
@@ -33,4 +34,6 @@ module ysyx_220066_Multi_dummy(
         3'b110:result=is_w?{{32{rem[31]}},rem}:$signed(src1)%$signed(src2);
         3'b111:result=is_w?{{32{rem_u[31]}},rem_u}:src1%src2;
     endcase
+
+    assign error=ALUctr[2]&&(src2==64'h0);
 endmodule

@@ -64,7 +64,6 @@ module ysyx_220066_EX(
     end
 
     assign valid=valid_native&&~raise_intr;
-    assign error=error_native;
     assign done=done_native;
     assign MemOp=MemOp_native;
     assign MemRd=MemRd_native;
@@ -100,9 +99,10 @@ module ysyx_220066_EX(
         .aluctr(ALUctr_native[4:0]),.zero(zero),.result(result_line)
     );
 
+    wire error_multi;
     ysyx_220066_Multi_dummy multi_dummy(
         .src1(src1_native),.src2(src2_native),.is_w(ALUctr_native[4]),.ALUctr(ALUctr_native[2:0]),
-        .result(mul_result)
+        .result(mul_result),.error(error_multi)
     );
 
     wire is_jmp_line;
@@ -110,8 +110,10 @@ module ysyx_220066_EX(
         .nxtpc(nxtpc),.is_jmp(is_jmp_line),.in_pc(pc_native),.BusA(src1_native),.Imm(imm_use),.Zero(zero),
         .Result_0(result_line[0]),.Branch(Branch_native)
     );
+
+    assign error=error_native||(ALUctr_native[5]&&error_multi);
     assign is_jmp=(is_jmp_line||csr_native)&&valid_native;
-    assign result=ALUctr_native[5]?result_line:mul_result;
+    assign result=ALUctr_native[5]?mul_result:result_line;
 
     always @(*) begin
         if(~rst&&~clk) $display("EX:nxtpc=%h,valid=%b,result=%b,is_jmp=%b,is_csr=%b,MemWr=%b,error=%b",nxtpc,valid,result,is_jmp,csr_native,MemWr_native,error);
