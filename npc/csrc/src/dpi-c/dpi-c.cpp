@@ -17,7 +17,7 @@ extern "C" void data_read(uLL raddr,uLL *rdata,u8 * valid){
         *rdata=device_table[i]->input(raddr);
         *valid=0;
         #ifdef MTRACE
-        Log("read from addr %llx: %llx",raddr,*rdata);
+        Log("read from addr %llx: %llx,%x",raddr,*rdata,*valid);
         #endif
         return;
     }
