@@ -135,17 +135,17 @@ module ysyx_220066_cpu(
 
     ysyx_220066_Wb module_wb(
         .clk(clk),.rst(rst),
-        .M_valid_in(module_m.valid),.data_Rd_error(data_Rd_error),
-        .M_wen_in(module_m.RegWr&&module_m.valid),.M_MemRd_in(module_m.MemRd_native),
-        .M_done_in(module_m.done&&module_m.valid),.M_rd_in(module_m.rd),.M_data_in(module_m.addr),
+        .valid_in(module_m.valid),.data_Rd_error(data_Rd_error),
+        .wen_in(module_m.RegWr&&module_m.valid),.MemRd_in(module_m.MemRd_native),
+        .done_in(module_m.done&&module_m.valid),.rd_in(module_m.rd),.data_in(module_m.addr),
         .data_Rd(data_Rd),.data_Rd_valid(data_Rd_valid),
-        .M_error_in(module_m.error),.M_nxtpc_in(module_m.nxtpc),
+        .error_in(module_m.error),.nxtpc_in(module_m.nxtpc),
         /*.Multi_wen_in(module_mutli.valid),.Multi_data_in(module_mutli.result),.Multi_rd_in(module_mutli.rd),
         .Multi_error_in(module_mutli.error),.Multi_nxtpc_in(module_mutli.nxtpc),
         .Div_wen_in(module_div.valid),.Div_data_in(module_div.result),.Div_rd_in(module_div.rd),
         .Div_error_in(module_div.valid),.Div_nxtpc_in(module_div.nxtpc),*/
         .rd(wb_rd),.data(wb_data),.wen(wb_wen),
-        .m_block(wb_m_block)//,.multi_block(wb_multi_block),.div_block(wb_div_block)
+        .block(wb_m_block)//,.multi_block(wb_multi_block),.div_block(wb_div_block)
     );
 
     always @(posedge clk) begin
