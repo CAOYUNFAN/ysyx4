@@ -18,12 +18,12 @@ module ysyx_220066_Wb(
     input [63:0] Div_data_in,
     input [63:0] Div_nxtpc_in,*/
 
-    output reg [4:0] rd,
-    output reg [63:0] data,
+    output [4:0] rd,
+    output [63:0] data,
     output wen,m_block//,multi_block,div_block
 );
-    reg error;
-    reg [63:0] nxtpc;
+    wire error;
+    wire [63:0] nxtpc;
     wire done,valid;
 
 
@@ -56,25 +56,11 @@ module ysyx_220066_Wb(
 //    assign div_block=Div_wen_native&&(M_wen_native&&(M_MemRd_native||~data_Rd_valid));
 //    assign multi_block=Multi_wen_native&&(Div_wen_native||(M_wen_native&&(M_MemRd_native||~data_Rd_valid)));
 
-    always @(*) begin
-//        if(M_valid_native&&(data_Rd_valid||~M_MemRd_native)) begin
-            data=M_MemRd_native?data_Rd:M_data_native;
-            rd=M_rd_native;
-            nxtpc=M_nxtpc_native;
-            error=M_error_native||(data_Rd_error&&M_MemRd_native);
-/*        end else if(Div_wen_native) begin
-            data=Div_data_native;
-            rd=Div_rd_native;
-            nxtpc=Div_nxtpc_native;
-            error=Div_error_native;
-        end else begin
-            data=Multi_data_native;
-            rd=Multi_rd_native;
-            nxtpc=Multi_nxtpc_native;
-            error=Multi_error_native;
-        end*/
-    end
-    
+    assign data=M_MemRd_native?data_Rd:M_data_native;
+    assign rd=M_rd_native;
+    assign nxtpc=M_nxtpc_native;
+    assign error=M_error_native||(data_Rd_error&&M_MemRd_native);
+
     assign done=M_done_native;
     assign valid=M_valid_native;//||Multi_wen_native||Div_wen_native;
 
