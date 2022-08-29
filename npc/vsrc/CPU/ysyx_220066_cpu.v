@@ -157,7 +157,7 @@ module ysyx_220066_cpu(
     end
 
     always @(*) if(!rst) begin
-        if(~clk) $display("done:nxtpc=%h,out_valid=%b,ex_src2=%h,error=%b",pc_nxt,out_valid,module_ex.src2,error);
+        if(~clk) $display("done:nxtpc=%h,out_valid=%b,error=%b",pc_nxt,out_valid,error);
 //        $display("clk=%b,pc=%h,instr=%h",clk,pc,instr);
 //        if(clk) $display("iscsr?%b,Funct3=%b,csrwen=",iscsr,instr[14:12],csr_wen&&~error_temp);
     end
