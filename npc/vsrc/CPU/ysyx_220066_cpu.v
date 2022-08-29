@@ -151,12 +151,12 @@ module ysyx_220066_cpu(
     always @(posedge clk) begin
         pc_nxt<=module_wb.nxtpc;
         out_valid<=module_wb.valid;
-        done<=module_wb.done;
+        done<=~rst&&module_wb.done;
         error<=module_wb.error||module_csr.wr_err;
     end
 
     always @(*) if(!rst) begin
-        if(~clk) $display("done:nxtpc=%h,out_valid=%b,error=%b",pc_nxt,out_valid,error);
+        if(~clk) $display("done:nxtpc=%h,out_valid=%b,error=%b,csre=%b",pc_nxt,out_valid,error,module_csr.wr_err);
 //        $display("clk=%b,pc=%h,instr=%h",clk,pc,instr);
 //        if(clk) $display("iscsr?%b,Funct3=%b,csrwen=",iscsr,instr[14:12],csr_wen&&~error_temp);
     end
