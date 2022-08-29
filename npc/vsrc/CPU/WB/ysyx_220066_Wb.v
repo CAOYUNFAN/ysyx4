@@ -62,10 +62,10 @@ module ysyx_220066_Wb(
     assign error=error_native||(data_Rd_error&&MemRd_native);
 
     assign done=done_native;
-    assign valid=valid_native;//||Multi_wen_native||Div_wen_native;
+    assign valid=valid_native&&(data_Rd_valid||~MemRd_native);//||Multi_wen_native||Div_wen_native;
 
     always @(*) begin
         if(!rst&&~clk) $display("WB:nxtpc=%h,valid=%b,done=%b",nxtpc,valid,done);
-        $display("WB:error=%b",error);
+        $display("WB:error=%b,dataRderr=%b",error,data_Rd_error);
     end
 endmodule
