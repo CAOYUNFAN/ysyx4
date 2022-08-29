@@ -17,12 +17,15 @@ extern "C" void data_read(uLL raddr,uLL *rdata,u8 * valid){
         *rdata=device_table[i]->input(raddr);
         *valid=0;
         #ifdef MTRACE
-        Log("read from addr %llx: %llx,%x",raddr,*rdata,*valid);
+        Log("read from addr %llx: %llx",raddr,*rdata);
         #endif
         return;
     }
     *rdata=0x1145141919810uLL;
     *valid=1;
+    #ifdef MTRACE
+    Log("fail read addr=%llx",raddr);
+    #endif
 //    panic("Unexpected addr %llx",raddr);
 }
 
