@@ -66,5 +66,6 @@ module ysyx_220066_Wb(
 
     always @(*) begin
         if(!rst&&~clk) $display("WB:nxtpc=%h,valid=%b,done=%b,error=%b,",nxtpc,valid,done,error);
+        else $display("WB:error=%b",error);
     end
 endmodule
