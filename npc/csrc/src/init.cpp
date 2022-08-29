@@ -15,6 +15,7 @@ FILE * Log_file =NULL;
 void init_log(char * log_file){
   Log_file=fopen(log_file,"w");
   if(!Log_file) Log("Cannot open/create file %s as log. No log file.",log_file);
+  else Log("Log file is %s",log_file);
 }
 
 static int size;
