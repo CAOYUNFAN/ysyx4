@@ -153,7 +153,7 @@ module ysyx_220066_cpu(
         out_valid<=module_wb.valid;
         done<=~rst&&module_wb.done;
         error<=module_wb.error||module_csr.wr_err;
-        $display("error:%b %b,memrd=%b",error,module_wb.error,module_wb.MemRd_native);
+        $display("error:%b %b,data_valid=%b",error,module_wb.error,data_Rd_error);
     end
 
     always @(*) if(!rst) begin
