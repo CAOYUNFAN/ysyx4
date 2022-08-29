@@ -152,7 +152,7 @@ module ysyx_220066_cpu(
         pc_nxt<=module_wb.nxtpc;
         out_valid<=module_wb.valid;
         done<=~rst&&module_wb.done;
-        error<=module_wb.error||module_csr.wr_err;
+        error<=module_wb.error;
     end
 
     always @(*) if(!rst) begin
