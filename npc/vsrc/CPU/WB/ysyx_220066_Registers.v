@@ -47,7 +47,7 @@ module ysyx_220066_Registers(
         end else if(rs1==m_rd&&m_wen) begin
             src1=m_data;
             rs1_valid=m_valid;
-        end else if(rs1==rd) begin
+        end else if(rs1==rd&&wen) begin
             src1=data;
             rs1_valid=1;
         end else begin
@@ -66,7 +66,7 @@ module ysyx_220066_Registers(
         end else if(rs2==m_rd&&m_wen) begin
             src2=m_data;
             rs2_valid=m_valid;
-        end else if(rs2==rd) begin
+        end else if(rs2==rd&&wen) begin
             src2=data;
             rs2_valid=1;
         end else begin 
