@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module ysyx_220066_top(
   output [63:0] pc_nxt,
 //  input [63:0] instr_data,
