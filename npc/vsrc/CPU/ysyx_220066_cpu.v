@@ -16,6 +16,7 @@ module ysyx_220066_cpu(
 );
     //ID
     wire id_rs1_valid,id_rs2_valid,id_rs_block;
+    wire [63:0] id_pc;
     //EX
     wire ex_valid,ex_wen,ex_MemRd,ex_is_jmp,ex_ecall,ex_mret,ex_csr,ex_done;
     wire [4:0] ex_rd;
@@ -48,9 +49,9 @@ module ysyx_220066_cpu(
     wire csr_jmp;
 
     ysyx_220066_IF module_if(
-        .clk(clk),.rst(rst),
+        .clk(clk),.rst(rst),.old_pc(id_pc),
         .block(~ex_is_jmp&&~csr_jmp&&(~instr_valid||id_rs_block)),
-        .is_jmp(ex_is_jmp||csr_jmp),
+        .is_jmp(ex_is_jmp||csr_jmp||~instr_valid||id_rs_block),
         .nxtpc(csr_jmp?csr_nxtpc:ex_nxtpc),.native_pc(pc_rd)
     );
     
@@ -79,7 +80,7 @@ module ysyx_220066_cpu(
         .clk(clk),.rst(rst),.block(0),
         .rs1_valid(id_rs1_valid),.rs2_valid(id_rs2_valid),.jmp((ex_is_jmp&&ex_valid)||csr_jmp),      
         .valid_in(module_if.valid),.instr(instr),.pc_in(module_if.pc),.instr_error(instr_error),
-        .csr_error(module_csr.rd_err),.rs_block(id_rs_block)
+        .csr_error(module_csr.rd_err),.rs_block(id_rs_block),.pc(id_pc)
     );
 
     ysyx_220066_EX module_ex(

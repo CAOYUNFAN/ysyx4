@@ -4,7 +4,8 @@ module ysyx_220066_ID (
     input valid_in,instr_error,csr_error,rs1_valid,rs2_valid,jmp,
     input [31:0] instr,
     input [63:0] pc_in,
-    output reg rs_block
+    output reg rs_block,
+    output [63:0] pc
 );
     wire valid;
 
@@ -23,7 +24,6 @@ module ysyx_220066_ID (
     wire [2:0] MemOp;
     wire [11:0] csr_addr;
     wire error,done;
-    wire [63:0] pc;
 
     reg valid_native;
     reg [63:0] pc_native;
