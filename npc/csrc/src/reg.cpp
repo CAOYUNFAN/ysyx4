@@ -44,7 +44,7 @@ bool difftest_checkregs(CPU_state * ref,uLL pc){
     ret=0;\
   }
 
-  CSR_MAP(CHECK)
+//  CSR_MAP(CHECK)
 
   return ret;
 }
