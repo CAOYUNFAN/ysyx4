@@ -13,7 +13,7 @@
 
 uLL boottime=0;
 extern void difftest_skip_ref(int x);
-static inline void input_difftest_skip(){difftest_skip_ref(1);};
+static inline void input_difftest_skip(){difftest_skip_ref(2);};
 static inline void output_difftest_skip(){difftest_skip_ref(1);};
 
 class main_memory:public device_regs{
