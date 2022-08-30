@@ -17,7 +17,7 @@ extern void difftest_skip_ref();
 class main_memory:public device_regs{
     public:
         void init(){name="main_memory";start=mem_start;end=mem_end;log_output();}
-        uLL input(uLL addr){return pmem_read(addr);}
+        void input(uLL addr,uLL * rdata,u8 * error){*rdata=pmem_read(addr);*error=0;}
         void output(uLL addr,uLL data,u8 mask){pmem_write(addr,data,mask);}
 }memory;
 
@@ -35,9 +35,10 @@ class RTC:public device_regs{
             name="RTC";start=RTC_ADDR;end=RTC_ADDR+8;
             log_output();
         }
-        uLL input(uLL addr){
+        void input(uLL addr,uLL * rdata,u8 * error){
             difftest_skip_ref();
-            return inner_gettime()-boottime;
+            *rdata=inner_gettime()-boottime;
+            *error=0;
         }
 }rtc;
 
@@ -93,9 +94,10 @@ class VGA_CTL:public device_regs{
             mem._16[1]=SCREEN_W;
             mem._32[1]=0;
         }
-        uLL input(uLL addr){
+        void input(uLL addr,uLL * rdata,u8 * error){
             difftest_skip_ref();
-            return mem._64;
+            *rdata=mem._64;
+            *error=0;
         }
         void output(uLL addr,uLL data,u8 mask){
             difftest_skip_ref();
@@ -110,9 +112,10 @@ class KEYBOARD:public device_regs{
             name="KEYBOARD";start=KBD_ADDR;end=KBD_ADDR+4;
             log_output();
         }
-        uLL input(uLL addr){
+        void input(uLL addr,uLL * rdata,u8 * error){
             difftest_skip_ref();
-            return key_dequeue();
+            *rdata=key_dequeue();
+            *error=0;
         }
 }kbd;
 

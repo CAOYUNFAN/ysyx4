@@ -12,17 +12,16 @@ extern "C" void assert_check_msg(bool cond,char * msg,...){
     }
 }
 
-extern "C" void data_read(uLL raddr,uLL *rdata,u8 * valid){
+extern "C" void data_read(uLL raddr,uLL *rdata,u8 * error){
     for(int i=0;i<6;i++) if(device_table[i]->in_range(raddr)){
-        *rdata=device_table[i]->input(raddr);
-        *valid=0;
+        device_table[i]->input(raddr,rdata,error);
         #ifdef MTRACE
         Log("read from addr %llx: %llx",raddr,*rdata);
         #endif
         return;
     }
     *rdata=0x1145141919810uLL;
-    *valid=1;
+    *error=1;
     #ifdef MTRACE
     Log("fail read addr=%llx",raddr);
     #endif

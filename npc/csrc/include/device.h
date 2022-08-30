@@ -8,7 +8,7 @@ class device_regs{
     public:
         inline bool in_range(uLL addr) {return addr>=start&&addr<end;}
         virtual void init(){panic("TODO!");}
-        virtual uLL input(uLL addr) {panic("device_reg %s cannot be read!",name);return 114514;}
+        virtual void input(uLL addr,uLL * data, u8 * error) {*data=0x1145141919810uLL;*error=1;return;}
         virtual void output(uLL addr,uLL data,u8 mask) {panic("device_reg %s cannot be write!",name);}
 };
 
