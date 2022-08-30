@@ -105,7 +105,7 @@ module ysyx_220066_cpu(
     wire MemWr_line;
     ysyx_220066_M module_m(
         .clk(clk),.rst(rst),.ready(m_ready),.valid(m_valid),.block(wb_m_block),
-        .nxtpc_in(module_ex.nxtpc),.done_in(module_ex.done),.valid_in(module_ex.valid),
+        .nxtpc_in(csr_jmp?csr_nxtpc:module_ex.nxtpc),.done_in(module_ex.done),.valid_in(module_ex.valid),
         .MemRd_in(module_ex.MemRd),.ex_result(module_ex.result),.error_in(module_ex.error),
         .data_Wr_in(module_ex.src2),.RegWr_in(module_ex.RegWr),.MemWr_in(module_ex.MemWr),
         .MemOp_in(module_ex.MemOp),.rd_in(module_ex.rd),
