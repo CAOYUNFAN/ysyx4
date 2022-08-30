@@ -29,24 +29,24 @@ void reg_display() {
 }
 
 bool difftest_checkregs(CPU_state * ref,uLL pc){
-
+  bool ret=1;
   for(int i=0;i<32;i++) if(mycpu->dbg_regs[i]!=ref->gpr[i]) {
     Log("DIFFERENT on %s, ref=%llx",regs[i],ref->gpr[i]);
-    return false;
+    ret=0;
   }
   if(pc!=ref->pc) {
     Log("DIFFERENT on pc, ref=%llx",ref->pc);
-    return false;
+    ret=0;
   }
   #define CHECK(name) \
   if(mycpu-> name !=ref-> name ){\
     Log("DIFFERENT on " str(name) ", ref=%llx",ref-> name);\
-    return false;\
+    ret=0;\
   }
 
   CSR_MAP(CHECK)
 
-  return true;
+  return ret;
 }
 
 CPU_state * current_cpu(){
