@@ -76,7 +76,7 @@ module ysyx_220066_EX(
         //$display("EX:src2=%h,src2_in=%h",src2_native,src2_in);
     end
 
-    assign valid=valid_native&&~raise_intr;
+    assign valid=valid_native&&(ecall_native||~raise_intr);
     assign done=done_native;
     assign MemOp=MemOp_native;
     assign MemRd=MemRd_native;
