@@ -18,6 +18,8 @@ module ysyx_220066_IF (
     assign valid=~is_jmp;
 
     always @(*) begin
-        //if(~rst&&~clk) $display("IF:pc=%h,valid=%b,block=%b",pc,valid,block);
+        `ifdef INSTR
+        if(~rst&&~clk) $display("IF:pc=%h,valid=%b,block=%b",pc,valid,block);
+        `endif
     end
 endmodule

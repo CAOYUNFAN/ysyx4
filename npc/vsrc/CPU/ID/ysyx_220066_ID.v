@@ -73,7 +73,9 @@ module ysyx_220066_ID (
     assign valid=valid_native&&~rs_block&&~jmp;
 
     always @(*) begin
-        //if(~rst&&~clk) $display("ID:pc=%h,instr=%h,valid=%h,MemWr=%b,rs_block=%b,error=%b",pc,instr,valid,MemWr,rs_block,error);
+        `ifdef INSTR
+        if(~rst&&~clk) $display("ID:pc=%h,instr=%h,valid=%h,MemWr=%b,rs_block=%b,error=%b",pc,instr,valid,MemWr,rs_block,error);
+        `endif
 //        $display("Instr=%h,error=%h",instr,error);
     end
 

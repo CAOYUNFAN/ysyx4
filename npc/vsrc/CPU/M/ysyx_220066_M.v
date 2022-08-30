@@ -50,7 +50,9 @@ module ysyx_220066_M (
     assign rd=rd_native;
 
     always @(*) begin
-        //if(~rst&&~clk) $display("M:nxtpc=%h,valid=%b,Memrd=%b,MemWr=%b,data_wr=%h,error=%b",nxtpc,valid,MemRd_native,MemWr_native,data_Wr,error);
+        `ifdef INSTR
+        if(~rst&&~clk) $display("M:nxtpc=%h,valid=%b,Memrd=%b,MemWr=%b,data_wr=%h,error=%b",nxtpc,valid,MemRd_native,MemWr_native,data_Wr,error);
+        `endif 
     end
 
 endmodule

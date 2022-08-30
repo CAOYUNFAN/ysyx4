@@ -65,6 +65,8 @@ module ysyx_220066_Wb(
     assign valid=valid_native&&(data_Rd_valid||~MemRd_native);//||Multi_wen_native||Div_wen_native;
 
     always @(*) begin
-        //if(~rst&&~clk) $display("WB:nxtpc=%h,data=%h,valid=%b,done=%b,error=%b",nxtpc,data,valid,done,error);
+        `ifdef INSTR
+        if(~rst&&~clk) $display("WB:nxtpc=%h,data=%h,valid=%b,done=%b,error=%b",nxtpc,data,valid,done,error);
+        `endif
     end
 endmodule
