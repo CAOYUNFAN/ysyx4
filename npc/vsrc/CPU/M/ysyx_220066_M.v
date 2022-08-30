@@ -39,6 +39,7 @@ module ysyx_220066_M (
         data_Wr<=data_Wr_in;
         MemOp_native<=MemOp_in;
         rd_native<=rd_in;
+        $display("MM:data_Wr=%h,data_Wr_in=%h",data_Wr,data_Wr_in);
     end
 
     assign valid=valid_native;
