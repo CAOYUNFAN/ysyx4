@@ -73,7 +73,9 @@ module ysyx_220066_csr (
     end
 
     always @(*) begin
-        if(~rst&&~clk&&wen) $display("CSR:write %h",csr_wr_addr); 
+        `ifdef INSTR
+        if(~rst&&~clk&&wen) $display("CSR:write %h",csr_wr_addr);
+        `endif
     end 
 
 endmodule
