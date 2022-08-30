@@ -105,6 +105,7 @@ void difftest_step(uLL pc, uLL npc) {
         // to skip the checking of an instruction, just copy the reg state to reference design
         ref_difftest_regcpy(current_cpu(), DIFFTEST_TO_REF);
         is_skip_ref = false;
+        Log("pc=%h,nxt=%h",npc,mycpu->pc_nxt);
         return;
     }
 
