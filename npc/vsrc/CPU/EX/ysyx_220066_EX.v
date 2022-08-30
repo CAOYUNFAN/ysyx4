@@ -61,6 +61,7 @@ module ysyx_220066_EX(
         Branch_native<=Branch_in;MemOp_native<=MemOp_in;rd_native<=rd_in;
         MemRd_native<=MemRd_in;MemWr_native<=MemWr_in;RegWr_native<=RegWr_in;
         csr_addr_native<=csr_addr_in;csr_native<=csr_in;ecall_native<=ecall_in;mret_native<=mret_in;
+        $display("EX:src2=%h,src2_in=%h",src2_native,src2_in);
     end
 
     assign valid=valid_native&&~raise_intr;
