@@ -39,7 +39,7 @@ module ysyx_220066_M (
         data_Wr<=data_Wr_in;
         MemOp_native<=MemOp_in;
         rd_native<=rd_in;
-        $display("MM:data_Wr=%h,data_Wr_in=%h",data_Wr,data_Wr_in);
+        //$display("MM:data_Wr=%h,data_Wr_in=%h",data_Wr,data_Wr_in);
     end
 
     assign valid=valid_native;
@@ -53,7 +53,4 @@ module ysyx_220066_M (
         if(~rst&&~clk) $display("M:nxtpc=%h,valid=%b,Memrd=%b,MemWr=%b,data_wr=%h,in=%h,error=%b",nxtpc,valid,MemRd_native,MemWr_native,data_Wr,data_Wr_in,error);
     end
 
-    always @(*) begin
-        if(~rst&&clk) $display("M:data_Wr=%h,data_Wr_in=%h",data_Wr,data_Wr_in);
-    end
 endmodule

@@ -55,13 +55,25 @@ module ysyx_220066_EX(
     
     always @(posedge clk) if(~block) begin
         error_native<=error_in;
-        src1_native<=src1_in;src2_native=src2_in;imm_native<=imm_in;csr_data_native<=csr_data_in;
-        pc_native<=pc_in;ALUAsrc_native<=ALUAsrc_in;ALUBsrc_native<=ALUBsrc_in;
-        done_native<=done_in;ALUctr_native<=ALUctr_in;rs1_native<=rs1_in;
-        Branch_native<=Branch_in;MemOp_native<=MemOp_in;rd_native<=rd_in;
-        MemRd_native<=MemRd_in;MemWr_native<=MemWr_in;RegWr_native<=RegWr_in;
-        csr_addr_native<=csr_addr_in;csr_native<=csr_in;ecall_native<=ecall_in;mret_native<=mret_in;
-        $display("EX:src2=%h,src2_in=%h",src2_native,src2_in);
+        src1_native<=src1_in;
+        src2_native<=src2_in;
+        imm_native<=imm_in;
+        csr_data_native<=csr_data_in;
+        pc_native<=pc_in;
+        ALUAsrc_native<=ALUAsrc_in;
+        ALUBsrc_native<=ALUBsrc_in;
+        done_native<=done_in;
+        ALUctr_native<=ALUctr_in;
+        rs1_native<=rs1_in;
+        Branch_native<=Branch_in;
+        MemOp_native<=MemOp_in;
+        rd_native<=rd_in;
+        MemRd_native<=MemRd_in;
+        MemWr_native<=MemWr_in;
+        RegWr_native<=RegWr_in;
+        csr_addr_native<=csr_addr_in;
+        csr_native<=csr_in;ecall_native<=ecall_in;mret_native<=mret_in;
+        //$display("EX:src2=%h,src2_in=%h",src2_native,src2_in);
     end
 
     assign valid=valid_native&&~raise_intr;
