@@ -95,7 +95,7 @@ module ysyx_220066_cpu(
         .RegWr_in(module_id.RegWr),.rs1_in(instr[19:15]),
         
         .nxtpc(ex_nxtpc),.is_jmp(ex_is_jmp),.result(ex_data),.rd(ex_rd),.RegWr(ex_wen),.valid_native(ex_valid_native),
-        .MemRd(ex_MemRd),.ecall(ex_ecall),.mret(ex_mret),.csr_addr(ex_csr_addr),.csr(ex_csr),.done(ex_done)
+        .MemRd(ex_MemRd),.ecall(ex_ecall),.mret(ex_mret),.csr_addr(ex_csr_addr),.csr(ex_csr),.done(ex_done),.pc(ex_pc)
     );
 
     ysyx_220066_csrwork csrwork(

@@ -20,6 +20,7 @@ module ysyx_220066_EX(
     input raise_intr,
 
     output [63:0] nxtpc,
+    output [63:0] pc,
     output is_jmp,
     output [4:0] rd,
     output [63:0] result,
@@ -33,7 +34,6 @@ module ysyx_220066_EX(
     wire [63:0] src2;
     wire [63:0] csr_data;
     wire MemWr,error;
-    wire [63:0] pc;
 
     reg error_native,csr_native,ecall_native,mret_native;
     reg [63:0] src1_native;
