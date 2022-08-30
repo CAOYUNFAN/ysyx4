@@ -13,6 +13,8 @@
 
 uLL boottime=0;
 extern void difftest_skip_ref(int x);
+static inline void input_difftest_skip(){difftest_skip_ref(1);};
+static inline void output_difftest_skip(){difftest_skip_ref(1);};
 
 class main_memory:public device_regs{
     public:
@@ -36,7 +38,7 @@ class RTC:public device_regs{
             log_output();
         }
         void input(uLL addr,uLL * rdata,u8 * error){
-            difftest_skip_ref(2);
+            input_difftest_skip();
             *rdata=inner_gettime()-boottime;
             *error=0;
         }
@@ -49,7 +51,7 @@ class SERIAL:public device_regs{
             log_output();
         }
         void output(uLL addr,uLL data,u8 mask){
-            difftest_skip_ref(1);
+            output_difftest_skip();
             Assert(mask==0x1,"Unexpected mask %x",mask);
             putchar(data);
         }
@@ -68,7 +70,7 @@ class FB:public device_regs{
             vga_update_screen(vmem);
         }
         void output(uLL addr,uLL data,u8 mask){
-            difftest_skip_ref(1);
+            output_difftest_skip();
             addr=(addr-FB_ADDR)>>3;
             for(int i=0;i<8;i++) if(mask&(1<<i)){
                 vmem[addr]._8[i]=data&0xff;
@@ -95,12 +97,12 @@ class VGA_CTL:public device_regs{
             mem._32[1]=0;
         }
         void input(uLL addr,uLL * rdata,u8 * error){
-            difftest_skip_ref(2);
+            input_difftest_skip();
             *rdata=mem._64;
             *error=0;
         }
         void output(uLL addr,uLL data,u8 mask){
-            difftest_skip_ref(1);
+            output_difftest_skip();
             assert(mask==0xf0);
             if(data) vga_update_screen(fb.pointer());
         }
@@ -113,7 +115,7 @@ class KEYBOARD:public device_regs{
             log_output();
         }
         void input(uLL addr,uLL * rdata,u8 * error){
-            difftest_skip_ref(2);
+            input_difftest_skip();
             *rdata=key_dequeue();
             *error=0;
         }
