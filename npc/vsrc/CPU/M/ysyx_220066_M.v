@@ -53,6 +53,6 @@ module ysyx_220066_M (
     end
 
     always @(*) begin
-        if(~rst&&clk) $display("");
+        if(~rst&&clk) $display("M:data_Wr=%h,data_Wr_in=%h",data_Wr,data_Wr_in);
     end
 endmodule
