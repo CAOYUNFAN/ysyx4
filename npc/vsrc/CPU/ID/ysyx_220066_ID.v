@@ -58,7 +58,8 @@ module ysyx_220066_ID (
     assign mret=(instr==32'h3020_0073);
     assign rd=instr[11:7];
     assign pc=pc_native;
-    assign ALUctr=ALUctr_line;  
+    assign ALUctr=ALUctr_line;
+    assign csr_addr=instr[31:20];
 //    assign is_Multi=ALUctr_line[5]&&~ALUctr_line[4];
 //    assign is_Div=ALUctr_line[5]&&ALUctr_line[4];
 //    assign is_ex=~ALUctr_line[5];
