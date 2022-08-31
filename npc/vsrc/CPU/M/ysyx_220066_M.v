@@ -9,6 +9,9 @@ module ysyx_220066_M (
     input [2:0] MemOp_in,
     input [4:0] rd_in,
     input error_in,
+    input is_mul,
+    input [63:0] mul_result,
+
     output reg MemRd_native,MemWr_native,
     output reg [2:0] MemOp_native,
     output reg [63:0] addr,
@@ -18,6 +21,7 @@ module ysyx_220066_M (
 );
     wire error,done;
     wire [63:0] nxtpc;
+    wire [63:0] data;
 
     reg valid_native;
     always @(posedge clk) valid_native<=~rst&&valid_in;
@@ -48,6 +52,7 @@ module ysyx_220066_M (
     assign nxtpc=nxtpc_native;
     assign RegWr=RegWr_native;
     assign rd=rd_native;
+    assign data=is_mul?mul_result:addr;
 
     always @(*) begin
         `ifdef INSTR

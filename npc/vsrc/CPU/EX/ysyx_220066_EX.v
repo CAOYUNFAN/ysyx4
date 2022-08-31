@@ -25,7 +25,7 @@ module ysyx_220066_EX(
     output [4:0] rd,
     output [63:0] result,
     output [11:0] csr_addr,
-    output MemRd,RegWr,ecall,mret,csr,done,
+    output is_ex,RegWr,ecall,mret,csr,done,
     output reg valid_native
 );
     wire [2:0] MemOp;
@@ -33,7 +33,7 @@ module ysyx_220066_EX(
     wire [63:0] src1;
     wire [63:0] src2;
     wire [63:0] csr_data;
-    wire MemWr,error;
+    wire MemRd,MemWr,error;
 
     reg error_native,csr_native,ecall_native,mret_native;
     reg [63:0] src1_native;
@@ -117,6 +117,10 @@ module ysyx_220066_EX(
         .src1(src1_native),.src2(src2_native),.is_w(ALUctr_native[4]),.ALUctr(ALUctr_native[2:0]),
         .result(mul_result),.error(error_multi)
     );
+    wire is_mul,is_div;
+    assign is_mul=ALUctr_native[5]&&~ALUctr_native[2];
+    assign is_div=ALUctr_native[5]&&ALUctr_native[2];
+    assign is_ex=~MemRd_native&&~is_mul;
 
     wire is_jmp_line;
     ysyx_220066_nxtPC nxtPC(

@@ -18,7 +18,7 @@ module ysyx_220066_cpu(
     wire id_rs1_valid,id_rs2_valid,id_rs_block;
     wire [63:0] id_pc;
     //EX
-    wire ex_valid,ex_wen,ex_MemRd,ex_is_jmp,ex_ecall,ex_mret,ex_csr,ex_done;
+    wire ex_valid,ex_wen,ex_isex,ex_is_jmp,ex_ecall,ex_mret,ex_csr,ex_done;
     wire [4:0] ex_rd;
     wire [63:0] ex_data;
     wire [11:0] ex_csr_addr;
@@ -57,7 +57,7 @@ module ysyx_220066_cpu(
     
     ysyx_220066_Registers module_regs(
         .clk(clk),.rst(rst),.wen(wb_wen),.rd(wb_rd),.data(wb_data),
-        .ex_rd(ex_rd),.ex_wen(ex_wen&&ex_valid),.ex_data(ex_data),.ex_valid(~ex_MemRd),
+        .ex_rd(ex_rd),.ex_wen(ex_wen&&ex_valid),.ex_data(ex_data),.ex_valid(ex_isex),
         .m_rd(m_rd),.m_wen(m_wen&&m_valid),.m_data(m_data),.m_valid(~m_MemRd),
         .rs1(instr[19:15]),.rs1_valid(id_rs1_valid),
         .rs2(instr[24:20]),.rs2_valid(id_rs2_valid)
@@ -95,7 +95,15 @@ module ysyx_220066_cpu(
         .RegWr_in(module_id.RegWr),.rs1_in(instr[19:15]),
         
         .nxtpc(ex_nxtpc),.is_jmp(ex_is_jmp),.result(ex_data),.rd(ex_rd),.RegWr(ex_wen),.valid_native(ex_valid_native),
-        .MemRd(ex_MemRd),.ecall(ex_ecall),.mret(ex_mret),.csr_addr(ex_csr_addr),.csr(ex_csr),.done(ex_done),.pc(ex_pc)
+        .is_ex(ex_isex),.ecall(ex_ecall),.mret(ex_mret),.csr_addr(ex_csr_addr),.csr(ex_csr),.done(ex_done),.pc(ex_pc)
+    );
+
+    wire [63:0] mul_result;
+    ysyx_220066_booth_walloc module_mutli(
+        .clk(clk),
+        .src1_in(module_regs.src1),.src2_in(module_regs.src2),.ALUctr_in(module_id.ALUctr[1:0]),
+        .ALUctr(module_ex.ALUctr_native[1:0]),.is_w(module_ex.ALUctr_native[4]),
+        .result(mul_result)
     );
 
     ysyx_220066_csrwork csrwork(
@@ -108,7 +116,7 @@ module ysyx_220066_cpu(
         .nxtpc_in(csr_jmp?csr_nxtpc:module_ex.nxtpc),.done_in(module_ex.done),.valid_in(module_ex.valid),
         .MemRd_in(module_ex.MemRd),.ex_result(module_ex.result),.error_in(module_ex.error),
         .data_Wr_in(module_ex.src2),.RegWr_in(module_ex.RegWr),.MemWr_in(module_ex.MemWr),
-        .MemOp_in(module_ex.MemOp),.rd_in(module_ex.rd),
+        .MemOp_in(module_ex.MemOp),.rd_in(module_ex.rd),.mul_result(mul_result),.is_mul(module_ex.is_mul),
         .RegWr(m_wen),.rd(m_rd),
         .MemRd_native(MemRd),.MemWr_native(MemWr_line),.MemOp_native(MemOp),.addr(addr),.data_Wr(data_Wr)
     );
@@ -138,7 +146,7 @@ module ysyx_220066_cpu(
         .clk(clk),.rst(rst),
         .valid_in(module_m.valid),.data_Rd_error(data_Rd_error),
         .wen_in(module_m.RegWr&&module_m.valid),.MemRd_in(module_m.MemRd_native),
-        .done_in(module_m.done&&module_m.valid),.rd_in(module_m.rd),.data_in(module_m.addr),
+        .done_in(module_m.done&&module_m.valid),.rd_in(module_m.rd),.data_in(module_m.data),
         .data_Rd(data_Rd),.data_Rd_valid(data_Rd_valid),
         .error_in(module_m.error),.nxtpc_in(module_m.nxtpc),
         /*.Multi_wen_in(module_mutli.valid),.Multi_data_in(module_mutli.result),.Multi_rd_in(module_mutli.rd),
