@@ -6,7 +6,7 @@ module ysyx_220066_cpu(
     input data_Rd_valid,data_Rd_error,
 
     output reg error,done,
-    output MemWr,MemRd,
+    output MemWr,MemRd,inner_block,
     output [2:0] MemOp,
     output [63:0] pc_rd,
     output reg [63:0] pc_nxt,
@@ -40,6 +40,7 @@ module ysyx_220066_cpu(
     wire csr_jmp;
 
     wire global_block;
+    assign inner_block=~div_ready;
     assign global_block=~div_ready||~instr_valid||(MemRd&&~data_Rd_valid);
 
     ysyx_220066_IF module_if(
