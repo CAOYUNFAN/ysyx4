@@ -1,5 +1,5 @@
 module ysyx_220066_IF (
-    input clk,rst,block,
+    input clk,rst,block,back,
 
     input is_jmp,
     input [63:0] nxtpc,
@@ -10,12 +10,13 @@ module ysyx_220066_IF (
     wire [63:0] pc;
     always @(posedge clk) begin
         if(rst) native_pc<=64'h8000_0000;
-        else if(block) native_pc<=old_pc;
+        else if(block) native_pc<=native_pc;
+        else if(back) native_pc<=old_pc;
         else native_pc<=is_jmp?nxtpc:native_pc+4;
     end
 
     assign pc=native_pc;
-    assign valid=~is_jmp;
+    assign valid=~is_jmp&&~back;
 
     always @(*) begin
         `ifdef INSTR

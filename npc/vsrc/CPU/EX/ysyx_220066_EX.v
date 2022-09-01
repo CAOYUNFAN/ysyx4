@@ -104,33 +104,35 @@ module ysyx_220066_EX(
         2'b11:datab=csr_data_native;
     endcase
     wire zero;
-    wire [63:0] result_line;
+//    wire [63:0] result_line;
     wire [63:0] mul_result;
 
     ysyx_220066_ALU alu(
         .data_input(ALUAsrc_native?pc_native:src1_native),.datab_input(datab),
-        .aluctr(ALUctr_native[4:0]),.zero(zero),.result(result_line)
+        .aluctr(ALUctr_native[4:0]),.zero(zero),.result(result)
     );
 
-    wire error_multi;
-    ysyx_220066_Multi_dummy multi_dummy(
-        .src1(src1_native),.src2(src2_native),.is_w(ALUctr_native[4]),.ALUctr(ALUctr_native[2:0]),
-        .result(mul_result),.error(error_multi)
-    );
     wire is_mul,is_div;
     assign is_mul=ALUctr_native[5]&&~ALUctr_native[2];
     assign is_div=ALUctr_native[5]&&ALUctr_native[2];
-    assign is_ex=~MemRd_native&&~is_mul;
+    assign is_ex=~MemRd_native&&~ALUctr_native[5];
+
+    wire error_div;
+/*    ysyx_220066_Multi_dummy multi_dummy(
+        .src1(src1_native),.src2(src2_native),.is_w(ALUctr_native[4]),.ALUctr(ALUctr_native[2:0]),
+        .result(mul_result),.error(error_div)
+    );*/
+    assign error_div=is_div&&(src2_native==64'h0);
 
     wire is_jmp_line;
     ysyx_220066_nxtPC nxtPC(
         .nxtpc(nxtpc),.is_jmp(is_jmp_line),.in_pc(pc_native),.BusA(src1_native),.Imm(imm_use),.Zero(zero),
-        .Result_0(result_line[0]),.Branch(Branch_native)
+        .Result_0(result[0]),.Branch(Branch_native)
     );
 
-    assign error=error_native||(ALUctr_native[5]&&error_multi);
+    assign error=error_native||(ALUctr_native[5]&&error_div);
     assign is_jmp=(is_jmp_line||csr_native)&&valid_native;
-    assign result=ALUctr_native[5]?mul_result:result_line;
+//    assign result=ALUctr_native[5]?mul_result:result_line;
 
     always @(*) begin
         `ifdef INSTR

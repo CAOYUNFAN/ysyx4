@@ -1,6 +1,6 @@
 module ysyx_220066_M (
     input clk,rst,valid_in,block,
-    output ready,valid,
+    output valid,
 
     input RegWr_in,MemRd_in,MemWr_in,done_in,
     input [63:0] ex_result,
@@ -9,8 +9,9 @@ module ysyx_220066_M (
     input [2:0] MemOp_in,
     input [4:0] rd_in,
     input error_in,
-    input is_mul,
+    input is_mul,is_div,div_valid,
     input [63:0] mul_result,
+    input [63:0] div_result,
 
     output reg MemRd_native,MemWr_native,
     output reg [2:0] MemOp_native,
@@ -24,15 +25,14 @@ module ysyx_220066_M (
     wire [63:0] data;
 
     reg valid_native;
-    always @(posedge clk) valid_native<=~rst&&valid_in;
-
-    assign ready=~block;
+    always @(posedge clk) valid_native<=~rst&&(block?valid_native:valid_in);
 
     reg done_native,error_native,RegWr_native;
     reg [63:0] nxtpc_native;
     reg [4:0] rd_native;
+    reg is_mul_native,is_div_native;
 
-    always @(posedge clk) if(!block) begin
+    always @(posedge clk) if(~block) begin
         MemRd_native<=MemRd_in;
         MemWr_native<=MemWr_in;
         RegWr_native<=RegWr_in;
@@ -43,16 +43,18 @@ module ysyx_220066_M (
         data_Wr<=data_Wr_in;
         MemOp_native<=MemOp_in;
         rd_native<=rd_in;
+        is_mul_native<=is_mul;
+        is_div_native<=is_div;
         //$display("MM:data_Wr=%h,data_Wr_in=%h",data_Wr,data_Wr_in);
     end
 
-    assign valid=valid_native;
+    assign valid=valid_native&&(div_valid||~is_div);
     assign done=done_native;
     assign error=error_native;
     assign nxtpc=nxtpc_native;
     assign RegWr=RegWr_native;
     assign rd=rd_native;
-    assign data=is_mul?mul_result:addr;
+    assign data=is_mul_native?mul_result:(is_div_native?div_result:addr);
 
     always @(*) begin
         `ifdef INSTR

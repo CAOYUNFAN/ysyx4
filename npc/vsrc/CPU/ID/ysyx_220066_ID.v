@@ -28,7 +28,6 @@ module ysyx_220066_ID (
     reg valid_native;
     reg [63:0] pc_native;
     always @(posedge clk) if(~block) begin
-        valid_native<=valid_in;
         pc_native<=pc_in;
     end
 

@@ -26,32 +26,26 @@ module ysyx_220066_cpu(
     wire [63:0] ex_csr_wdata;
     wire [63:0] ex_pc;
     //M
-    wire m_valid,m_wen,m_MemRd,m_ready;
+    wire m_valid,m_wen,m_MemRd;
     wire [4:0] m_rd;
     wire [63:0] m_data;
-/*    //Multi
-    wire mul_valid1,mul_valid2,multi_ready;
-    wire [4:0] mul_rd1;
-    wire [4:0] mul_rd2;
-    wire [63:0] mul_data;
     //Div
-    wire div_valid1,div_valid2,div_ready;
-    wire [4:0] div_rd1;
-    wire [4:0] div_rd2;
-    wire [63:0] div_data;*/
+    wire div_ready;
     //WB
-    wire wb_wen,wb_m_block;
- //   wire ,wb_multi_block,wb_div_block;
+    wire wb_wen;
     wire [4:0] wb_rd;
     wire [63:0] wb_data;
     //CSR
     wire [63:0] csr_nxtpc;
     wire csr_jmp;
 
+    wire global_block;
+    assign global_block=~div_ready||~instr_valid||(MemRd&&~data_Rd_valid);
+
     ysyx_220066_IF module_if(
         .clk(clk),.rst(rst),.old_pc(id_pc),
-        .block(~ex_is_jmp&&~csr_jmp&&(~instr_valid||id_rs_block)),
-        .is_jmp(ex_is_jmp||csr_jmp||~instr_valid||id_rs_block),
+        .block(global_block),
+        .is_jmp(ex_is_jmp||csr_jmp),.back(id_rs_block),
         .nxtpc(csr_jmp?csr_nxtpc:ex_nxtpc),.native_pc(pc_rd)
     );
     
@@ -71,13 +65,13 @@ module ysyx_220066_cpu(
         .rst(rst),.clk(clk),
         .csr_rd_addr(instr[31:20]),
         .csr_wr_addr(ex_csr_addr),.in_data(ex_csr_wdata),.wen(ex_valid&&ex_csr&&~ex_ecall&&~ex_mret&&~ex_done),
-        .raise_intr(raise_intr),.NO(NO),.pc(ex_pc),
-        .ret(ex_mret&&ex_valid),
+        .raise_intr(raise_intr&&~global_block),.NO(NO),.pc(ex_pc),
+        .ret(ex_mret&&ex_valid&&~global_block),
         .jmp(csr_jmp),.nxtpc(csr_nxtpc)
     );
 
     ysyx_220066_ID module_id(
-        .clk(clk),.rst(rst),.block(0),
+        .clk(clk),.rst(rst),.block(global_block),
         .rs1_valid(id_rs1_valid),.rs2_valid(id_rs2_valid),.jmp((ex_is_jmp&&ex_valid)||csr_jmp),      
         .valid_in(module_if.valid),.instr(instr),.pc_in(module_if.pc),.instr_error(instr_error),
         .csr_error(module_csr.rd_err),.rs_block(id_rs_block),.pc(id_pc)
@@ -100,7 +94,7 @@ module ysyx_220066_cpu(
 
     wire [63:0] mul_result;
     ysyx_220066_booth_walloc module_mutli(
-        .clk(clk),
+        .clk(clk),.block(global_block),
         .src1_in(module_regs.src1),.src2_in(module_regs.src2),.ALUctr_in(module_id.ALUctr[1:0]),
         .ALUctr(module_ex.ALUctr_native[1:0]),.is_w(module_ex.ALUctr_native[4]),
         .result(mul_result)
@@ -110,13 +104,25 @@ module ysyx_220066_cpu(
         .csr_data(module_ex.csr_data),.rs1(module_ex.src1),.zimm(module_ex.rs1),.csrctl(module_ex.MemOp),.data(ex_csr_wdata)
     );
 
+    wire div_valid,div_ready;
+    wire [63:0] div_result;
+    ysyx_220066_Div module_div(
+        .clk(clk),.rst(rst),
+        .src1_in(module_ex.src1_native),.src2_in(module_ex.src2_native),
+        .is_w(module_ex.ALUctr_native[4]),.ALUctr_in(module_ex.ALUctr_native[1:0]),
+        .in_valid(module_ex.valid&&module_ex.is_div&&~global_block),
+        .out_valid(div_valid),.in_ready(div_ready),.result(div_result)
+    );
+
     wire MemWr_line;
     ysyx_220066_M module_m(
-        .clk(clk),.rst(rst),.ready(m_ready),.valid(m_valid),.block(wb_m_block),
+        .clk(clk),.rst(rst),.valid(m_valid),.block(global_block),
         .nxtpc_in(csr_jmp?csr_nxtpc:module_ex.nxtpc),.done_in(module_ex.done),.valid_in(module_ex.valid),
         .MemRd_in(module_ex.MemRd),.ex_result(module_ex.result),.error_in(module_ex.error),
         .data_Wr_in(module_ex.src2),.RegWr_in(module_ex.RegWr),.MemWr_in(module_ex.MemWr),
-        .MemOp_in(module_ex.MemOp),.rd_in(module_ex.rd),.mul_result(mul_result),.is_mul(module_ex.is_mul),
+        .MemOp_in(module_ex.MemOp),.rd_in(module_ex.rd),
+        .is_mul(module_ex.is_mul),.mul_result(mul_result),
+        .is_div(module_ex.is_div),.div_valid(div_valid),.div_result(div_result),
         .RegWr(m_wen),.rd(m_rd),
         .MemRd_native(MemRd),.MemWr_native(MemWr_line),.MemOp_native(MemOp),.addr(addr),.data_Wr(data_Wr)
     );
@@ -124,40 +130,17 @@ module ysyx_220066_cpu(
     assign m_MemRd=MemRd;
     assign m_data=addr;
 
-//    ysyx_220066_Multi module_mutli(
-//        .clk(clk),.rst(rst),.block(wb_multi_block),
-//        .valid_in(module_id.valid&&module_id.is_Multi),.error_in(module_id.error),.nxtpc_in(module_id.pc+4),
-//        .ready(multi_ready),
-//        .valid(mul_valid2),.valid_part(mul_valid1),.rd_part(mul_rd1),.rd(mul_rd2),
-//        .src1_in(module_regs.src1),.src2_in(module_regs.src2),.ALUctr_in(module_id.ALUctr[1:0]),.is_w_in(module_id.ALUctr[4]),.rd_in(module_id.rd),
-//        .result(mul_data)
-//    );
-
-//    ysyx_220066_Div module_div(
-//        .clk(clk),.rst(rst),.block(wb_div_block),
-//        .valid_in(module_id.valid&&module_id.is_Div),.error_in(module_id.error),.nxtpc_in(module_id.pc+4),
-//        .ready(div_ready),
-//        .valid(div_valid2),.valid_part(div_valid1),.rd_part(div_rd1),.rd(div_rd2),
-//        .src1_in(module_regs.src1),.src2_in(module_regs.src2),.ALUctr_in(module_id.ALUctr[1:0]),.is_w_in(module_id.ALUctr[4]),.rd_in(module_id.rd),
-//        .result(div_data)
-//    );
-
     ysyx_220066_Wb module_wb(
         .clk(clk),.rst(rst),
-        .valid_in(module_m.valid),.data_Rd_error(data_Rd_error),
+        .valid_in(module_m.valid&&(~MemRd||data_Rd_valid)),.data_Rd_error(data_Rd_error),
         .wen_in(module_m.RegWr&&module_m.valid),.MemRd_in(module_m.MemRd_native),
         .done_in(module_m.done&&module_m.valid),.rd_in(module_m.rd),.data_in(module_m.data),
-        .data_Rd(data_Rd),.data_Rd_valid(data_Rd_valid),
+        .data_Rd(data_Rd),
         .error_in(module_m.error),.nxtpc_in(module_m.nxtpc),
-        /*.Multi_wen_in(module_mutli.valid),.Multi_data_in(module_mutli.result),.Multi_rd_in(module_mutli.rd),
-        .Multi_error_in(module_mutli.error),.Multi_nxtpc_in(module_mutli.nxtpc),
-        .Div_wen_in(module_div.valid),.Div_data_in(module_div.result),.Div_rd_in(module_div.rd),
-        .Div_error_in(module_div.valid),.Div_nxtpc_in(module_div.nxtpc),*/
-        .rd(wb_rd),.data(wb_data),.wen(wb_wen),
-        .block(wb_m_block)//,.multi_block(wb_multi_block),.div_block(wb_div_block)
+        .rd(wb_rd),.data(wb_data),.wen(wb_wen)
     );
 
-    always @(posedge clk) begin
+    always @(posedge clk) if(~global_block) begin
         pc_nxt<=module_wb.nxtpc;
         out_valid<=module_wb.valid;
         done<=~rst&&module_wb.done;

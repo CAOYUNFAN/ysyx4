@@ -1,5 +1,5 @@
 module ysyx_220066_booth_walloc(
-    input clk,
+    input clk,block,
     input [63:0] src1_in,//clk0
     input [63:0] src2_in,//clk0
     input [1:0] ALUctr_in,//clk0
@@ -10,7 +10,7 @@ module ysyx_220066_booth_walloc(
 );
     reg [129:0] x;
     reg [65:0] y;
-    always @(posedge clk) begin
+    always @(posedge clk) if(~block) begin
         x[63:0]<=src1_in;
         x[129:64]<={66{src1_in[63]&&(ALUctr[1]^ALUctr[0])}};
         y[63:0]<=src2_in;
@@ -67,7 +67,7 @@ module ysyx_220066_booth_walloc(
     reg [129:0] wt_s_native;
     reg [1:0] part_cout_native;
 
-    always @(posedge clk) begin
+    always @(posedge clk) if(~block) begin
         is_long<=ALUctr[0]||ALUctr[1];
         is_w_native<=is_w;
         wt_c_native<={wt_c,part_cout[30]};
