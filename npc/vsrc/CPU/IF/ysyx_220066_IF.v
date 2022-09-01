@@ -20,7 +20,7 @@ module ysyx_220066_IF (
 
     always @(*) begin
         `ifdef INSTR
-        if(~rst&&~clk&&~block) $display("IF:pc=%h,valid=%b,block=%b",pc,valid,block);
+        if(~rst&&~clk) $display("IF:pc=%h,valid=%b,block=%b",pc,valid,block);
         `endif
     end
 endmodule

@@ -18,7 +18,7 @@ module ysyx_220066_memrd (
 //        $display("ALL memrd:addr=%h,data=%h",addr,data_temp);
     end
 
-    always @(posedge clk) if(MemRd) begin
+    always @(posedge clk) begin
         data<=data_temp;
         error<=error_native[0];
 //        $display("pos memrd:addr=%h,data=%h",addr,data_temp);
@@ -27,7 +27,7 @@ endmodule
 
 
 module ysyx_220066_imem (
-    input clk,rst,block,
+    input clk,rst,
 
     input [63:0] pc,
     output [31:0] instr,
@@ -35,7 +35,7 @@ module ysyx_220066_imem (
 );
     wire [63:0] instr_long;
     ysyx_220066_memrd imem(
-        .clk(clk),.rst(rst),.MemRd(~block),
+        .clk(clk),.rst(rst),.MemRd(1),
         .error(error),.valid(valid),
         .addr(pc),.data(instr_long)
     );
