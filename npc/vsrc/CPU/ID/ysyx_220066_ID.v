@@ -73,7 +73,7 @@ module ysyx_220066_ID (
 
     always @(*) begin
         `ifdef INSTR
-        if(~rst&&~clk) $display("ID:pc=%h,instr=%h,valid=%h,MemWr=%b,rs_block=%b,error=%b",pc,instr,valid,MemWr,rs_block,error);
+        if(~rst&&~clk&&~block) $display("ID:pc=%h,instr=%h,valid=%h,MemWr=%b,rs_block=%b,error=%b",pc,instr,valid,MemWr,rs_block,error);
         `endif
 //        $display("Instr=%h,error=%h",instr,error);
     end
