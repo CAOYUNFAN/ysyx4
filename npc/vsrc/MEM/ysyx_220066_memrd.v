@@ -41,7 +41,7 @@ module ysyx_220066_imem (
     );
 
     reg pc_2;
-    always @(posedge clk) pc_2<=pc[2];
+    always @(posedge clk) if(~block) pc_2<=pc[2];
 
     assign instr=pc_2?instr_long[63:32]:instr_long[31:0];
 endmodule
@@ -63,7 +63,7 @@ module ysyx_220066_dmem_rd (
     reg [2:0] addr_low;
     reg [2:0] MemOp_native;
 
-    always @(posedge clk) begin
+    always @(posedge clk) if(MemRd) begin
         addr_low<=addr[2:0];
         MemOp_native<=MemOp;
     end
