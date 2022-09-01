@@ -34,12 +34,13 @@ module ysyx_220066_Div(
     end
 
     always @(posedge clk) begin
-        if(rst||out_valid) doing<=0;
+        if(rst) doing<=0;
         else if(ready_to_doing) doing<=1;
+        else if(out_valid) doing<=0;
     end
 
     always @(posedge clk) begin
-        if(rst||out_valid) count<=6'b0;
+        if(rst) count<=6'b0;
         else if(doing) count<=count+6'b1;
     end
     //calculate regs
