@@ -72,4 +72,10 @@ module ysyx_220066_Div(
     assign qutient_real=(dividend_s^divisor_s)?-qutient:qutient;
     assign remain_real=dividend_s?-remain:remain;
     assign result=aluctr?remain_real:qutient_real;
+
+    always @(*) begin
+        `ifdef INSTR
+        $display("DIV:count=%h,the long=%h",count,dividend);
+        `endif
+    end
 endmodule
