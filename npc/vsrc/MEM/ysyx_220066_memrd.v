@@ -21,7 +21,7 @@ module ysyx_220066_memrd (
     always @(posedge clk) if(MemRd) begin
         data<=data_temp;
         error<=error_native[0];
-        $display("pos memrd:addr=%h,data=%h",addr,data_temp);
+        //$display("pos memrd:addr=%h,data=%h",addr,data_temp);
     end
 endmodule
 
