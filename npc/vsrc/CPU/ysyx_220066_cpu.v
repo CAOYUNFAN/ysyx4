@@ -40,6 +40,7 @@ module ysyx_220066_cpu(
     wire csr_jmp;
 
     wire global_block;
+    assign inner_block=~div_ready;
     assign global_block=~div_ready||~instr_valid||(MemRd&&~data_Rd_valid);
 
     ysyx_220066_IF module_if(
