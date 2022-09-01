@@ -1,11 +1,11 @@
 VSRC = $(shell find . -name "*.v")
 CSRC = $(shell find ./test/ -name "*.cpp")
-TOP_MODULE = ysyx_220066_booth_walloc
-TARGET = ./emu_multi/emu_multi
+TOP_MODULE = ysyx_220066_Div
+TARGET = ./emu_div/emu_div
 
 $(TARGET): $(VSRC) $(CSRC)
 	@echo "building"
-	@verilator --cc\
+	@verilator --cc -CFLAGS -g\
 		--Mdir $(@D) --top-module $(TOP_MODULE) --prefix $(@F)\
 		--exe $(CSRC) $(VSRC)\
 		--report-unoptflat
@@ -14,5 +14,4 @@ $(TARGET): $(VSRC) $(CSRC)
 sim: $(TARGET)
 	$< 
 
-clear:
-	rm -rf $(dir $(TARGET))
+.phony: sim,clear
