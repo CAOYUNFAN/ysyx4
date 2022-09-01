@@ -42,11 +42,15 @@ int main(){
         assert(emu->in_ready);
         int num=0;
         do{
+            //printf("CLK U\n");
             emu->clk=1;
             emu->eval();
+            //printf("CLK D\n");
             emu->clk=0;
             emu->eval();
             emu->in_valid=0;
+            //printf("%d\n",num);
+            assert(!emu->in_ready||emu->out_valid||num==0);
             num++;
         } while (!emu->out_valid||num>67);
         if(!emu->out_valid||emu->result!=check(x,y,aluctr,is_w)){
@@ -56,7 +60,7 @@ int main(){
         }
         assert(emu->in_ready);
         num=ramdom()%3;
-        for(int i=0;i<=num;i++){
+        for(int i=0;i<num;i++){
             emu->clk=1;
             emu->eval();
             emu->clk=0;

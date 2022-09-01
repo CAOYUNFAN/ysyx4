@@ -6,7 +6,7 @@ module ysyx_220066_Div(
     input is_w,
     input [1:0] ALUctr_in,
     input in_valid,
-    output in_ready,
+    output reg in_ready,
     output out_valid,
     output [63:0] result
 );
@@ -23,11 +23,15 @@ module ysyx_220066_Div(
     assign y_abs=y_sign?(~src2+64'b1):src2;
     //control_regs
     reg doing;
-    reg [6:0] count;//in_ready
-    assign out_valid = doing && count==7'h40;
-    assign in_ready = rst||~doing||out_valid;
+    reg [5:0] count;//in_ready
+    assign out_valid = doing && in_ready;
     wire ready_to_doing;
     assign ready_to_doing = in_ready&&in_valid;
+
+    always @(posedge clk) begin
+        if(rst||(&count)) in_ready<=1;
+        else if(ready_to_doing) in_ready<=0;
+    end
 
     always @(posedge clk) begin
         if(rst||out_valid) doing<=0;
@@ -35,8 +39,8 @@ module ysyx_220066_Div(
     end
 
     always @(posedge clk) begin
-        if(rst||out_valid) count<=7'b0;
-        else if(doing) count<=count+7'b1;
+        if(rst||out_valid) count<=6'b0;
+        else if(doing) count<=count+6'b1;
     end
     //calculate regs
     reg dividend_s,divisor_s,aluctr;
