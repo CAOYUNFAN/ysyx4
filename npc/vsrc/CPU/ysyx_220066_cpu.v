@@ -121,8 +121,8 @@ module ysyx_220066_cpu(
         .MemRd_in(module_ex.MemRd),.ex_result(module_ex.result),.error_in(module_ex.error),
         .data_Wr_in(module_ex.src2),.RegWr_in(module_ex.RegWr),.MemWr_in(module_ex.MemWr),
         .MemOp_in(module_ex.MemOp),.rd_in(module_ex.rd),
-        .is_mul(module_ex.is_mul),.mul_result(mul_result),
-        .is_div(module_ex.is_div),.div_valid(div_valid),.div_result(div_result),
+        .is_mul_in(module_ex.is_mul),.mul_result(mul_result),
+        .is_div_in(module_ex.is_div),.div_valid(div_valid),.div_result(div_result),
         .RegWr(m_wen),.rd(m_rd),
         .MemRd_native(MemRd),.MemWr_native(MemWr_line),.MemOp_native(MemOp),.addr(addr),.data_Wr(data_Wr)
     );

@@ -9,7 +9,7 @@ module ysyx_220066_M (
     input [2:0] MemOp_in,
     input [4:0] rd_in,
     input error_in,
-    input is_mul,is_div,div_valid,
+    input is_mul_in,is_div_in,div_valid,
     input [63:0] mul_result,
     input [63:0] div_result,
 
@@ -43,12 +43,12 @@ module ysyx_220066_M (
         data_Wr<=data_Wr_in;
         MemOp_native<=MemOp_in;
         rd_native<=rd_in;
-        is_mul_native<=is_mul;
-        is_div_native<=is_div;
+        is_mul_native<=is_mul_in;
+        is_div_native<=is_div_in;
         //$display("MM:data_Wr=%h,data_Wr_in=%h",data_Wr,data_Wr_in);
     end
 
-    assign valid=valid_native&&(div_valid||~is_div);
+    assign valid=valid_native&&(div_valid||~is_div_native);
     assign done=done_native;
     assign error=error_native;
     assign nxtpc=nxtpc_native;
