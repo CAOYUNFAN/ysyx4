@@ -58,7 +58,7 @@ module ysyx_220066_M (
 
     always @(*) begin
         `ifdef INSTR
-        if(~rst&&~clk&&~block) $display("M:nxtpc=%h,valid=%b,Memrd=%b,MemWr=%b,data_wr=%h,error=%b",nxtpc,valid,MemRd_native,MemWr_native,data_Wr,error);
+        if(~rst&&~clk&&~block) $display("M:nxtpc=%h,valid=%b,Memrd=%b,MemWr=%b,data=%h,error=%b",nxtpc,valid,MemRd_native,MemWr_native,data,error);
         `endif 
     end
 
