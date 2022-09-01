@@ -53,7 +53,7 @@ void cpu_exec(uLL n){
         oldpc=mycpu->pc_nxt;
         int tt=0;
         cpu_exec_once();
-        while(!mycpu->valid&&tt<1000) cpu_exec_once(),++tt;
+        while(!mycpu->valid&&tt<70) cpu_exec_once(),++tt;
         if(!mycpu->valid){
           Log("npc run too much cycles!");
           reg_display();
