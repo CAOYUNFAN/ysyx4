@@ -129,7 +129,7 @@ module ysyx_220066_cpu(
     );
     assign MemWr=MemWr_line&&module_m.valid;
     assign m_MemRd=MemRd;
-    assign m_data=addr;
+    assign m_data=module_m.data;
 
     ysyx_220066_Wb module_wb(
         .clk(clk),.rst(rst),
