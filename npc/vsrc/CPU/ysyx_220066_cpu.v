@@ -132,7 +132,7 @@ module ysyx_220066_cpu(
 
     ysyx_220066_Wb module_wb(
         .clk(clk),.rst(rst),
-        .valid_in(module_m.valid&&(~MemRd||data_Rd_valid)),.data_Rd_error(data_Rd_error),
+        .valid_in(module_m.valid&&~global_block),.data_Rd_error(data_Rd_error),
         .wen_in(module_m.RegWr&&module_m.valid),.MemRd_in(module_m.MemRd_native),
         .done_in(module_m.done&&module_m.valid),.rd_in(module_m.rd),.data_in(module_m.data),
         .data_Rd(data_Rd),
@@ -140,7 +140,7 @@ module ysyx_220066_cpu(
         .rd(wb_rd),.data(wb_data),.wen(wb_wen)
     );
 
-    always @(posedge clk) if(~global_block) begin
+    always @(posedge clk) begin
         pc_nxt<=module_wb.nxtpc;
         out_valid<=module_wb.valid;
         done<=~rst&&module_wb.done;
