@@ -78,7 +78,7 @@ module ysyx_220066_cpu(
     );
 
     ysyx_220066_EX module_ex(
-        .clk(clk),.rst(rst),.block(0),
+        .clk(clk),.rst(rst),.block(global_block),
         .valid_in(module_id.valid),.raise_intr(raise_intr),
         .valid(ex_valid),.error_in(module_id.error),.rd_in(module_id.rd),
         .src1_in(module_regs.src1),.src2_in(module_regs.src2),.imm_in(module_id.imm),.pc_in(module_id.pc),
