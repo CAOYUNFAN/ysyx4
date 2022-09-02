@@ -40,7 +40,7 @@ module ysyx_220066_Div(
     end
 
     always @(posedge clk) begin
-        if(rst) count<=6'b0;
+        if(rst||ready_to_doing) count<=6'b0;
         else if(doing) count<=count+6'b1;
     end
     //calculate regs
@@ -76,7 +76,7 @@ module ysyx_220066_Div(
 
     always @(*) begin
         `ifdef INSTR
-        $display("DIV:count=%h,the long=%h",count,dividend);
+        //if(~rst&&~clk)$display("DIV:count=%h,the long=%h",count,dividend);
         `endif
     end
 endmodule

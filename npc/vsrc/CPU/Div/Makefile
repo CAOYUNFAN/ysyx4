@@ -5,7 +5,7 @@ TARGET = ./emu_div/emu_div
 
 $(TARGET): $(VSRC) $(CSRC)
 	@echo "building"
-	@verilator --cc -CFLAGS -g\
+	@verilator --cc -CFLAGS -g -DINSTR\
 		--Mdir $(@D) --top-module $(TOP_MODULE) --prefix $(@F)\
 		--exe $(CSRC) $(VSRC)\
 		--report-unoptflat
