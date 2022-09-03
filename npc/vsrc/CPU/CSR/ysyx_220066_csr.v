@@ -14,7 +14,8 @@ module ysyx_220066_csr (
     output jmp,
     output [63:0] nxtpc
 );
-    reg [63:0] csr_data;
+    wire [63:0] csr_data;
+    reg [63:0] csr_data_native;
     reg rd_err;
     wire wr_err;
 
@@ -27,12 +28,14 @@ module ysyx_220066_csr (
     assign jmp=ret||raise_intr;
 
     always @(*) case(csr_rd_addr)
-        12'h341: begin csr_data=mepc; rd_err=0; end
-        12'h300: begin csr_data=mstatus; rd_err=0; end
-        12'h342: begin csr_data=mcause; rd_err=0; end
-        12'h305: begin csr_data=mtvec; rd_err=0; end
-        default: begin csr_data=64'h0; rd_err=1; end
+        12'h341: begin csr_data_native=mepc; rd_err=0; end
+        12'h300: begin csr_data_native=mstatus; rd_err=0; end
+        12'h342: begin csr_data_native=mcause; rd_err=0; end
+        12'h305: begin csr_data_native=mtvec; rd_err=0; end
+        default: begin csr_data_native=64'h0; rd_err=1; end
     endcase
+
+    assign csr_data=(csr_rd_addr==csr_wr_addr&&wen)?in_data:csr_data_native;
 
     assign wr_err=wen&&
                     (csr_wr_addr!=12'h341)&&

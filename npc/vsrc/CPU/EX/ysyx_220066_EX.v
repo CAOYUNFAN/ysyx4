@@ -131,7 +131,7 @@ module ysyx_220066_EX(
     );
 
     assign error=error_native||(ALUctr_native[5]&&error_div);
-    assign is_jmp=(is_jmp_line||csr_native)&&valid_native;
+    assign is_jmp=is_jmp_line&&valid_native;
 //    assign result=ALUctr_native[5]?mul_result:result_line;
 
     always @(*) begin
