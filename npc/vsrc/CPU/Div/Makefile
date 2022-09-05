@@ -14,4 +14,7 @@ $(TARGET): $(VSRC) $(CSRC)
 sim: $(TARGET)
 	$< 
 
-.phony: sim,clear
+clear:
+	rm -rf $(dir $(TARGET))
+
+.PHONY:sim clear

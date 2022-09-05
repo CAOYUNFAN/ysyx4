@@ -16,3 +16,5 @@ sim: $(TARGET)
 
 clear:
 	rm -rf $(dir $(TARGET))
+
+.PHONY:sim clear
