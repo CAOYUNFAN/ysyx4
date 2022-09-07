@@ -168,7 +168,7 @@ module ysyx_220066_EX(
     always @(*) begin
         `ifdef INSTR
         if(~rst&&~clk&&~block) $display("EX:nxtpc=%h,valid=%b,csr_addr=%h,result=%h,is_jmp=%b,is_csr=%b,MemWr=%b,error=%b,done=%b,zero=%b",nxtpc,valid,csr_addr,result,is_jmp,csr_native,MemWr_native,error,done,zero);
-        if(~rst&&~clk&&~block) $display("EX2:src1=%h,src2=%h",ALUAsrc_native?pc_native:src1_native,datab);
+        if(~rst&&~clk&&~block) $display("EX2:x=%h,y=%h,src1=%h,src2=%h",ALUAsrc_native?pc_native:src1_native,datab,src1_native,src2_native);
         `endif
     end
 endmodule
