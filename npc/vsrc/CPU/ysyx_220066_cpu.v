@@ -1,6 +1,6 @@
 module ysyx_220066_cpu(
     input clk,rst,
-    input [31:0] instr,
+    input [31:0] instr_rd,
     input [63:0] data_Rd,
     input instr_valid,instr_error,
     input data_Rd_valid,data_Rd_error,
@@ -39,6 +39,8 @@ module ysyx_220066_cpu(
     wire [63:0] csr_nxtpc;
     wire csr_jmp;
 
+    wire [31:0] instr;
+
     wire global_block;
     assign inner_block=~div_ready;
     assign global_block=~div_ready||~instr_valid||(MemRd&&~data_Rd_valid);
@@ -74,9 +76,10 @@ module ysyx_220066_cpu(
     ysyx_220066_ID module_id(
         .clk(clk),.rst(rst),.block(global_block),
         .rs1_valid(id_rs1_valid),.rs2_valid(id_rs2_valid),.jmp((ex_is_jmp&&ex_valid)||csr_jmp),      
-        .valid_in(module_if.valid),.instr_read(instr),.pc_in(module_if.pc),.instr_error_rd(instr_error),
+        .valid_in(module_if.valid),.instr_read(instr_rd),.pc_in(module_if.pc),.instr_error_rd(instr_error),
         .csr_error(module_csr.rd_err),.rs_block(id_rs_block),.pc(id_pc)
     );
+    assign instr=module_id.instr;
 
     ysyx_220066_EX module_ex(
         .clk(clk),.rst(rst),.block(global_block),

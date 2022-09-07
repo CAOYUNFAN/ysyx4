@@ -36,7 +36,7 @@ module ysyx_220066_top(
   ysyx_220066_cpu cpu(
     .clk(clk),.rst(rst),
     .pc_nxt(pc_nxt),
-    .pc_rd(pc_rd),.instr(instr),.instr_valid(instr_valid),.instr_error(instr_error),
+    .pc_rd(pc_rd),.instr_rd(instr),.instr_valid(instr_valid),.instr_error(instr_error),
     .addr(addr),.wr_mask(wr_mask),.MemRd(MemRd),.MemWr(MemWr),.inner_block(inner_block),
     .data_Rd_valid(data_Rd_valid),.data_Rd_error(data_Rd_error),
     .data_Rd(data_Rd),.data_Wr(data_Wr),.error(error),.done(done),.out_valid(valid)
