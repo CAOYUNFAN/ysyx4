@@ -10,7 +10,7 @@ uLL myrandom(){
     return (uLL)rand()*(uLL)rand()*(uLL)rand()*(uLL)rand();
 }
 
-const int N=10000000;
+const int N=1000000;
 
 const uLL mem_start=0x80000000,mem_size=0x8000000;
 uLL big_mem[mem_size/8];
@@ -87,23 +87,6 @@ int main(){
         emu_cache_work(emu->index,emu->tag,emu->op,read,read_addr,write,write_addr);
         do{
             CYCLE_ONE();
-            if(emu->rd_req){
-                Assert(read,"should not read!");
-                assert((emu->rd_addr&0xf)==0);
-                Assert(emu->rd_addr==read_addr,"Unexpected read addr %lx,should be %llx\n",emu->rd_addr,read_addr);
-                if(read_num==1){
-                    emu->rd_valid=1;
-                    uLL addr=(emu->rd_addr-mem_start)>>3;
-                    emu->rd_data[0]=big_mem[addr];
-                    emu->rd_data[1]=big_mem[addr]>>32uLL;
-                    emu->rd_data[2]=big_mem[addr|1];
-                    emu->rd_data[3]=big_mem[addr|1]>>32uLL;
-                }
-                Log("Read from memory %d,%lx\n",read_num,emu->rd_addr);
-                Assert(read_num>=0,"readnum < 0!\n");
-                if(!read_num) emu->rd_ready=0;
-                read_num--;
-            }
             if(emu->wr_req){
                 Assert(write,"should not write!");
                 uLL low=(uLL)emu->wr_data[0]|((uLL)emu->wr_data[1]<<32uLL);
@@ -123,7 +106,24 @@ int main(){
                 assert(write_num>=0); 
                 write_num--;
             }
-            emu->rd_ready=(emu->rd_req&&read_num==0);
+            if(emu->rd_req||(emu->wr_req&&write_num==0)){
+                Assert(read,"should not read!");
+                assert((emu->rd_addr&0xf)==0);
+                Assert(emu->rd_addr==read_addr,"Unexpected read addr %lx,should be %llx\n",emu->rd_addr,read_addr);
+                if(read_num==1){
+                    emu->rd_valid=1;
+                    uLL addr=(emu->rd_addr-mem_start)>>3;
+                    emu->rd_data[0]=big_mem[addr];
+                    emu->rd_data[1]=big_mem[addr]>>32uLL;
+                    emu->rd_data[2]=big_mem[addr|1];
+                    emu->rd_data[3]=big_mem[addr|1]>>32uLL;
+                }
+                Log("Read from memory %d,%lx\n",read_num,emu->rd_addr);
+                Assert(read_num>=0,"readnum < 0!\n");
+                if(!read_num) emu->rd_ready=0;
+                read_num--;
+            }
+            emu->rd_ready=((emu->rd_req||(emu->wr_req&&write_num==0))&&read_num==0);
             emu->wr_ready=(emu->wr_req&&write_num==0);
             tt++;
         } while (!emu->ok && tt<=20);

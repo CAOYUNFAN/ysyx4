@@ -15,7 +15,7 @@ class cache_emu{
         cache_emu(){
             memset(valid,0,sizeof(valid));
         }
-        void work(int index,uLL tag,int flow,bool &read, uLL &read_addr,bool &write,uLL &write_addr){
+        void work(int index,uLL tag,int flow,bool &read, uLL &read_addr,bool &write,uLL &write_addr,int fence){
             read=write=0;
             for(int i=0;i<2;i++) if(cache_tag[index][i]==tag&&valid[index][i]){
                 dirty[index][i]|=flow;
@@ -46,5 +46,5 @@ class cache_emu{
 }ref_cache;
 
 void emu_cache_work(int index,uLL tag,int flow,bool &read, uLL &read_addr,bool &write,uLL &write_addr){
-    ref_cache.work(index,tag,flow,read,read_addr,write,write_addr);
+    ref_cache.work(index,tag,flow,read,read_addr,write,write_addr,0);
 }

@@ -47,15 +47,15 @@ module ysyx_220066_cache (
                     ( (cache_dirty[{index,1'b0}]^cache_dirty[{index,1'b1}])?cache_dirty[{index,1'b0}]:~cache_freq[index] );
 
     wire ready_to_read,ready_to_write;
-    assign ready_to_read=rd_req&&rd_ready&&status==2'b10;
+    assign ready_to_read=rd_req&&rd_ready&&status[1];
     assign ready_to_write=wr_ready&&wr_req;
 
     always @(posedge clk) begin
         if(rst) status<=2'b00;
         else if(fence) status<=2'b01;
         else if(valid&&miss) status<={1'b1,cache_dirty[{index,refill_pos}]&&cache_valid[{index,refill_pos}]};
+        else if(ready_to_read) status<=2'b00;
         else if(status==2'b11&&ready_to_write) status[0]<=1'b0;
-        else if(ready_to_read) status[1]<=1'b0;
         else if(status==2'b01&&count==8'hff&&(ready_to_write||~cache_dirty[8'hff]||~cache_valid[8'hff])) status<=2'b00;
     end
 
@@ -139,7 +139,7 @@ module ysyx_220066_cache (
 
     always @(*) begin
         `ifdef fully_info
-        if(~rst&&~clk)$display("Cache:status=%b,rd_req=%b,wr_req=%b,refill_pos=%b,hit_0=%b,hit_1=%b,tag_0=%h,tag_1=%h,index=%h,tag=%h",status,rd_req,wr_req,refill_pos,hit_0,hit_1,cache_tag[{index,1'b0}],cache_tag[{index,1'b1}],index,tag);
+        if(~rst&&~clk)$display("Cache:status=%b,rd_req=%b,wr_req=%b,refill_pos=%b,hit_0=%b,hit_1=%b,tag_0=%h,tag_1=%h,index=%h,tag=%h,ready_to_read=%b",status,rd_req,wr_req,refill_pos,hit_0,hit_1,cache_tag[{index,1'b0}],cache_tag[{index,1'b1}],index,tag,ready_to_read);
         `endif
     end
 endmodule
