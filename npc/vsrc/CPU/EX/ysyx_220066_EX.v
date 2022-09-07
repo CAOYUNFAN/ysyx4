@@ -167,7 +167,7 @@ module ysyx_220066_EX(
 
     always @(*) begin
         `ifdef INSTR
-        if(~rst&&~clk&&~block) $display("EX:nxtpc=%h,valid=%b,csr_addr=%h,result=%h,is_jmp=%b,is_csr=%b,MemWr=%b,error=%b,done=%b",nxtpc,valid,csr_addr,result,is_jmp,csr_native,MemWr_native,error,done);
+        if(~rst&&~clk&&~block) $display("EX:nxtpc=%h,valid=%b,csr_addr=%h,result=%h,is_jmp=%b,is_csr=%b,MemWr=%b,error=%b,done=%b,zero=%b",nxtpc,valid,csr_addr,result,is_jmp,csr_native,MemWr_native,error,done,zero);
         `endif
     end
 endmodule
