@@ -31,9 +31,10 @@ module ysyx_220066_EX(
     wire [2:0] MemOp;
     wire [4:0] rs1;
     wire [63:0] src1;
-    wire [63:0] src2;
     wire [63:0] csr_data;
     wire MemRd,MemWr,error;
+    reg [7:0] wmask;
+    reg [63:0] data_Wr;
 
     reg error_native,csr_native,ecall_native,mret_native;
     reg [63:0] src1_native;
@@ -82,7 +83,6 @@ module ysyx_220066_EX(
     assign MemRd=MemRd_native;
     assign MemWr=MemWr_native;
     assign src1=src1_native;
-    assign src2=src2_native;
     assign csr_addr=csr_addr_native;
     assign csr_data=csr_data_native;
     assign ecall=ecall_native;
@@ -106,10 +106,11 @@ module ysyx_220066_EX(
     wire zero;
 //    wire [63:0] result_line;
     wire [63:0] mul_result;
+    wire [2:0] add_lowbit;
 
     ysyx_220066_ALU alu(
         .data_input(ALUAsrc_native?pc_native:src1_native),.datab_input(datab),
-        .aluctr(ALUctr_native[4:0]),.zero(zero),.result(result)
+        .aluctr(ALUctr_native[4:0]),.zero(zero),.result(result),.add_lowbit(add_lowbit)
     );
 
     wire is_mul,is_div;
@@ -133,6 +134,36 @@ module ysyx_220066_EX(
     assign error=error_native||(ALUctr_native[5]&&error_div);
     assign is_jmp=is_jmp_line&&valid_native;
 //    assign result=ALUctr_native[5]?mul_result:result_line;
+
+    always @(*) case (MemOp[1:0])
+        2'b00: begin
+            data_Wr={8{src2_native[7:0]}};
+            wmask[0]=(add_lowbit==3'o0);
+            wmask[1]=(add_lowbit==3'o1);
+            wmask[2]=(add_lowbit==3'o2);
+            wmask[3]=(add_lowbit==3'o3);
+            wmask[4]=(add_lowbit==3'o4);
+            wmask[5]=(add_lowbit==3'o5);
+            wmask[6]=(add_lowbit==3'o6);
+            wmask[7]=(add_lowbit==3'o7);
+        end
+        2'b01: begin
+            data_Wr={4{src2_native[15:0]}};
+            wmask[1:0]={2{add_lowbit[2:1]==2'o0}};
+            wmask[3:2]={2{add_lowbit[2:1]==2'o1}};
+            wmask[5:4]={2{add_lowbit[2:1]==2'o2}};
+            wmask[7:6]={2{add_lowbit[2:1]==2'o3}};
+        end
+        2'b10: begin
+            data_Wr={2{src2_native[31:0]}};
+            wmask[3:0]={4{~add_lowbit[2]}};
+            wmask[7:4]={4{add_lowbit[2]}};
+        end
+        2'b11: begin
+            data_Wr=src2_native;
+            wmask=8'hff;
+        end
+    endcase
 
     always @(*) begin
         `ifdef INSTR

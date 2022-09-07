@@ -28,7 +28,7 @@ $(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES) $(CSRC_INCLUDE)
 		--exe $(CSRC_FILES)\
 		$(VFLAGS)\
 		$(VSRC_FILES)
-	@make -C $(EMU_DIR) -f $(EMU_TARGET).mk -j2
+	@make -C $(EMU_DIR) -f $(EMU_TARGET).mk -j
 
 sim: $(EMU_DIR)/$(EMU_TARGET)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!

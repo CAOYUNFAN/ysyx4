@@ -7,11 +7,11 @@ module ysyx_220066_cpu(
 
     output reg error,done,
     output MemWr,MemRd,inner_block,
-    output [2:0] MemOp,
     output [63:0] pc_rd,
     output reg [63:0] pc_nxt,
     output reg out_valid,
     output [63:0] addr,
+    output [7:0] wr_mask,
     output [63:0] data_Wr
 );
     //ID
@@ -74,7 +74,7 @@ module ysyx_220066_cpu(
     ysyx_220066_ID module_id(
         .clk(clk),.rst(rst),.block(global_block),
         .rs1_valid(id_rs1_valid),.rs2_valid(id_rs2_valid),.jmp((ex_is_jmp&&ex_valid)||csr_jmp),      
-        .valid_in(module_if.valid),.instr(instr),.pc_in(module_if.pc),.instr_error(instr_error),
+        .valid_in(module_if.valid),.instr_read(instr),.pc_in(module_if.pc),.instr_error_rd(instr_error),
         .csr_error(module_csr.rd_err),.rs_block(id_rs_block),.pc(id_pc)
     );
 
@@ -120,12 +120,12 @@ module ysyx_220066_cpu(
         .clk(clk),.rst(rst),.valid(m_valid),.block(global_block),
         .nxtpc_in(csr_jmp?csr_nxtpc:module_ex.nxtpc),.done_in(module_ex.done),.valid_in(module_ex.valid),
         .MemRd_in(module_ex.MemRd),.ex_result(module_ex.result),.error_in(module_ex.error),
-        .data_Wr_in(module_ex.src2),.RegWr_in(module_ex.RegWr),.MemWr_in(module_ex.MemWr),
+        .data_Wr_in(module_ex.data_Wr),.wr_mask_in(module_ex.wmask),.RegWr_in(module_ex.RegWr),.MemWr_in(module_ex.MemWr),
         .MemOp_in(module_ex.MemOp),.rd_in(module_ex.rd),
         .is_mul_in(module_ex.is_mul),.mul_result(mul_result),
         .is_div_in(module_ex.is_div),.div_valid(div_valid),.div_result(div_result),
-        .RegWr(m_wen),.rd(m_rd),
-        .MemRd_native(MemRd),.MemWr_native(MemWr_line),.MemOp_native(MemOp),.addr(addr),.data_Wr(data_Wr)
+        .RegWr(m_wen),.rd(m_rd),.wr_mask(wr_mask),
+        .MemRd_native(MemRd),.MemWr_native(MemWr_line),.addr(addr),.data_Wr(data_Wr)
     );
     assign MemWr=MemWr_line&&module_m.valid;
     assign m_MemRd=MemRd;
@@ -136,7 +136,7 @@ module ysyx_220066_cpu(
         .valid_in(module_m.valid&&~global_block),.data_Rd_error(data_Rd_error),
         .wen_in(module_m.RegWr&&module_m.valid),.MemRd_in(module_m.MemRd_native),
         .done_in(module_m.done&&module_m.valid),.rd_in(module_m.rd),.data_in(module_m.data),
-        .data_Rd(data_Rd),
+        .data_Rd(data_Rd),.MemOp_in(module_m.MemOp_native),.addr_lowbit_in(module_m.addr[2:0]),
         .error_in(module_m.error),.nxtpc_in(module_m.nxtpc),
         .rd(wb_rd),.data(wb_data),.wen(wb_wen)
     );

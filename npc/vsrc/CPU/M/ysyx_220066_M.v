@@ -12,12 +12,13 @@ module ysyx_220066_M (
     input is_mul_in,is_div_in,div_valid,
     input [63:0] mul_result,
     input [63:0] div_result,
+    input [7:0] wr_mask_in,
 
     output reg MemRd_native,MemWr_native,
-    output reg [2:0] MemOp_native,
     output reg [63:0] addr,
     output reg [63:0] data_Wr,
     output [4:0] rd,
+    output reg [7:0] wr_mask,
     output RegWr
 );
     wire error,done;
@@ -30,6 +31,7 @@ module ysyx_220066_M (
     reg done_native,error_native,RegWr_native;
     reg [63:0] nxtpc_native;
     reg [4:0] rd_native;
+    reg [2:0] MemOp_native;
     reg is_mul_native,is_div_native;
 
     always @(posedge clk) if(~block) begin
@@ -45,6 +47,7 @@ module ysyx_220066_M (
         rd_native<=rd_in;
         is_mul_native<=is_mul_in;
         is_div_native<=is_div_in;
+        wr_mask<=wr_mask_in;
         //$display("MM:data_Wr=%h,data_Wr_in=%h",data_Wr,data_Wr_in);
     end
 

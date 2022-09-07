@@ -1,8 +1,8 @@
 module ysyx_220066_ID (
     input clk,rst,block,
 
-    input valid_in,instr_error,csr_error,rs1_valid,rs2_valid,jmp,
-    input [31:0] instr,
+    input valid_in,instr_error_rd,csr_error,rs1_valid,rs2_valid,jmp,
+    input [31:0] instr_read,
     input [63:0] pc_in,
     output reg rs_block,
     output [63:0] pc
@@ -14,9 +14,6 @@ module ysyx_220066_ID (
     wire [1:0] ALUBSrc;
     wire ALUASrc;
     wire [5:0] ALUctr;
-//    wire is_Multi;
-//    wire is_Div;
-//    wire is_ex;
     wire [2:0] Branch;
     wire MemWr,MemRd;
     wire RegWr;
@@ -32,6 +29,16 @@ module ysyx_220066_ID (
     end
 
     always @(posedge clk) valid_native<=~rst&&(block?valid_native:valid_in);
+
+    reg [31:0] prev_instr;
+    reg prev_block,instr_error_prev;
+    always @(posedge clk) if(~block) prev_instr<=instr_read;
+    always @(posedge clk) if(~block) instr_error_prev<=instr_error_rd;
+    always @(posedge clk) prev_block<=block;
+    wire [31:0] instr;
+    wire instr_error;
+    assign instr=prev_block?prev_instr:instr_read;
+    assign instr_error=prev_block?instr_error_prev:instr_error_rd;
 
     wire [2:0] ExtOp;
     wire err_temp;

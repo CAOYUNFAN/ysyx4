@@ -16,7 +16,7 @@ module ysyx_220066_top(
 );
   wire MemWr,MemRd,inner_block;
   wire [63:0] addr;
-  wire [2:0] MemOp;
+  wire [7:0] wr_mask;
   wire [63:0] data_Rd;
   wire [63:0] pc_rd;
   wire [63:0] data_Wr;
@@ -37,7 +37,7 @@ module ysyx_220066_top(
     .clk(clk),.rst(rst),
     .pc_nxt(pc_nxt),
     .pc_rd(pc_rd),.instr(instr),.instr_valid(instr_valid),.instr_error(instr_error),
-    .addr(addr),.MemOp(MemOp),.MemRd(MemRd),.MemWr(MemWr),.inner_block(inner_block),
+    .addr(addr),.wr_mask(wr_mask),.MemRd(MemRd),.MemWr(MemWr),.inner_block(inner_block),
     .data_Rd_valid(data_Rd_valid),.data_Rd_error(data_Rd_error),
     .data_Rd(data_Rd),.data_Wr(data_Wr),.error(error),.done(done),.out_valid(valid)
   );
@@ -50,13 +50,13 @@ module ysyx_220066_top(
   );
 
   ysyx_220066_memwr memwr(
-    .clk(clk),.rst(rst),.addr(addr),
-    .MemOp(MemOp),.data(data_Wr),.MemWr(MemWr)
+    .clk(clk),.rst(rst),.addr(addr),.wmask(wr_mask),
+    .data(data_Wr),.MemWr(MemWr)
   );
 
   ysyx_220066_dmem_rd dmemrd(
     .clk(clk),.rst(rst),.MemRd(MemRd&&~inner_block),
-    .addr(addr),.MemOp(MemOp),.data(data_Rd),
+    .addr(addr),.data(data_Rd),
     .error(data_Rd_error),.valid(data_Rd_valid)
   );
 
