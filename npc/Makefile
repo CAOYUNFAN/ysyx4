@@ -10,7 +10,7 @@ VSRC_FILES := $(shell find $(VSRC_DIR) -name "*.v")
 EMU_DIR := $(NPC_HOME)/emu
 EMU_TOP_MODULE :=$(STUID)top
 EMU_TARGET := emu
-INSTR = #-DINSTR
+INSTR = -DINSTR
 CFLAGS_NPC = -I$(CSRC_INCLUDE_DIR) -g -O2 $(INSTR) #-DMTRACE
 VFLAGS = $(INSTR) -O3
 LDFLAGS =-lSDL2 
@@ -28,7 +28,7 @@ $(EMU_DIR)/$(EMU_TARGET): $(VSRC_FILES) $(CSRC_FILES) $(CSRC_INCLUDE)
 		--exe $(CSRC_FILES)\
 		$(VFLAGS)\
 		$(VSRC_FILES)
-	@make -C $(EMU_DIR) -f $(EMU_TARGET).mk -j
+	@make -C $(EMU_DIR) -f $(EMU_TARGET).mk -j4
 
 sim: $(EMU_DIR)/$(EMU_TARGET)
 	$(call git_commit, "sim RTL") # DO NOT REMOVE THIS LINE!!!
