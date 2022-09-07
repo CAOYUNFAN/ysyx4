@@ -16,7 +16,7 @@ module ysyx_220066_ALU(
     wire [31:0] data_sra;
     assign data_sra=$signed($signed(data_input[31:0])>>>$signed(datab_input[4:0]));
 
-    ysyx_220066_Adder adder(data_input,datab_input,SUBctr,Add_result,CF,SF,OF);
+    ysyx_220066_Adder adder(data_input,datab_input,SUBctr,Add_result,CF,zero,SF,OF);
     always @(*)
     case (aluctr[2:0])
         3'o0: result={Wctr?{32{Add_result[31]}}:Add_result[63:32],Add_result[31:0]};
@@ -31,7 +31,6 @@ module ysyx_220066_ALU(
         3'o7: result=({64{aluctr[3]}}|data_input)&datab_input;
     endcase
 
-    assign zero=~|(data_input^datab_input);
     assign add_lowbit=Add_result[2:0];
 
     always @(*) begin
@@ -45,7 +44,7 @@ module ysyx_220066_Adder(
     input [63:0] y,
     input SUBctr,
     output reg [63:0] result,
-    output reg CF,SF,OF
+    output reg CF,ZF,SF,OF
     );
     reg [63:0] y_;
     reg Ctemp,Cout;
@@ -54,6 +53,7 @@ module ysyx_220066_Adder(
         {Ctemp,result[62:0]}={1'b0,x[62:0]}+{1'b0,y_[62:0]}+{{63{1'b0}},SUBctr};
         {Cout,result[63]}={1'b0,x[63]}+{1'b0,y_[63]}+{1'b0,Ctemp};
         SF=result[63];
+        ZF=~|result;
         OF=Cout^Ctemp;
         CF=SUBctr^Cout;
     end
