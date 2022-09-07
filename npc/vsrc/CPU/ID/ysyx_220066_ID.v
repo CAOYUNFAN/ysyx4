@@ -32,7 +32,7 @@ module ysyx_220066_ID (
 
     reg [31:0] prev_instr;
     reg prev_block,instr_error_prev;
-    always @(posedge clk) if(~block) prev_instr<=instr_read;
+    always @(posedge clk) prev_instr<=instr;
     always @(posedge clk) if(~block) instr_error_prev<=instr_error_rd;
     always @(posedge clk) prev_block<=block;
     wire [31:0] instr;
