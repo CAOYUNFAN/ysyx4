@@ -27,21 +27,20 @@ endmodule
 
 
 module ysyx_220066_imem (
-    input clk,rst,block,
-
+    input clk,rst,
     input [63:0] pc,
     output [31:0] instr,
     output error,valid
 );
     wire [63:0] instr_long;
     ysyx_220066_memrd imem(
-        .clk(clk),.rst(rst),.MemRd(~block),
+        .clk(clk),.rst(rst),.MemRd(1),
         .error(error),.valid(valid),
         .addr(pc),.data(instr_long)
     );
 
     reg pc_2;
-    always @(posedge clk) if(~block) pc_2<=pc[2];
+    always @(posedge clk) pc_2<=pc[2];
 
     assign instr=pc_2?instr_long[63:32]:instr_long[31:0];
 endmodule

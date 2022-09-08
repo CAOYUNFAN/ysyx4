@@ -6,7 +6,7 @@ module ysyx_220066_cpu(
     input data_Rd_valid,data_Rd_error,
 
     output reg error,done,
-    output MemWr,MemRd,inner_block,
+    output MemWr,MemRd,
     output [63:0] pc_rd,
     output reg [63:0] pc_nxt,
     output reg out_valid,
@@ -15,7 +15,7 @@ module ysyx_220066_cpu(
     output [63:0] data_Wr
 );
     //ID
-    wire id_rs1_valid,id_rs2_valid,id_rs_block;
+    wire id_rs1_valid,id_rs2_valid;
     wire [63:0] id_pc;
     //EX
     wire ex_valid,ex_wen,ex_isex,ex_is_jmp,ex_ecall,ex_mret,ex_csr,ex_done;
@@ -41,14 +41,17 @@ module ysyx_220066_cpu(
 
     wire [31:0] instr;
 
+    wire div_block,instr_block,mem_block,id_block;
+    assign div_block=~div_ready;
+    assign instr_block=~instr_valid;
+    assign mem_block=MemRd&&~data_Rd_valid;
     wire global_block;
-    assign inner_block=~div_ready;
-    assign global_block=~div_ready||~instr_valid||(MemRd&&~data_Rd_valid);
+    assign global_block=div_block||instr_block||mem_block;
 
     ysyx_220066_IF module_if(
-        .clk(clk),.rst(rst),.old_pc(id_pc),
-        .block(global_block),
-        .is_jmp(ex_is_jmp||csr_jmp),.back(id_rs_block),
+        .clk(clk),.rst(rst),
+        .block(global_block||id_block),
+        .is_jmp(ex_is_jmp||csr_jmp),
         .nxtpc(csr_jmp?csr_nxtpc:ex_nxtpc),.native_pc(pc_rd)
     );
     
@@ -74,10 +77,10 @@ module ysyx_220066_cpu(
     );
 
     ysyx_220066_ID module_id(
-        .clk(clk),.rst(rst),.block(global_block),
+        .clk(clk),.rst(rst),.block(global_block||id_block),
         .rs1_valid(id_rs1_valid),.rs2_valid(id_rs2_valid),.jmp((ex_is_jmp&&ex_valid)||csr_jmp),      
         .valid_in(module_if.valid),.instr_read(instr_rd),.pc_in(module_if.pc),.instr_error_rd(instr_error),
-        .csr_error(module_csr.rd_err),.rs_block(id_rs_block),.pc(id_pc)
+        .csr_error(module_csr.rd_err),.rs_block(id_block),.pc(id_pc)
     );
     assign instr=module_id.instr;
 
@@ -97,12 +100,22 @@ module ysyx_220066_cpu(
     );
 
     wire [63:0] mul_result;
+
+    `ifdef EMU_MULTI
+    multi_dummy module_mutli(
+        .clk(clk),.block(global_block),
+        .src1_in(module_regs.src1),.src2_in(module_regs.src2),.ALUctr_in(module_id.ALUctr[1:0]),
+        .ALUctr(module_ex.ALUctr_native[1:0]),.is_w(module_ex.ALUctr_native[4]),
+        .result(mul_result)
+    );
+    `else
     ysyx_220066_booth_walloc module_mutli(
         .clk(clk),.block(global_block),
         .src1_in(module_regs.src1),.src2_in(module_regs.src2),.ALUctr_in(module_id.ALUctr[1:0]),
         .ALUctr(module_ex.ALUctr_native[1:0]),.is_w(module_ex.ALUctr_native[4]),
         .result(mul_result)
     );
+    `endif
 
     ysyx_220066_csrwork csrwork(
         .csr_data(module_ex.csr_data),.rs1(module_ex.src1),.zimm(module_ex.rs1),.csrctl(module_ex.MemOp),.data(ex_csr_wdata)
