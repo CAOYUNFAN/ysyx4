@@ -2,7 +2,7 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     input clk,rst,
 
     //CPU
-    //[63:12] [11:4] [3:3] [2:0]
+    //[63:32] [31:11] [10:6] [5:3] [2:0]
     input valid,op,//op 0:read,1:write
     input [IDNEX_LEN-1:0] index,
     input [TAG_LEN-1:0] tag,
@@ -10,6 +10,7 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     input [7:0] wstrb,
     input [63:0] wdata,
     output ok,
+    output ready,
     output reg [63:0] rdata,
     output reg rw_error,
     input fence,
@@ -45,6 +46,7 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     assign refill_pos=(~cache_valid[{index,1'b0}]||~cache_valid[{index,1'b1}])?cache_valid[{index,1'b0}]:
                     ( (cache_dirty[{index,1'b0}]^cache_dirty[{index,1'b1}])?cache_dirty[{index,1'b0}]:~cache_freq[index] );
     assign dirty=cache_dirty[{index,refill_pos}]&&cache_valid[{index,refill_pos}];
+    assign ready=(status==2'b00);
 
     wire ready_to_read,ready_to_write;
     assign ready_to_read=rd_req&&rd_ready;
@@ -75,28 +77,16 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     always @(posedge clk) if(valid&&ok&&~op)
         rw_error<=cache_error[{index,hit_1}];
 
+    `ifdef R_W
+    //integer xx;
+    `endif
+
     always @(posedge clk) begin
         if(rst) begin
             cache_valid<={INDEX_NUM{1'b0}};
             cache_freq<={(INDEX_NUM/2){1'b0}};
         end else if(valid&&ok) begin
             if(op) begin
-                /*if(wstrb[0]&&~offset) cache_data[{index,hit_1}][  7:  0] <= wdata[ 7: 0] ;
-                if(wstrb[1]&&~offset) cache_data[{index,hit_1}][ 15:  8] <= wdata[15: 8] ;
-                if(wstrb[2]&&~offset) cache_data[{index,hit_1}][ 23: 16] <= wdata[23:16] ;
-                if(wstrb[3]&&~offset) cache_data[{index,hit_1}][ 31: 24] <= wdata[31:24] ;
-                if(wstrb[4]&&~offset) cache_data[{index,hit_1}][ 39: 32] <= wdata[39:32] ;
-                if(wstrb[5]&&~offset) cache_data[{index,hit_1}][ 47: 40] <= wdata[47:40] ;
-                if(wstrb[6]&&~offset) cache_data[{index,hit_1}][ 55: 48] <= wdata[55:48] ;
-                if(wstrb[7]&&~offset) cache_data[{index,hit_1}][ 63: 56] <= wdata[63:56] ;
-                if(wstrb[0]&& offset) cache_data[{index,hit_1}][ 71: 64] <= wdata[ 7: 0] ;
-                if(wstrb[1]&& offset) cache_data[{index,hit_1}][ 79: 72] <= wdata[15: 8] ;
-                if(wstrb[2]&& offset) cache_data[{index,hit_1}][ 87: 80] <= wdata[23:16] ;
-                if(wstrb[3]&& offset) cache_data[{index,hit_1}][ 95: 88] <= wdata[31:24] ;
-                if(wstrb[4]&& offset) cache_data[{index,hit_1}][103: 96] <= wdata[39:32] ;
-                if(wstrb[5]&& offset) cache_data[{index,hit_1}][111:104] <= wdata[47:40] ;
-                if(wstrb[6]&& offset) cache_data[{index,hit_1}][119:112] <= wdata[55:48] ;
-                if(wstrb[7]&& offset) cache_data[{index,hit_1}][127:120] <= wdata[63:56] ;*/
                 cache_dirty[{index,hit_1}]<=1;
                 `ifdef R_W
                 $display("simple write on %b,tag=%h,index=%h,offset=%h,data=%h,wmask=%b,hit_0=%b,tt=%h",hit_1,tag,index,offset,wdata,wstrb,hit_0,cache_tag[{index,hit_1}]);
@@ -110,13 +100,15 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
             cache_dirty[{index,refill_pos}]<=0;
             cache_error[{index,refill_pos}]<=~rd_valid;
             `ifdef R_W
-            $display("Read on %b tag=%h,index=%h,data=%h%h",refill_pos,tag,index,rd_data[127:64],rd_data[63:0]);
+            $display("Read on %b tag=%h,index=%h",refill_pos,tag,index);
+            //for(xx=0;xx<8;xx=xx+1) $display("rd_data[%d]=%h",xx[2:0],rd_data[{509'h0,xx[2:0]}*{512'd64}+{512'd63}:{509'h0,xx[2:0]}*{512'd64}]);
             `endif
         end else if(ready_to_write) begin
             if(status==2'b11) cache_dirty[{index,refill_pos}]<=0;
             else if(status==2'b01) cache_dirty[count]<=0;
             `ifdef R_W
             $display("Write on %b tag=%h,index=%h",refill_pos,tag,index);
+            //for(xx=0;xx<8;xx++) $display("wr_data[%d]=%h",xx[2:0],wr_data[{509'h0,xx[2:0]}*{512'd64}+{512'd63}:{509'h0,xx[2:0]}*{512'd64}]);
             `endif
         end
     end
@@ -132,6 +124,9 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
         write_ready<=ready_to_write;
     end
 
+    reg start_fence;
+    always @(posedge clk) start_fence<=fence&&(status==2'b00);
+
     always @(posedge clk) begin
         if(rst) {rd_req,wr_req}<=2'b00;
         else if(valid&&miss) begin
@@ -145,7 +140,7 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
             rd_req<=0;
         end else if(status==2'b01) begin
             addr<={cache_tag[count],count[IDNEX_LEN:1],6'b0};
-            wr_req<=cache_valid[count]&&cache_dirty[count]&&~ready_to_write;
+            wr_req<=cache_valid[count]&&cache_dirty[count]&&~ready_to_write&&~start_fence;
         end
     end
 
@@ -160,9 +155,9 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     genvar x,y;generate for(x=0;x<4;x=x+1)begin:ram
         wire [127:0] Q,D;
         S011HD1P_X32Y2D128_BW ram_data(
-            .Q(Q),.CLK(clk),.CEN(1'b1),.BWEN(BWEN),.D(D),
-            .WEN(((valid&&ok&&op)||ready_to_read)&&~rst),
-            .A({index,ready_to_read?refill_pos:hit_1})
+            .Q(Q),.CLK(clk),.CEN(1'b0),.BWEN(~BWEN),.D(D),
+            .WEN((~(valid&&ok&&op)&&~ready_to_read)||rst),
+            .A((status==2'b01)?count:{index,ok?hit_1:refill_pos})
         );
         for(y=0;y<64;y=y+1) begin
             assign rd[x*2+1+y*8:x*2+y*8]=Q[y*2+1:y*2];
@@ -172,7 +167,10 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
 
     always @(*) begin
         `ifdef fully_info
-        if(~rst&&~clk)$display("Cache:status=%b,rd_req=%b,wr_req=%b,refill_pos=%b,hit_0=%b,hit_1=%b,tag_0=%h,tag_1=%h,index=%h,tag=%h,ready_to_read=%b",status,rd_req,wr_req,refill_pos,hit_0,hit_1,cache_tag[{index,1'b0}],cache_tag[{index,1'b1}],index,tag,ready_to_read);
+        if(~rst&&~clk)begin
+            $display("Cache:status=%b,tag=%h,index=%h,count=%h,wr=%b,wen=%b,freq=%b",status,cache_tag[count],index,count,cache_dirty[count]&&cache_valid[count],(valid&&ok&&op)||ready_to_read,cache_freq[index]);
+            $display("Cache:wen=%h,rd=%h",BWEN,rd);
+        end
         `endif
     end
 endmodule

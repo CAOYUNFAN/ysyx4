@@ -2,7 +2,7 @@ VSRC = $(shell find . -name "*.v")
 CSRC = $(shell find ./test/ -name "*.cpp")
 TARGET = emu_cache/emu_cache
 TOP_MODULE = ysyx_220066_cache
-CFLAGS = #-DDEBUG
+CFLAGS = -O2 -g #-DDEBUG
 VFLAGS = #-DR_W -Dfully_info
 
 $(TARGET):$(CSRC) $(VSRC)
