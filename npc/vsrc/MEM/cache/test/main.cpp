@@ -53,7 +53,7 @@ void update(uLL addr,uint8_t wstrb,uLL data){
     big_mem[(addr-mem_start)>>3]=xx._64;
 }
 
-extern void emu_cache_work(uint32_t index,uint32_t tag,uint32_t flow,bool &read, uint32_t &read_addr,bool &write,uint32_t &write_addr);
+extern void emu_cache_work(uint32_t index,uint32_t tag,uint32_t offset,uint32_t flow,bool &read, uint32_t &read_addr,bool &write,uint32_t &write_addr);
 extern vu * emu_cache_fence();
 
 const int LEN=512;
@@ -62,14 +62,16 @@ void test_1(){
     for(int i=0;i<N;i++){
         emu->valid=1;
         emu->op=rand()%2;
-        uint32_t addr=mem_start+random()%mem_size;
+        int uncache=myrandom()%2;
+        uint32_t addr=mem_start*(uncache^1)+myrandom()%mem_size;
+        uLL uncache_read,uncache_write;
         emu->offset=(addr>>3)&((1<<3)-1);
         emu->index=(addr>>6)&((1<<5)-1);
         emu->tag=addr>>11;
         if(emu->op){
             emu->wstrb=rand()&((1<<8)-1);
-            emu->wdata=random();
-            update(addr,emu->wstrb,emu->wdata);
+            emu->wdata=uncache_write=myrandom();
+            if(!uncache) update(addr,emu->wstrb,emu->wdata);
             Log("%d:Write addr=%x,data=%lx,mask=%x\n",i,addr,emu->wdata,emu->wstrb);
         }else Log("%d:Read addr=%x\n",i,addr);
         int read_num=rand()%8+1;
@@ -78,7 +80,7 @@ void test_1(){
         int tt=0;
         bool read,write;
         uint32_t read_addr=0,write_addr=0;
-        emu_cache_work(emu->index,emu->tag,emu->op,read,read_addr,write,write_addr);
+        emu_cache_work(emu->index,emu->tag,emu->offset<<3u,emu->op,read,read_addr,write,write_addr);
         do{
             CYCLE_ONE();
             Assert(!emu->rd_req||!emu->wr_req,"Read and write flags raise up at the same time!");
@@ -87,7 +89,10 @@ void test_1(){
                 assert((emu->addr&0xf)==0);
                 Assert(emu->addr==write_addr,"Unexpected write addr %x,should be %x\n",emu->addr,write_addr);
                 uint32_t addr=(emu->addr-mem_start)>>3;
-                for(int i=0;i<LEN/64;i++){
+                if(uncache){
+                    uLL data=(uLL)emu->wr_data[0]|((uLL)emu->wr_data[1]<<32uLL);
+                    Assert(data==uncache_write,"Unexpected cache write %llx,expected %llx\n",data,uncache_write);
+                }else for(int i=0;i<LEN/64;i++){
                     uLL data=(uLL)emu->wr_data[i<<1]|((uLL)emu->wr_data[(i<<1)|1]<<32uLL);
                     if(data!=big_mem[addr+i]){
                         Log("FAIL on addr %x:write in %llx,expected %llx\n",emu->addr+(i<<3),data,big_mem[addr+i]);
@@ -105,7 +110,11 @@ void test_1(){
                 if(read_num==1){
                     emu->rd_valid=1;
                     uint32_t addr=(emu->addr-mem_start)>>3;
-                    for(int i=0;i<LEN/64;i++){
+                    if(uncache){
+                        uncache_read=myrandom();
+                        emu->rd_data[0]=uncache_read;
+                        emu->rd_data[1]=uncache_read>>32uLL;
+                    }else for(int i=0;i<LEN/64;i++){
                         emu->rd_data[i<<1]=big_mem[addr+i];
                         emu->rd_data[(i<<1)|1]=big_mem[addr+i]>>32uLL;
                         Log("read data %d:%llx\n",i,big_mem[addr+i]);
@@ -128,7 +137,9 @@ void test_1(){
         }
         Log("DONE! checking...\n");
         if(!emu->op){
-            if(big_mem[(addr-mem_start)>>3]!=emu->rdata){
+            if(uncache){
+                Assert(emu->rdata==uncache_read,"Unexpected unache read! %lx,expected %llx\n",emu->rdata,uncache_read);
+            }else if(big_mem[(addr-mem_start)>>3]!=emu->rdata){
                 Log("FAIL ON addr %x,read %lx,expected %llx\n",addr,emu->rdata,big_mem[(addr-mem_start)>>3]);
                 FORCE_END    
             }
@@ -138,7 +149,8 @@ void test_1(){
         emu->valid=0;
         int left_empty=rand()%4;
         for(int i=0;i<left_empty;i++){
-            assert(!emu->rd_req&&!emu->wr_req);
+            Assert(!emu->rd_req,"should not read!\n");
+            Assert(!emu->wr_req,"should not write!\n");
             CYCLE_ONE();
         }
     }

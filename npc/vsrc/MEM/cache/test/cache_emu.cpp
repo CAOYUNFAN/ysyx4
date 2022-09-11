@@ -8,16 +8,22 @@ class cache_emu{
     private:
         uint32_t cache_tag[cache_size][2];
         bool valid[cache_size][2],dirty[cache_size][2],freq[cache_size];
-        inline uint32_t addr_make(uint32_t tag,uint32_t index){
-            return (tag<<11u)|(index<<6u);
+        inline uint32_t addr_make(uint32_t tag,uint32_t index,uint32_t offset=0){
+            return (tag<<11u)|(index<<6u)|offset;
         }
     public:
         cache_emu(){
             memset(valid,0,sizeof(valid));
             memset(freq,0,sizeof(freq));
         }
-        void work(uint32_t index,uint32_t tag,uint32_t flow,bool &read, uint32_t &read_addr,bool &write,uint32_t &write_addr,uint32_t fence){
+        void work(uint32_t index,uint32_t tag,uint32_t offset,uint32_t flow,bool &read, uint32_t &read_addr,bool &write,uint32_t &write_addr){
             read=write=0;
+            if(tag<(1<<20)){
+                read=flow^1;
+                write=flow;
+                read_addr=write_addr=addr_make(tag,index);
+                return;
+            }
             for(uint32_t i=0;i<2;i++) if(cache_tag[index][i]==tag&&valid[index][i]){
                 dirty[index][i]|=flow;
                 freq[index]=i;
@@ -38,7 +44,6 @@ class cache_emu{
                 freq[index]=i;
                 return;
             }
-            
             uint32_t pos=freq[index]^1;
             freq[index]^=1;
             write=dirty[index][pos];
@@ -58,8 +63,8 @@ class cache_emu{
         }
 }ref_cache;
 
-void emu_cache_work(uint32_t index,uint32_t tag,uint32_t flow,bool &read, uint32_t &read_addr,bool &write,uint32_t &write_addr){
-    ref_cache.work(index,tag,flow,read,read_addr,write,write_addr,0);
+void emu_cache_work(uint32_t index,uint32_t tag,uint32_t offset,uint32_t flow,bool &read, uint32_t &read_addr,bool &write,uint32_t &write_addr){
+    ref_cache.work(index,tag,offset,flow,read,read_addr,write,write_addr);
 }
 
 vu * emu_cache_fence(){
