@@ -12,7 +12,7 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     output ok,
     output ready,
     output reg [63:0] rdata,
-    output rw_error,
+    reg rw_error,
     input fence,
 
     //AXI
@@ -84,13 +84,7 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
         endcase
     end
     assign wr_data=uncache?{rd[511:64],wdata}:rd;
-    reg cache_rw_error;
-    always @(posedge clk) if(valid&&hit)
-        cache_rw_error<=op?wr_error:cache_error[{index,hit_1}];
-    reg uncache_rw_error;
-    always @(posedge clk) uncache_rw_error<=uncache&&(op?wr_error:~rd_valid);
-
-    assign rw_error=uncache?uncache_rw_error:cache_rw_error;
+    always @(posedge clk) rw_error<=uncache&&(op?wr_error:~rd_valid);
 
     `ifdef R_W
     //integer xx;
@@ -113,7 +107,6 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
             cache_tag[{index,refill_pos}]<=tag;
             cache_valid[{index,refill_pos}]<=1;
             cache_dirty[{index,refill_pos}]<=0;
-            cache_error[{index,refill_pos}]<=~rd_valid;
             `ifdef R_W
             $display("Read on %b tag=%h,index=%h",refill_pos,tag,index);
             //for(xx=0;xx<8;xx=xx+1) $display("rd_data[%d]=%h",xx[2:0],rd_data[{509'h0,xx[2:0]}*{512'd64}+{512'd63}:{509'h0,xx[2:0]}*{512'd64}]);
