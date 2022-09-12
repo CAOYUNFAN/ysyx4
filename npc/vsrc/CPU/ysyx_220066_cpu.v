@@ -3,14 +3,15 @@ module ysyx_220066_cpu(
     input [31:0] instr_rd,
     input [63:0] data_Rd,
     input instr_valid,instr_error,
-    input data_Rd_valid,data_Rd_error,
+    input data_valid,data_error,
 
     output reg error,done,
-    output MemWr,MemRd,
+    output MemWr,MemRd,fence_i,
     output [63:0] pc_rd,
     output reg [63:0] pc_nxt,
     output reg out_valid,
     output [63:0] addr,
+    output [2:0] wr_len,
     output [7:0] wr_mask,
     output [63:0] data_Wr
 );
@@ -44,9 +45,10 @@ module ysyx_220066_cpu(
     wire div_block,instr_block,mem_block,id_block;
     assign div_block=~div_ready;
     assign instr_block=~instr_valid;
-    assign mem_block=MemRd&&~data_Rd_valid;
-    wire global_block;
-    assign global_block=div_block||instr_block||mem_block;
+    assign mem_block=(MemRd||MemWr)&&~data_valid;
+    wire m_block,global_block;
+    assign m_block=div_block||mem_block;
+    assign global_block=instr_block||m_block;
 
     ysyx_220066_IF module_if(
         .clk(clk),.rst(rst),
@@ -93,7 +95,7 @@ module ysyx_220066_cpu(
         .ecall_in(module_id.ecall),.mret_in(module_id.mret),
         .ALUAsrc_in(module_id.ALUASrc),.ALUBsrc_in(module_id.ALUBSrc),.ALUctr_in(module_id.ALUctr),.Branch_in(module_id.Branch),
         .MemOp_in(module_id.MemOp),.MemRd_in(module_id.MemRd),.MemWr_in(module_id.MemWr),.done_in(module_id.done),
-        .RegWr_in(module_id.RegWr),.rs1_in(instr[19:15]),
+        .RegWr_in(module_id.RegWr),.rs1_in(instr[19:15]),.fence_i_in(module_id.fence_i),
         
         .nxtpc(ex_nxtpc),.is_jmp(ex_is_jmp),.result(ex_data),.rd(ex_rd),.RegWr(ex_wen),.valid_native(ex_valid_native),
         .is_ex(ex_isex),.ecall(ex_ecall),.mret(ex_mret),.csr_addr(ex_csr_addr),.csr(ex_csr),.done(ex_done),.pc(ex_pc)
@@ -133,15 +135,15 @@ module ysyx_220066_cpu(
 
     wire MemWr_line;
     ysyx_220066_M module_m(
-        .clk(clk),.rst(rst),.valid(m_valid),.block(global_block),
-        .nxtpc_in(csr_jmp?csr_nxtpc:module_ex.nxtpc),.done_in(module_ex.done),.valid_in(module_ex.valid),
+        .clk(clk),.rst(rst),.valid(m_valid),.block(m_block),
+        .nxtpc_in(csr_jmp?csr_nxtpc:module_ex.nxtpc),.done_in(module_ex.done),.valid_in(module_ex.valid&&~instr_block),
         .MemRd_in(module_ex.MemRd),.ex_result(module_ex.result),.error_in(module_ex.error),
         .data_Wr_in(module_ex.data_Wr),.wr_mask_in(module_ex.wmask),.RegWr_in(module_ex.RegWr),.MemWr_in(module_ex.MemWr),
-        .MemOp_in(module_ex.MemOp),.rd_in(module_ex.rd),
+        .MemOp_in(module_ex.MemOp),.rd_in(module_ex.rd),.fence_i_in(module_ex.fence_i),
         .is_mul_in(module_ex.is_mul),.mul_result(mul_result),
         .is_div_in(module_ex.is_div),.div_valid(div_valid),.div_result(div_result),
-        .RegWr(m_wen),.rd(m_rd),.wr_mask(wr_mask),
-        .MemRd_native(MemRd),.MemWr_native(MemWr_line),.addr(addr),.data_Wr(data_Wr)
+        .RegWr(m_wen),.rd(m_rd),.wr_mask(wr_mask),.wr_len(wr_len),
+        .MemRd_native(MemRd),.MemWr_native(MemWr_line),.addr(addr),.data_Wr(data_Wr),.fence_i(fence_i)
     );
     assign MemWr=MemWr_line&&module_m.valid;
     assign m_MemRd=MemRd;
@@ -149,8 +151,8 @@ module ysyx_220066_cpu(
 
     ysyx_220066_Wb module_wb(
         .clk(clk),.rst(rst),
-        .valid_in(module_m.valid&&~global_block),.data_Rd_error(data_Rd_error),
-        .wen_in(module_m.RegWr&&module_m.valid),.MemRd_in(module_m.MemRd_native),
+        .valid_in(module_m.valid&&~m_block),.data_error(data_error),
+        .wen_in(module_m.RegWr&&module_m.valid),.MemRd_in(module_m.MemRd_native),.MemWr_in(module_m.MemWr_native),
         .done_in(module_m.done&&module_m.valid),.rd_in(module_m.rd),.data_in(module_m.data),
         .data_Rd(data_Rd),.MemOp_in(module_m.MemOp_native),.addr_lowbit_in(module_m.addr[2:0]),
         .error_in(module_m.error),.nxtpc_in(module_m.nxtpc),

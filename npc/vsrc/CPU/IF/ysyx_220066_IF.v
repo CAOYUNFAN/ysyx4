@@ -8,7 +8,7 @@ module ysyx_220066_IF (
     wire valid;
     wire [63:0] pc;
     always @(posedge clk) begin
-        if(rst) native_pc<=64'h8000_0000;
+        if(rst) native_pc<=64'h3000_0000;
         else if(block) native_pc<=native_pc;
         else native_pc<=is_jmp?nxtpc:native_pc+4;
     end

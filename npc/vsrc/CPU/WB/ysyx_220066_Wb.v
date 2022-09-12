@@ -1,35 +1,25 @@
 module ysyx_220066_Wb(
     input clk,rst,
 
-    input wen_in,MemRd_in,done_in,valid_in,error_in,
+    input wen_in,MemRd_in,MemWr_in,done_in,valid_in,error_in,
     input [4:0] rd_in,
     input [63:0] data_in,
     input [63:0] data_Rd,
     input [63:0] nxtpc_in,
     input [2:0] MemOp_in,
-    input data_Rd_error,
+    input data_error,
     input [2:0] addr_lowbit_in,
-
-/*    input Multi_wen_in,Multi_error_in,
-    input [4:0] Multi_rd_in,
-    input [63:0] Multi_data_in,
-    input [63:0] Multi_nxtpc_in,
-
-    input Div_wen_in,Div_error_in,
-    input [4:0] Div_rd_in,
-    input [63:0] Div_data_in,
-    input [63:0] Div_nxtpc_in,*/
 
     output [4:0] rd,
     output [63:0] data,
-    output wen//,multi_block,div_block
+    output wen
 );
     wire error;
     wire [63:0] nxtpc;
     wire done,valid;
 
 
-    reg wen_native,MemRd_native,valid_native;
+    reg wen_native,MemRd_native,MemWr_native,valid_native;
     reg done_native;
     reg error_native;
     reg [4:0] rd_native;
@@ -38,12 +28,12 @@ module ysyx_220066_Wb(
     reg [2:0] MemOp_native;  
     reg [2:0] addr_lowbit_native;
     always @(posedge clk) begin
-        wen_native<=wen_in&&valid_in;MemRd_native<=MemRd_in;done_native<=done_in;
+        wen_native<=wen_in&&valid_in;MemRd_native<=MemRd_in;MemWr_native<=MemWr_in;done_native<=done_in;
         rd_native<=rd_in;data_native<=data_in;nxtpc_native<=nxtpc_in;valid_native<=valid_in;
         error_native<=error_in;MemOp_native<=MemOp_in;addr_lowbit_native<=addr_lowbit_in;
     end
 
-    assign error=error_native||(data_Rd_error&&MemRd_native);
+    assign error=error_native||(data_error&&(MemRd_native||MemWr_native));
     assign wen=~rst&&wen_native&&~error;
 //    assign div_block=Div_wen_native&&(wen_native&&(MemRd_native||~data_Rd_valid));
 //    assign multi_block=Multi_wen_native&&(Div_wen_native||(wen_native&&(MemRd_native||~data_Rd_valid)));

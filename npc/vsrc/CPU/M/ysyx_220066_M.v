@@ -8,17 +8,18 @@ module ysyx_220066_M (
     input [63:0] nxtpc_in,
     input [2:0] MemOp_in,
     input [4:0] rd_in,
-    input error_in,
+    input error_in,fence_i_in,
     input is_mul_in,is_div_in,div_valid,
     input [63:0] mul_result,
     input [63:0] div_result,
     input [7:0] wr_mask_in,
 
-    output reg MemRd_native,MemWr_native,
+    output reg MemRd_native,MemWr_native,fence_i,
     output reg [63:0] addr,
     output reg [63:0] data_Wr,
     output [4:0] rd,
     output reg [7:0] wr_mask,
+    output reg [2:0] wr_len,
     output RegWr
 );
     wire error,done;
@@ -48,6 +49,13 @@ module ysyx_220066_M (
         is_mul_native<=is_mul_in;
         is_div_native<=is_div_in;
         wr_mask<=wr_mask_in;
+        fence_i<=fence_i_in&&valid_in&&~error_in;
+        case (MemOp_in[1:0])
+            2'b00:wr_len<=3'b011;
+            2'b01:wr_len<=3'b100;
+            2'b10:wr_len<=3'b101;
+            2'b11:wr_len<=3'b110;
+        endcase
         //$display("MM:data_Wr=%h,data_Wr_in=%h",data_Wr,data_Wr_in);
     end
 

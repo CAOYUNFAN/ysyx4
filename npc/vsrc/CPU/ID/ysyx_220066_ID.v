@@ -21,6 +21,7 @@ module ysyx_220066_ID (
     wire [2:0] MemOp;
     wire [11:0] csr_addr;
     wire error,done;
+    wire fence_i;
 
     reg valid_native;
     reg [63:0] pc_native;
@@ -39,6 +40,7 @@ module ysyx_220066_ID (
     wire instr_error;
     assign instr=prev_block?prev_instr:instr_read;
     assign instr_error=prev_block?instr_error_prev:instr_error_rd;
+    assign fence_i=(instr==32'h0000_100f);
 
     wire [2:0] ExtOp;
     wire err_temp;
@@ -57,7 +59,8 @@ module ysyx_220066_ID (
 
     assign error=err_temp||instr_error||(csr&&(
             (instr[14:12]==3'b000&&(instr!=32'h0010_0073&&instr!=32'h0000_0073&&instr!=32'h3020_0073))||
-            (instr[14:12]!=3'b000&&csr_error)));
+            (instr[14:12]!=3'b000&&csr_error)))||
+            (instr[6:2]==5'b00011&&!fence_i);
 
     assign done=(instr==32'h0010_0073);
     assign ecall=(instr==32'h0000_0073);
@@ -113,6 +116,7 @@ module ysyx_220066_Decode (
     assign csr=(OP[6:2]==5'b11100);
     always @(*)//ALUctr
     case(OP[6:2])//ExtOp:I=000,U=101,B=011,S=010,J=001
+        5'b00011:begin ExtOp=3'b000;ALUBSrc=0;ALUctr=4'b0000;Branch=3'b000;err=0; end
         5'b11100:begin ExtOp=3'b000;ALUBSrc=3;ALUctr=4'b1111;Branch=3'b000; case(Funct3)
             3'b000,//ecall,ebreak,mret
             3'b001,//csrrw

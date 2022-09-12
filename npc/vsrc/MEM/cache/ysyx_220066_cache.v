@@ -1,5 +1,5 @@
 module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE_LEN=512)(
-    input clk,rst,
+    input clk,rst,force_update,
 
     //CPU
     //[63:32] [31:11] [10:6] [5:3] [2:0]
@@ -19,7 +19,7 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     output reg [31:0] addr,
     output reg rd_req,
     input rd_ready,
-    input rd_valid,
+    input rd_error,
     input [LINE_LEN-1:0] rd_data,
     output reg wr_req,
     output [LINE_LEN-1:0] wr_data,
@@ -46,7 +46,7 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     assign refill_pos=(~cache_valid[{index,1'b0}]||~cache_valid[{index,1'b1}])?cache_valid[{index,1'b0}]:
                     ( (cache_dirty[{index,1'b0}]^cache_dirty[{index,1'b1}])?cache_dirty[{index,1'b0}]:~cache_freq[index] );
     assign dirty=cache_dirty[{index,refill_pos}]&&cache_valid[{index,refill_pos}];
-    assign ready=(status==2'b00);
+    assign ready=(status!=2'b01);
 
     wire ready_to_read,ready_to_write;
     assign ready_to_read=rd_req&&rd_ready;
@@ -62,11 +62,17 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
         else if(status==2'b01&&(&count)&&(ready_to_write||~cache_dirty[{(IDNEX_LEN+1){1'b1}}]||~cache_valid[{(IDNEX_LEN+1){1'b1}}])) status<=2'b00;
     end
 
+    reg nxt_clear;
+    always @(posedge clk)begin
+        if(rst||(rd_req&&ready_to_read)) nxt_clear<=0;
+        else if(rd_req&&force_update) nxt_clear<=1; 
+    end
+
     wire [LINE_LEN-1:0] rd;
 
     reg [63:0] uncached_data;
     always @(posedge clk) uncached_data<=rd_data[63:0];
-    always @(posedge clk) uncached_done<=~rst&&uncache&&(ready_to_read&&status==2'b10||ready_to_write&&status==2'b11);
+    always @(posedge clk) uncached_done<=~rst&&uncache&&(ready_to_read&&status==2'b10||ready_to_write&&status==2'b11)&&~nxt_clear;
 
     assign ok=uncache?uncached_done:hit;
 
@@ -84,14 +90,14 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
         endcase
     end
     assign wr_data=uncache?{rd[511:64],wdata}:rd;
-    always @(posedge clk) rw_error<=uncache&&(op?wr_error:~rd_valid);
+    always @(posedge clk) rw_error<=uncache&&(op?wr_error:rd_error);
 
     `ifdef R_W
     //integer xx;
     `endif
 
     always @(posedge clk) begin
-        if(rst) begin
+        if(rst||force_update) begin
             cache_valid<={INDEX_NUM{1'b0}};
             cache_freq<={(INDEX_NUM/2){1'b0}};
         end else if(valid&&hit) begin
@@ -105,7 +111,7 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
         end else if(ready_to_read&&~uncache) begin
             //cache_data[{index,refill_pos}]<=rd_data;
             cache_tag[{index,refill_pos}]<=tag;
-            cache_valid[{index,refill_pos}]<=1;
+            cache_valid[{index,refill_pos}]<=~nxt_clear;
             cache_dirty[{index,refill_pos}]<=0;
             `ifdef R_W
             $display("Read on %b tag=%h,index=%h",refill_pos,tag,index);

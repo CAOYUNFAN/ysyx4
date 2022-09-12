@@ -18,6 +18,7 @@ module ysyx_220066_EX(
     input [2:0] MemOp_in,
     input MemRd_in,MemWr_in,RegWr_in,
     input raise_intr,
+    input fence_i_in,
 
     output [63:0] nxtpc,
     output [63:0] pc,
@@ -51,6 +52,7 @@ module ysyx_220066_EX(
     reg [11:0] csr_addr_native;
     reg [4:0] rd_native;
     reg [4:0] rs1_native;
+    reg fence_i;
 
     always @(posedge clk) valid_native<=~rst&&(block?valid_native:valid_in);
     
@@ -74,7 +76,7 @@ module ysyx_220066_EX(
         RegWr_native<=RegWr_in;
         csr_addr_native<=csr_addr_in;
         csr_native<=csr_in;ecall_native<=ecall_in;mret_native<=mret_in;
-        //$display("EX:src2=%h,src2_in=%h",src2_native,src2_in);
+        fence_i<=fence_i_in;
     end
 
     assign valid=valid_native&&(ecall_native||~raise_intr);
@@ -104,7 +106,6 @@ module ysyx_220066_EX(
         2'b11:datab=csr_data_native;
     endcase
     wire zero;
-//    wire [63:0] result_line;
     wire [63:0] mul_result;
     wire [2:0] add_lowbit;
 
@@ -119,11 +120,7 @@ module ysyx_220066_EX(
     assign is_ex=~MemRd_native&&~ALUctr_native[5];
 
     wire error_div;
-/*    ysyx_220066_Multi_dummy multi_dummy(
-        .src1(src1_native),.src2(src2_native),.is_w(ALUctr_native[4]),.ALUctr(ALUctr_native[2:0]),
-        .result(mul_result),.error(error_div)
-    );*/
-    assign error_div=is_div&&(src2_native==64'h0);
+    assign error_div=is_div&&(src2_native[31:0]==32'h0)&&(ALUctr_native[4]||src2_native[63:32]==32'h0);
 
     wire is_jmp_line;
     ysyx_220066_nxtPC nxtPC(
@@ -132,7 +129,7 @@ module ysyx_220066_EX(
     );
 
     assign error=error_native||(ALUctr_native[5]&&error_div);
-    assign is_jmp=is_jmp_line&&valid_native;
+    assign is_jmp=(is_jmp_line||fence_i)&&valid_native;
 //    assign result=ALUctr_native[5]?mul_result:result_line;
 
     always @(*) case (MemOp[1:0])
