@@ -76,9 +76,12 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
 
     assign ok=uncache?uncached_done:hit;
 
+    reg [OFFSET_LEN-1:0] offset_native;
+    always@(posedge clk) offset_native<=offset;
+
     always @(*) begin 
         if(uncache) rdata=uncached_data; 
-        else case (offset)
+        else case (offset_native)
             3'b000:rdata=rd[ 63:  0];
             3'b001:rdata=rd[127: 64];
             3'b010:rdata=rd[191:128];
