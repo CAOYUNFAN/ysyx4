@@ -1,7 +1,7 @@
 #include <am.h>
 #include <klib-macros.h>
 
-#define MMIO_BASE 0xa0000000
+#define MMIO_BASE 0x20000000
 #define VGACTL_ADDR     (MMIO_BASE   + 0x0000100)
 #define FB_ADDR         (MMIO_BASE   + 0x1000000)
 static inline uint16_t inw(uintptr_t addr) { return *(volatile uint16_t *)addr; }

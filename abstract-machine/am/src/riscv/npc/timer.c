@@ -3,7 +3,7 @@
 void __am_timer_init() {
 }
 
-#define RTC_ADDR 0xa0000000+0x00000048
+#define RTC_ADDR 0x20000000+0x00000048
 
 static inline uint64_t inq(uintptr_t addr) { return *(volatile uint64_t *)addr; }
 void __am_timer_uptime(AM_TIMER_UPTIME_T *uptime) {

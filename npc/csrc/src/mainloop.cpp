@@ -18,11 +18,26 @@ void trace_and_difftest(){
 #define CC(...) (0)
 #endif 
 
+void data_read(uLL addr,u8 burst,uLL * data,u8 * error);
+void data_write(uLL addr,u8 burst,uLL *data,u8 mask, u8 * error);
+
 inline void cpu_exec_once(){
     mycpu->clk=1;
     CC("One cycle-UP!");
     mycpu->eval();
     if(mycpu->done) return;
+    if(mycpu->ins_req){
+      mycpu->ins_ready=1;
+      data_read(mycpu->ins_addr,mycpu->ins_burst,(uLL *)mycpu->ins_data,&mycpu->ins_err);
+    }else mycpu->ins_ready=0;
+    if(mycpu->rd_req){
+      mycpu->rd_ready=1;
+      data_read(mycpu->rd_addr,mycpu->rd_burst,(uLL *)mycpu->rd_data,&mycpu->rd_err);
+    }else mycpu->rd_ready=0;
+    if(mycpu->wr_req){
+      mycpu->wr_ready=1;
+      data_write(mycpu->wr_addr,mycpu->wr_burst,(uLL *)mycpu->wr_data,mycpu->wr_mask,&mycpu->wr_err);
+    }else mycpu->wr_ready=0;
     mycpu->clk=0;
     CC("One cycle-DOWN!");
     mycpu->eval();

@@ -1,6 +1,6 @@
 #include <am.h>
 
-#define KBD_ADDR        (0xa0000000 + 0x0000060)
+#define KBD_ADDR        (0x20000000 + 0x0000060)
 #define KEYDOWN_MASK 0x8000
 
 static inline uint32_t inl(uintptr_t addr) { return *(volatile uint32_t *)addr; }
