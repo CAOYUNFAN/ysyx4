@@ -117,6 +117,7 @@ void difftest_step(uLL pc, uLL npc) {
     ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
 
     checkregs(&ref_r, npc);
+    Log("123");
 }
 
 void disable_difftest(){difftest_enabled=0;}
