@@ -47,7 +47,6 @@ void init_difftest(char * ref_so_file, unsigned long img_size){
 }
 
 static uLL is_skip_ref_pc[6] = {0x30000004,0x80000000};
-static uLL is_skip_ref_num[6] = {1,1};
 static int num=3;
 static int skip_dut_nr_inst = 0;
 
@@ -63,8 +62,7 @@ void difftest_skip_ref() {
     // will load that memory, we will encounter false negative. But such
     // situation is infrequent.
     skip_dut_nr_inst = 0;
-    for(int i=0;i<num;i++) if(is_skip_ref_pc[i]==jmp_pc) {++is_skip_ref_num[i]; return;}
-    is_skip_ref_pc[num]=jmp_pc;is_skip_ref_num[num++]=1;
+    is_skip_ref_pc[num]=jmp_pc;
 }
 
 // this is used to deal with instruction packing in QEMU.
@@ -107,12 +105,8 @@ void difftest_step(uLL pc, uLL npc) {
     for(int i=0;i<num;i++) if (is_skip_ref_pc[i]==npc) {
         // to skip the checking of an instruction, just copy the reg state to reference design
         ref_difftest_regcpy(current_cpu(), DIFFTEST_TO_REF);
-        --is_skip_ref_num[i];
-        if(!is_skip_ref_num[i]){
-            --num;
-            is_skip_ref_num[i]=is_skip_ref_num[num];
-            swap(is_skip_ref_pc[i],is_skip_ref_pc[num]);
-        }
+        --num;
+        swap(is_skip_ref_pc[i],is_skip_ref_pc[num]);
         //Log("pc=%llx,nxt=%lx",npc,mycpu->pc_nxt);
         return;
     }
