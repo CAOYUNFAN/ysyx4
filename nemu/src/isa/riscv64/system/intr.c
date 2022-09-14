@@ -7,7 +7,6 @@ word_t isa_raise_intr(word_t NO, vaddr_t epc) {
   cpu.mepc=epc;
   cpu.mcause=NO;
   cpu.mstatus=(cpu.mstatus&(~(word_t)((1<<3)|(1<<7)|(3<<11))))|(((cpu.mstatus>>3)&1)<<7)|((word_t)(3<<11));
-  Log("mtvec=%lx",cpu.mtvec);
   return cpu.mtvec;
 }
 
