@@ -48,7 +48,6 @@ static int now=0;
 #endif
 
 static inline word_t * getcsr(uint32_t csr){
-  Log("using csr %x! pc=%lx",csr,cpu.pc);
   switch (csr) {
     case 0x341: return &cpu.mepc;
     case 0x300: return &cpu.mstatus;
