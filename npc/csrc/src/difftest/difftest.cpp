@@ -47,7 +47,7 @@ void init_difftest(char * ref_so_file, unsigned long img_size){
 }
 
 static uLL is_skip_ref_pc[6] = {0x30000004,0x80000000};
-static int num=3;
+static int num=2;
 static int skip_dut_nr_inst = 0;
 
 // this is used to let ref skip instructions which
