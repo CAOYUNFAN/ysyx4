@@ -12,7 +12,7 @@
 #define KBD_ADDR        (DEVICE_BASE + 0x0000060)
 
 uLL boottime=0;
-extern void difftest_skip_ref(int x=1);
+extern void difftest_skip_ref();
 
 class main_memory:public device_regs{
     public:
@@ -127,7 +127,6 @@ class INIT: public device_regs{
         void input(uLL addr,uLL *rdata, u8 * error){
             *error=0;
             *rdata=0x806750000097uLL;
-            difftest_skip_ref(0);
         }
 }init;
 

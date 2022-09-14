@@ -46,14 +46,14 @@ void init_difftest(char * ref_so_file, unsigned long img_size){
     ref_difftest_regcpy(current_cpu(), DIFFTEST_TO_REF);
 }
 
-static uLL is_skip_ref_pc[6] = {};
-static int num=0;
+static uLL is_skip_ref_pc[6] = {0x30000004,0x80000000};
+static int num=3;
 static int skip_dut_nr_inst = 0;
 
 // this is used to let ref skip instructions which
 // can not produce consistent behavior with NEMU
-void difftest_skip_ref(int x=1) {
-    uLL jmp_pc=x?mycpu->pc_m:mycpu->ins_addr;
+void difftest_skip_ref() {
+    uLL jmp_pc=mycpu->pc_m;
     // If such an instruction is one of the instruction packing in QEMU
     // (see below), we end the process of catching up with QEMU's pc to
     // keep the consistent behavior in our best.
@@ -63,7 +63,6 @@ void difftest_skip_ref(int x=1) {
     // situation is infrequent.
     skip_dut_nr_inst = 0;
     for(int i=0;i<num;i++) if(is_skip_ref_pc[i]==jmp_pc) return;
-    Log("num++:%d,%llx",x,jmp_pc);
     is_skip_ref_pc[num++]=jmp_pc;
 }
 
@@ -104,7 +103,6 @@ void difftest_step(uLL pc, uLL npc) {
         panic("can not catch up with ref.pc = %llx at pc = %llx", ref_r.pc, (uLL)pc);
         return;
     }
-    Log("%d\n",num);
     for(int i=0;i<num;i++) if (is_skip_ref_pc[i]==npc) {
         // to skip the checking of an instruction, just copy the reg state to reference design
         ref_difftest_regcpy(current_cpu(), DIFFTEST_TO_REF);
