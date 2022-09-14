@@ -113,9 +113,6 @@ void difftest_step(uLL pc, uLL npc) {
     ref_difftest_exec(1);
     ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
     checkregs(&ref_r, npc);
-    static int pp=0;
-    if(ref_r.mtvec!=0&&!pp) pp=1,printf("pc=%lx\n",pc);
-    if(pp&&!ref_r.mtvec) Log("zero! pc=%lx",pc);
 }
 
 void disable_difftest(){difftest_enabled=0;}

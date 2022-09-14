@@ -25,7 +25,7 @@ void reg_display() {
     Cao_show_reg("pc",mycpu->pc_nxt);
 
     #define CSR_SHOW(name) Cao_show_reg(str(name),mycpu->name);
-    //CSR_MAP(CSR_SHOW)
+    CSR_MAP(CSR_SHOW)
 }
 
 bool difftest_checkregs(CPU_state * ref,uLL pc){
@@ -56,7 +56,7 @@ CPU_state * current_cpu(){
   if(!cpu.pc) cpu.pc=0x80000000;
 
   #define SET_REGS(name) cpu. name = mycpu -> name ;
-  //CSR_MAP(SET_REGS)
+  CSR_MAP(SET_REGS)
 
   return &cpu;
 }

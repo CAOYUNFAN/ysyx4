@@ -23,10 +23,10 @@ module ysyx_220066_top(
   output [511:0] wr_data,
 
   output reg [63:0] dbg_regs [31:0],
-  /*output reg [63:0] mepc,
+  output reg [63:0] mepc,
   output reg [63:0] mstatus,
   output reg [63:0] mcause,
-  output reg [63:0] mtvec,*/
+  output reg [63:0] mtvec,
 
   output error,done,valid
 );
@@ -109,10 +109,10 @@ module ysyx_220066_top(
     for(i=1;i<32;i=i+1) dbg_regs[i]=cpu.module_regs.module_regs.rf[i];
     dbg_regs[0]=0;
 //    if(MemWr&&clk)$display("Write to:addr=%h,data=%x,help=%h,real=%h,wmask=%b",addr,data_Wr,data_Wr_help,data_Wr_data,wmask);
-    /*mepc=cpu.module_csr.mepc;
+    mepc=cpu.module_csr.mepc;
     mstatus=cpu.module_csr.mstatus;
     mcause=cpu.module_csr.mcause;
-    mtvec=cpu.module_csr.mtvec;*/
+    mtvec=cpu.module_csr.mtvec;
   end
 
   assign pc_m=cpu.module_m.nxtpc;
