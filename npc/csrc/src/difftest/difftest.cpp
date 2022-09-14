@@ -52,8 +52,8 @@ static int skip_dut_nr_inst = 0;
 
 // this is used to let ref skip instructions which
 // can not produce consistent behavior with NEMU
-void difftest_skip_ref() {
-    uLL jmp_pc=mycpu->pc_m;
+void difftest_skip_ref(int x=1) {
+    uLL jmp_pc=x?mycpu->pc_m:mycpu->ins_addr;
     // If such an instruction is one of the instruction packing in QEMU
     // (see below), we end the process of catching up with QEMU's pc to
     // keep the consistent behavior in our best.
@@ -63,7 +63,7 @@ void difftest_skip_ref() {
     // situation is infrequent.
     skip_dut_nr_inst = 0;
     for(int i=0;i<num;i++) if(is_skip_ref_pc[i]==jmp_pc) return;
-    Log("num++:%llx",jmp_pc);
+    Log("num++:%d,%llx",x,jmp_pc);
     is_skip_ref_pc[num++]=jmp_pc;
 }
 
