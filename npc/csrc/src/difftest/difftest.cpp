@@ -63,7 +63,6 @@ void difftest_skip_ref() {
     // situation is infrequent.
     skip_dut_nr_inst = 0;
     is_skip_ref_pc[num++]=jmp_pc;
-    //Log("%d:%llx is added.",num,jmp_pc);
 }
 
 // this is used to deal with instruction packing in QEMU.
