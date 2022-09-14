@@ -112,7 +112,7 @@ void difftest_step(uLL pc, uLL npc) {
     }
     ref_difftest_exec(1);
     ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
-    if(pc>=0x80001270&&pc<0x80001290) Log("npc:%llx,mtvec:%llx",npc,ref_r.mtvec);
+    if(pc>=0x80001270&&pc<0x80001290) Log("pc:%llx,mtvec:%llx",pc,ref_r.mtvec);
     checkregs(&ref_r, npc);
 }
 
