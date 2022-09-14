@@ -120,18 +120,13 @@ class KEYBOARD:public device_regs{
 }kbd;
 
 class INIT: public device_regs{
-    private:
-        u64 data[2];
     public:
         void init(){
             name="INIT";start=0x30000000;end=0x3000000c;
-            log_output();
-            data[0]=0x00fe0010009buLL;
-            data[1]=0x8082uLL;
         }
         void input(uLL addr,uLL *rdata, u8 * error){
             *error=0;
-            *rdata=(addr<0x30000008)?data[0]:data[1];
+            *rdata=0x806750000097uLL;
             difftest_skip_ref();
         }
 }init;
