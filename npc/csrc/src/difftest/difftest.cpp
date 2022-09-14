@@ -110,9 +110,9 @@ void difftest_step(uLL pc, uLL npc) {
         //Log("pc=%llx,nxt=%lx",npc,mycpu->pc_nxt);
         return;
     }
+    Log("%llx",pc);
     ref_difftest_exec(1);
     ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
-    if(pc>=0x80001270&&pc<0x80001290) Log("pc:%llx,mtvec:%llx",pc,ref_r.mtvec);
     checkregs(&ref_r, npc);
 }
 
