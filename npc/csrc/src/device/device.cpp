@@ -122,7 +122,7 @@ class KEYBOARD:public device_regs{
 class INIT: public device_regs{
     public:
         void init(){
-            name="INIT";start=0x30000000;end=0x3000000c;
+            name="INIT";start=0x30000000;end=0x30000008;
         }
         void input(uLL addr,uLL *rdata, u8 * error){
             *error=0;
