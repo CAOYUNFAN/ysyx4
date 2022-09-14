@@ -63,6 +63,7 @@ void difftest_skip_ref() {
     // situation is infrequent.
     skip_dut_nr_inst = 0;
     is_skip_ref_pc[num++]=jmp_pc;
+    Log("%d:%llx is added.",num,jmp_pc);
 }
 
 // this is used to deal with instruction packing in QEMU.
@@ -103,10 +104,10 @@ void difftest_step(uLL pc, uLL npc) {
         return;
     }
     for(int i=0;i<num;i++) if (is_skip_ref_pc[i]==npc) {
+        Log("%d:%llx is skipped.",num,npc);
         // to skip the checking of an instruction, just copy the reg state to reference design
         ref_difftest_regcpy(current_cpu(), DIFFTEST_TO_REF);
-        --num;
-        swap(is_skip_ref_pc[i],is_skip_ref_pc[num]);
+        swap(is_skip_ref_pc[i],is_skip_ref_pc[--num]);
         //Log("pc=%llx,nxt=%lx",npc,mycpu->pc_nxt);
         return;
     }
