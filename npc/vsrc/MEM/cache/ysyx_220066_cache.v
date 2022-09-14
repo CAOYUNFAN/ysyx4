@@ -12,7 +12,7 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     output ok,
     output ready,
     output reg [63:0] rdata,
-    reg rw_error,
+    output reg rw_error,
     input fence,
 
     //AXI
@@ -78,9 +78,11 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
 
     reg [OFFSET_LEN-1:0] offset_native;
     always@(posedge clk) offset_native<=offset;
+    reg uncache_native;
+    always@(posedge clk) uncache_native<=uncache;
 
     always @(*) begin 
-        if(uncache) rdata=uncached_data; 
+        if(uncache_native) rdata=uncached_data; 
         else case (offset_native)
             3'b000:rdata=rd[ 63:  0];
             3'b001:rdata=rd[127: 64];
@@ -179,7 +181,7 @@ module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     always @(*) begin
         `ifdef fully_info
         if(~rst&&~clk)begin
-            $display("Cache:status=%b,tag=%h,index=%h,hit_0=%b,hit_1=%b,uncache=%b,valid=%b",status,tag,index,hit_0,hit_1,uncache,valid);
+            $display("Cache:status=%b,tag=%h,index=%h,offset_native=%h,hit_0=%b,hit_1=%b,uncache=%b,valid=%b",status,tag,index,offset_native,hit_0,hit_1,uncache,valid);
             //$display("Cache:wen=%h,rd=%h",BWEN,rd);
         end
         `endif
