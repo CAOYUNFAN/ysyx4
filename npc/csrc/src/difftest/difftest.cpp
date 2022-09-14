@@ -103,6 +103,7 @@ void difftest_step(uLL pc, uLL npc) {
         panic("can not catch up with ref.pc = %llx at pc = %llx", ref_r.pc, (uLL)pc);
         return;
     }
+    Log("%d\n",num);
     for(int i=0;i<num;i++) if (is_skip_ref_pc[i]==npc) {
         // to skip the checking of an instruction, just copy the reg state to reference design
         ref_difftest_regcpy(current_cpu(), DIFFTEST_TO_REF);
