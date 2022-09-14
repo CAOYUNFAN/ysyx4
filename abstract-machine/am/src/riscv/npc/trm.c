@@ -14,7 +14,7 @@ Area heap = RANGE(&_heap_start, PMEM_END);
 #endif
 static const char mainargs[] = MAINARGS;
 
-#define SERIAL_PORT 0xa0000000+0x000003f8
+#define SERIAL_PORT 0x20000000+0x000003f8
 
 static inline void outb(uintptr_t addr, uint8_t  data) { *(volatile uint8_t  *)addr = data; }
 
