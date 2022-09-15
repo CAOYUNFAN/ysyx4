@@ -145,6 +145,9 @@ void device_update(){
 }
 
 void data_read(uLL addr,u8 burst,uLL * data,u8 * error){
+    #ifdef MTRACE
+    Log("read from addr %llx",addr);
+    #endif
     for(int i=0;i<7;i++)if(device_table[i]->in_range(addr)){
         if(burst) for(int j=0;j<512/64;j++) device_table[i]->input(addr+j*64/8,data+j,error);
         else device_table[i]->input(addr,data,error);
@@ -156,6 +159,9 @@ void data_read(uLL addr,u8 burst,uLL * data,u8 * error){
 
 void data_write(uLL addr,u8 burst,uLL *data,u8 mask, u8 * error){
     *error=0;
+    #ifdef MTRACE
+    Log("write to addr %llx",addr);
+    #endif
     for(int i=0;i<7;i++) if(device_table[i]->in_range(addr)){
         if(burst) for(int j=0;j<512/64;j++) device_table[i]->output(addr+j*64/8,data[j],0xff);
         else device_table[i]->output(addr,*data,mask);
