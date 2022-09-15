@@ -29,4 +29,8 @@ module ysyx_220066_clinet (
 
     assign intr=(mtime>mtimecmp);
     always @(posedge clk) data_rd<=(addr[15:0]==16'h4000)?mtimecmp:mtime;
+
+    always @(*) begin
+        if(~clk&&~rst) $display("CLIENT:%h",mtime);
+    end
 endmodule
