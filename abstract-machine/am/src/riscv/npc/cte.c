@@ -39,8 +39,12 @@ void yield() {
 }
 
 bool ienabled() {
-  return false;
+  unsigned long x,y;
+  asm("csrr %0,mstatus; csrr %1,mie":"=r"(x),"=r"(y):);
+  return (x>>3&1)&&(y>>7&1);
 }
 
 void iset(bool enable) {
+  asm("csrw mstatus,%0" : :"r"(enable?0xa0001880:0xa0001888));
+  asm("csrw mie,%0": :"r"(enable?0x80:0));
 }
