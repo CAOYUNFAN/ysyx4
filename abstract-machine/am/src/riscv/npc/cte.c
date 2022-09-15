@@ -45,6 +45,6 @@ bool ienabled() {
 }
 
 void iset(bool enable) {
-  asm("csrw mstatus,%0" : :"r"(enable?0xa0001880:0xa0001888));
-  asm("csrw mie,%0": :"r"(enable?0x80:0));
+  asm("csrw mstatus,%0" : :"r"(enable?0xa0001880uLL:0xa0001888uLL));
+  asm("csrw mie,%0": :"r"(enable?0x80uLL:0));
 }
