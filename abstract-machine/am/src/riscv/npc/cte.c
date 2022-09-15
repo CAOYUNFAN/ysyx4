@@ -5,6 +5,7 @@ static Context* (*user_handler)(Event, Context*) = NULL;
 
 Context* __am_irq_handle(Context *c) {
   volatile unsigned long long * ptr=(unsigned long long *)(0x2004000);
+  printf("123\n");
   if (user_handler) {
     Event ev = {0};
     switch (c->mcause) {
