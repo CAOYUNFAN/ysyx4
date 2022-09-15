@@ -98,7 +98,7 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
 			if(length=='l'&&*fmt=='l'){
 				length='L';
 				++fmt;
-				panic("Not implemented or Error hapens");
+				//panic("Not implemented or Error hapens");
 			}
 		}
 
