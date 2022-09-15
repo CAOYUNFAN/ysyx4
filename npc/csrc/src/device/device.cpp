@@ -163,7 +163,6 @@ void data_write(uLL addr,u8 burst,uLL *data,u8 mask, u8 * error){
     Log("write to addr %llx",addr);
     #endif
     for(int i=0;i<7;i++) if(device_table[i]->in_range(addr)){
-        Log("%d",i);
         if(burst) for(int j=0;j<512/64;j++) device_table[i]->output(addr+j*64/8,data[j],0xff);
         else device_table[i]->output(addr,*data,mask);
         return;
