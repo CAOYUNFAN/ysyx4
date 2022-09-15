@@ -20,7 +20,8 @@ module ysyx_220066_ID (
     wire csr,ecall,mret;
     wire [2:0] MemOp;
     wire [11:0] csr_addr;
-    wire error,done;
+    wire [1:0] error;
+    wire done;
     wire fence_i;
 
     reg valid_native;
@@ -57,7 +58,8 @@ module ysyx_220066_ID (
         .instr(instr[31:7]),.ExtOp(ExtOp),.imm(imm)
     );
 
-    assign error=err_temp||instr_error||(csr&&(
+    assign error[0]=instr_error;
+    assign error[1]=err_temp||(csr&&(
             (instr[14:12]==3'b000&&(instr!=32'h0010_0073&&instr!=32'h0000_0073&&instr!=32'h3020_0073))||
             (instr[14:12]!=3'b000&&csr_error)))||
             (instr[6:2]==5'b00011&&!fence_i);

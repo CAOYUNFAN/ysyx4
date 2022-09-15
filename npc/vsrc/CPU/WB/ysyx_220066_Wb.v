@@ -1,7 +1,7 @@
 module ysyx_220066_Wb(
     input clk,rst,
 
-    input wen_in,MemRd_in,MemWr_in,done_in,valid_in,error_in,
+    input wen_in,MemRd_in,MemWr_in,done_in,valid_in,error_in,block,
     input [4:0] rd_in,
     input [63:0] data_in,
     input [63:0] data_Rd,
@@ -27,16 +27,14 @@ module ysyx_220066_Wb(
     reg [63:0] nxtpc_native;
     reg [2:0] MemOp_native;  
     reg [2:0] addr_lowbit_native;
-    always @(posedge clk) begin
+    always @(posedge clk) if(~block) begin
         wen_native<=wen_in&&valid_in;MemRd_native<=MemRd_in;MemWr_native<=MemWr_in;done_native<=done_in;
         rd_native<=rd_in;data_native<=data_in;nxtpc_native<=nxtpc_in;valid_native<=valid_in;
         error_native<=error_in;MemOp_native<=MemOp_in;addr_lowbit_native<=addr_lowbit_in;
     end
 
     assign error=error_native||(data_error&&(MemRd_native||MemWr_native));
-    assign wen=~rst&&wen_native&&~error;
-//    assign div_block=Div_wen_native&&(wen_native&&(MemRd_native||~data_Rd_valid));
-//    assign multi_block=Multi_wen_native&&(Div_wen_native||(wen_native&&(MemRd_native||~data_Rd_valid)));
+    assign wen=~rst&&wen_native&&~error&&~block;
     wire [63:0] real_read_data;
 
     ysyx_220066_data_choose data_choose(

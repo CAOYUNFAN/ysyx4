@@ -1,5 +1,5 @@
 module ysyx_220066_IF (
-    input clk,rst,block,
+    input clk,rst,block,id_block,
 
     input is_jmp,
     input [63:0] nxtpc,
@@ -10,7 +10,7 @@ module ysyx_220066_IF (
     always @(posedge clk) begin
         if(rst) native_pc<=64'h3000_0000;
         else if(block) native_pc<=native_pc;
-        else native_pc<=is_jmp?nxtpc:native_pc+4;
+        else native_pc<=is_jmp?nxtpc:id_block?native_pc:native_pc+4;
     end
 
     assign pc=native_pc;

@@ -7,12 +7,16 @@ module ysyx_220066_csr (
     
     input raise_intr,
     input [63:0] NO,
+    input [63:0] tval,
     input [63:0] pc,
 
-    input ret,
+    input ret,clear_mip,
 
     output jmp,
-    output [63:0] nxtpc
+    output [63:0] nxtpc,
+
+    output reg [63:0] mie,
+    output reg [63:0] mstatus
 );
     wire [63:0] csr_data;
     reg [63:0] csr_data_native;
@@ -20,9 +24,11 @@ module ysyx_220066_csr (
     wire wr_err;
 
     reg [63:0] mepc;
-    reg [63:0] mstatus;
     reg [63:0] mcause;
     reg [63:0] mtvec;
+    reg [63:0] mip;
+    reg [63:0] mtval;
+    reg [63:0] mscratch;
 
     assign nxtpc=ret?mepc:mtvec;
     assign jmp=ret||raise_intr;
@@ -32,6 +38,10 @@ module ysyx_220066_csr (
         12'h300: begin csr_data_native=mstatus; rd_err=0; end
         12'h342: begin csr_data_native=mcause; rd_err=0; end
         12'h305: begin csr_data_native=mtvec; rd_err=0; end
+        12'h304: begin csr_data_native=mie; rd_err=0; end
+        12'h344: begin csr_data_native=mip; rd_err=0; end
+        12'h343: begin csr_data_native=mtval; rd_err=0; end
+        12'h340: begin csr_data_native=mscratch; rd_err=0; end
         default: begin csr_data_native=64'h0; rd_err=1; end
     endcase
 
@@ -41,11 +51,17 @@ module ysyx_220066_csr (
                     (csr_wr_addr!=12'h341)&&
                     (csr_wr_addr!=12'h300)&&
                     (csr_wr_addr!=12'h342)&&
-                    (csr_wr_addr!=12'h305);
+                    (csr_wr_addr!=12'h305)&&
+                    (csr_wr_addr!=12'h304)&&
+                    (csr_wr_addr!=12'h340)&&
+                    (csr_wr_addr!=12'h343)&&
+                    (csr_wr_addr!=12'h344);
 
     always @(posedge clk) begin
         if(rst) begin
             mstatus<=64'ha0001800;
+            mie<=64'h0;
+            mip<=64'h0;
         end else begin
             if(ret) begin
                 mstatus[12:11]<=2'b00;
@@ -58,6 +74,10 @@ module ysyx_220066_csr (
                         12'h300: mstatus<=in_data;
                         12'h342: mcause<=in_data;
                         12'h305: mtvec<=in_data;
+                        12'h304: mie<=in_data;
+                        12'h340: mscratch<=in_data;
+                        12'h343: mtval<=in_data;
+                        12'h344: mip<=in_data;
                         default: begin end
                     endcase
                     //$display("csr_addr=%h,in_data=%h",csr_addr,in_data);
@@ -66,10 +86,12 @@ module ysyx_220066_csr (
                         //$display("raise_intr,wen=%b",wen);
                         mcause <= NO;
                         mepc <= pc;
+                        mtval <= tval;
                         mstatus[12:11]<=2'b11;
                         mstatus[7]<=mstatus[3];
-                        mstatus[3]<=1'b0;    
-                    end
+                        mstatus[3]<=1'b0;
+                        mip[7]<=NO[63];  
+                    end else if(clear_mip) mip[7]<=0;
                 end
             end
         end

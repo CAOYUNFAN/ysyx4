@@ -1,5 +1,6 @@
 module ysyx_220066_EX(
-    input clk,rst,block,valid_in,error_in,
+    input clk,rst,block,valid_in,
+    input [1:0] error_in,
     output valid,
 
     input [63:0] src1_in,
@@ -33,11 +34,13 @@ module ysyx_220066_EX(
     wire [4:0] rs1;
     wire [63:0] src1;
     wire [63:0] csr_data;
-    wire MemRd,MemWr,error;
+    wire MemRd,MemWr;
+    wire [1:0] error;
     reg [7:0] wmask;
     reg [63:0] data_Wr;
 
-    reg error_native,csr_native,ecall_native,mret_native;
+    reg [1:0] error_native;
+    reg csr_native,ecall_native,mret_native;
     reg [63:0] src1_native;
     reg [63:0] src2_native;
     reg [31:0] imm_native;
@@ -128,7 +131,7 @@ module ysyx_220066_EX(
         .Result_0(result[0]),.Branch(Branch_native)
     );
 
-    assign error=error_native||(ALUctr_native[5]&&error_div);
+    assign error=error_native;//||(ALUctr_native[5]&&error_div);
     assign is_jmp=(is_jmp_line||fence_i)&&valid_native;
 //    assign result=ALUctr_native[5]?mul_result:result_line;
 
