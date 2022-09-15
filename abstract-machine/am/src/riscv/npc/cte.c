@@ -4,14 +4,14 @@
 static Context* (*user_handler)(Event, Context*) = NULL;
 
 Context* __am_irq_handle(Context *c) {
+  volatile unsigned long long * ptr=(unsigned long long *)(0x2004000);
   if (user_handler) {
     Event ev = {0};
     switch (c->mcause) {
       case 11: c->mepc+=4; ev.event = (c->gpr[17]==-1?EVENT_YIELD:EVENT_SYSCALL); break;
-      case (1uLL<<63uLL)+11uLL: ev.event =EVENT_IRQ_TIMER; break;
+      case (1uLL<<63uLL)+11uLL: ev.event =EVENT_IRQ_TIMER; *ptr+=10000;break;
       default: ev.event = EVENT_ERROR; break;
     }
-
     c = user_handler(ev, c);
     assert(c != NULL);
   }
