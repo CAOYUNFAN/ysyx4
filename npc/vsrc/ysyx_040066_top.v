@@ -6,14 +6,14 @@ module ysyx_040066_top(
 
   output ins_req,ins_burst,
   output [63:0] ins_addr,
-  input ins_ready,ins_err,
-  input [511:0] ins_data,
+  input ins_ready,ins_err,ins_last,
+  input [63:0] ins_data,
 
   output rd_req,rd_burst,
   output [2:0] rd_len,
   output [63:0] rd_addr,
-  input rd_ready,rd_err,
-  input [511:0] rd_data,
+  input rd_ready,rd_err,rd_last,
+  input [63:0] rd_data,
 
   output wr_req,wr_burst,
   output [2:0] wr_len,
@@ -60,7 +60,7 @@ module ysyx_040066_top(
     .wstrb(8'b0),.wdata(64'h0),.fence(1'b0),
     .ok(instr_valid),.ready(),.rdata(instr_line),.rw_error(instr_error),
 
-    .addr(icache_addr),.rd_req(ins_req),.rd_ready(ins_ready),.rd_error(ins_err),
+    .addr(icache_addr),.rd_req(ins_req),.rd_ready(ins_ready),.rd_last(ins_last),.rd_error(ins_err),
     .rd_data(ins_data),.wr_req(),.wr_data(),.wr_ready(1'b0),.wr_error(1'b0)
   );
   reg pc_2;always@(posedge clk) pc_2<=pc_rd[2];
@@ -78,7 +78,7 @@ module ysyx_040066_top(
     .rdata(data_Rd),.rw_error(data_error),.fence(fence_i),
     
     .addr(dcache_addr),
-    .rd_req(rd_req),.rd_ready(rd_ready),.rd_error(rd_err),.rd_data(rd_data),
+    .rd_req(rd_req),.rd_ready(rd_ready),.rd_last(rd_last),.rd_error(rd_err),.rd_data(rd_data),
     .wr_req(wr_req),.wr_data(wr_data),.wr_ready(wr_ready),.wr_error(wr_err)
   );
 

@@ -1,6 +1,6 @@
 VSRC = $(shell find . -name "*.v")
 CSRC = $(shell find ./test/ -name "*.cpp")
-TOP_MODULE = ysyx_220066_Div
+TOP_MODULE = ysyx_040066_Div
 TARGET = ./emu_div/emu_div
 
 $(TARGET): $(VSRC) $(CSRC)

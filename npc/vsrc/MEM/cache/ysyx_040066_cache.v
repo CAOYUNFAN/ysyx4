@@ -20,10 +20,18 @@ module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     output reg rd_req,
     input rd_ready,
     input rd_error,
-    input [LINE_LEN-1:0] rd_data,
+    input rd_last,
+    input [63:0] rd_data,
     output reg wr_req,
     output [LINE_LEN-1:0] wr_data,
-    input wr_ready,wr_error
+    input wr_ready,wr_error,
+
+    //CACHE
+    input [127:0] Q [3:0],
+    output [127:0] D [3:0],
+    output [5:0] A,
+    output WEN,
+    output [127:0] BWEN
 );
     wire uncache;
     assign uncache=~tag[TAG_LEN-1]&&valid;
@@ -57,21 +65,28 @@ module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
         if(rst) status<=2'b00;
         else if(fence&&status==2'b00) status<=2'b01;
         else if(valid&&miss&&~uncached_done) status<={1'b1,uncache?op:dirty};
-        else if(ready_to_read) status<=2'b00;
+        else if(ready_to_read&&rd_last) status<=2'b00;
         else if(status==2'b11&&ready_to_write) status<=uncache?2'b00:2'b10;
         else if(status==2'b01&&(&count)&&(ready_to_write||~cache_dirty[{(IDNEX_LEN+1){1'b1}}]||~cache_valid[{(IDNEX_LEN+1){1'b1}}])) status<=2'b00;
     end
 
     reg nxt_clear;
     always @(posedge clk)begin
-        if(rst||(rd_req&&ready_to_read)) nxt_clear<=0;
+        if(rst||(ready_to_read&&rd_last)) nxt_clear<=0;
         else if(rd_req&&force_update) nxt_clear<=1; 
+    end
+
+    reg [2:0] rd_count;
+    always @(posedge clk) begin
+        if(rst||(ready_to_read&&rd_last)) rd_count<=3'b0;
+        else if(ready_to_read&&!uncache) rd_count<=rd_count+3'b1;
+        else if(status!=2'b10) rd_count<=3'b0;
     end
 
     wire [LINE_LEN-1:0] rd;
 
     reg [63:0] uncached_data;
-    always @(posedge clk) uncached_data<=rd_data[63:0];
+    always @(posedge clk) uncached_data<=rd_data;
     always @(posedge clk) uncached_done<=~rst&&uncache&&(ready_to_read&&status==2'b10||ready_to_write&&status==2'b11)&&~nxt_clear;
 
     assign ok=uncache?uncached_done:hit;
@@ -97,10 +112,6 @@ module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     assign wr_data=uncache?{rd[511:64],wdata}:rd;
     always @(posedge clk) rw_error<=uncache&&(op?wr_error:rd_error);
 
-    `ifdef R_W
-    //integer xx;
-    `endif
-
     always @(posedge clk) begin
         if(rst||force_update) begin
             cache_valid<={INDEX_NUM{1'b0}};
@@ -113,7 +124,7 @@ module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
                 `endif
             end
             cache_freq[index]<=hit_1;
-        end else if(ready_to_read&&~uncache) begin
+        end else if(ready_to_read&&rd_last&&~uncache) begin
             //cache_data[{index,refill_pos}]<=rd_data;
             cache_tag[{index,refill_pos}]<=tag;
             cache_valid[{index,refill_pos}]<=~nxt_clear;
@@ -149,7 +160,7 @@ module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
         end else if(status==2'b11&&ready_to_write) begin
             rd_req<=~uncache;wr_req<=0;
             addr<={tag,index,6'b0};
-        end else if(ready_to_read) begin
+        end else if(ready_to_read&&rd_last) begin
             rd_req<=0;
         end else if(status==2'b01) begin
             addr<={cache_tag[count],count[IDNEX_LEN:1],6'b0};
@@ -157,31 +168,25 @@ module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
         end
     end
 
-    wire [127:0] BWEN;
     genvar i,j;
     generate for(i=0;i<8;i=i+1) for(j=0;j<8;j=j+1) 
-        assign BWEN[j*2+1+i*16:j*2+i*16]={2{ready_to_read?1'b1:(offset==i[2:0])&&wstrb[j]}};     
+        assign BWEN[j*2+1+i*16:j*2+i*16]=~{2{ready_to_read?rd_count==i[2:0]:(offset==i[2:0])&&wstrb[j]}};     
     endgenerate    
 
+    assign WEN=(~(valid&&hit&&op)&&~ready_to_read)||rst||uncache;
+    assign A=(status==2'b01)?count:{index,hit?hit_1:refill_pos};
+
     wire [LINE_LEN-1:0] wrr_data;
-    assign wrr_data={8{wdata}};
-    genvar x,y;generate for(x=0;x<4;x=x+1)begin:ram
-        wire [127:0] Q,D;
-        S011HD1P_X32Y2D128_BW ram_data(
-            .Q(Q),.CLK(clk),.CEN(1'b0),.BWEN(~BWEN),.D(D),
-            .WEN((~(valid&&hit&&op)&&~ready_to_read)||rst||uncache),
-            .A((status==2'b01)?count:{index,hit?hit_1:refill_pos})
-        );
-        for(y=0;y<64;y=y+1) begin
-            assign rd[x*2+1+y*8:x*2+y*8]=Q[y*2+1:y*2];
-            assign D[y*2+1:y*2]=(ready_to_read?rd_data[x*2+1+y*8:x*2+y*8]:wrr_data[x*2+1+y*8:x*2+y*8]);
-        end
+    assign wrr_data={8{ready_to_read?rd_data:wdata}};
+    genvar x,y;generate for(x=0;x<4;x=x+1) for(y=0;y<64;y=y+1) begin
+        assign rd[x*2+1+y*8:x*2+y*8]=Q[x][y*2+1:y*2];
+        assign D[x][y*2+1:y*2]=wrr_data[x*2+1+y*8:x*2+y*8];
     end endgenerate
 
     always @(*) begin
         `ifdef fully_info
         if(~rst&&~clk)begin
-            $display("Cache:status=%b,tag=%h,index=%h,offset_native=%h,hit_0=%b,hit_1=%b,uncache=%b,valid=%b",status,tag,index,offset_native,hit_0,hit_1,uncache,valid);
+            $display("Cache:status=%b,tag=%h,index=%h,offset_native=%h,hit_0=%b,hit_1=%b,uncache=%b,valid=%b,rd_count=%b,ready_to_read=%b,last=%b",status,tag,index,offset_native,hit_0,hit_1,uncache,valid,rd_count,ready_to_read,rd_last);
             //$display("Cache:wen=%h,rd=%h",BWEN,rd);
         end
         `endif

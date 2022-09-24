@@ -74,9 +74,10 @@ void test_1(){
             if(!uncache) update(addr,emu->wstrb,emu->wdata);
             Log("%d:Write addr=%x,data=%lx,mask=%x\n",i,addr,emu->wdata,emu->wstrb);
         }else Log("%d:Read addr=%x\n",i,addr);
-        int read_num=rand()%8+1;
+        int read_total=uncache?1:8;
+        int read_num=0;
         int write_num=rand()%8+1;
-        Log("readnum %d,writenum %d\n",read_num,write_num);
+        Log("writenum %d\n",write_num);
         int tt=0;
         bool read,write;
         uint32_t read_addr=0,write_addr=0;
@@ -107,31 +108,32 @@ void test_1(){
                 Assert(read,"should not read!");
                 assert((emu->addr&0xf)==0);
                 Assert(emu->addr==read_addr,"Unexpected read addr %x,should be %x\n",emu->addr,read_addr);
+                if(!read_num) read_num=rand()%3+1;
                 if(read_num==1){
-                    emu->rd_valid=1;
+                    emu->rd_ready=1;
                     uint32_t addr=(emu->addr-mem_start)>>3;
                     if(uncache){
                         uncache_read=myrandom();
-                        emu->rd_data[0]=uncache_read;
-                        emu->rd_data[1]=uncache_read>>32uLL;
-                    }else for(int i=0;i<LEN/64;i++){
-                        emu->rd_data[i<<1]=big_mem[addr+i];
-                        emu->rd_data[(i<<1)|1]=big_mem[addr+i]>>32uLL;
-                        Log("read data %d:%llx\n",i,big_mem[addr+i]);
+                        emu->rd_data=uncache_read;
+                    }else{
+                        emu->rd_data=big_mem[addr+8-read_total];
+                        Log("read data %d:%llx\n",8-read_total,big_mem[addr+i]);
                     }
-                }
+                    read_total--;
+                }else emu->rd_ready=0;
                 Log("Read from memory %d,%x\n",read_num,emu->addr);
                 Assert(read_num>=0,"readnum < 0!\n");
-                if(!read_num) emu->rd_ready=0;
+                Assert(read_total>=0,"read total <0!\n");
+                if(read_total==0&&read_num==1) emu->rd_last=1;
+                else emu->rd_last=0;
                 read_num--;
-            }
-            emu->rd_ready=(emu->rd_req&&read_num==0);
+            }else emu->rd_ready=0;
             emu->wr_ready=(emu->wr_req&&write_num==0);
             tt++;
-        } while (!emu->ok && tt<=20);
+        } while (!emu->ok && tt<=50);
         Log("Read or write complete! one more cycle\n");
         if(read||write) CYCLE_ONE();
-        if(tt>20) {
+        if(tt>50) {
             Log("TOO MUCH CYCLES!\n");
             FORCE_END
         }
@@ -168,6 +170,7 @@ int main(){
     emu->eval();
     emu->rst=0;
     emu->fence=0;
+    emu->force_update=0;
     printf("hello!\n");
     printf("seed=%u\n",seed);
     for(int _=0;_<M;_++){

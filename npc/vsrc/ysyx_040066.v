@@ -121,10 +121,10 @@ module ysyx_040066 # (
     reg [511:0] ins_data;
     wire [511:0] wr_data;
 
-    wire ins_req,ins_burst,ins_valid,ins_err;
+    wire ins_req,ins_burst,ins_valid,ins_err,ins_last;
     wire [63:0] ins_addr;
 
-    wire rd_req,rd_burst,rd_ready,rdr_err;
+    wire rd_req,rd_burst,rd_ready,rd_err,rd_last;
     wire [2:0] rd_len;
     wire [63:0] rd_addr;
 
@@ -136,10 +136,10 @@ module ysyx_040066 # (
     wire rst; assign rst=~reset;
     ysyx_220066_top top(
         .clk(clock),.rst(rst),
-        .ins_req(ins_req),.ins_burst(ins_burst),.ins_addr(ins_addr),
+        .ins_req(ins_req),.ins_burst(ins_burst),.ins_addr(ins_addr),.ins_last(ins_last),
         .ins_ready(ins_ready),.ins_err(ins_err),.ins_data(ins_data),
 
-        .rd_req(rd_req),.rd_burst(rd_burst),.rd_len(rd_len),.rd_addr(rd_addr),
+        .rd_req(rd_req),.rd_burst(rd_burst),.rd_len(rd_len),.rd_addr(rd_addr),.rd_last(rd_last),
         .rd_ready(rd_ready),.rd_err(rd_err),.rd_data(rd_data),
 
         .wr_req(wr_req),.wr_burst(wr_burst),.wr_len(wr_len),.wr_addr(wr_addr),

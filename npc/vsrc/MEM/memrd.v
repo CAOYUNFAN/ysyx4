@@ -1,4 +1,4 @@
-module ysyx_040066_memrd (
+module memrd (
     input clk,rst,MemRd,
     input [63:0] addr,
     output reg [63:0] data,
@@ -26,14 +26,14 @@ module ysyx_040066_memrd (
 endmodule
 
 
-module ysyx_040066_imem (
+module imem (
     input clk,rst,
     input [63:0] pc,
     output [31:0] instr,
     output error,valid
 );
     wire [63:0] instr_long;
-    ysyx_040066_memrd imem(
+    memrd imem(
         .clk(clk),.rst(rst),.MemRd(1),
         .error(error),.valid(valid),
         .addr(pc),.data(instr_long)
@@ -45,13 +45,13 @@ module ysyx_040066_imem (
     assign instr=pc_2?instr_long[63:32]:instr_long[31:0];
 endmodule
 
-module ysyx_040066_dmem_rd (
+module dmem_rd (
     input clk,rst,MemRd,
     input [63:0] addr,
     output reg [63:0] data,
     output error,valid
 );
-    ysyx_040066_memrd dmemrd(
+    memrd dmemrd(
         .clk(clk),.rst(rst),.MemRd(MemRd),
         .error(error),.valid(valid),
         .addr(addr),.data(data)
