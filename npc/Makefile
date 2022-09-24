@@ -1,6 +1,6 @@
 .PHONY:sim clear sim_gdb find_display
 
-STUID := ysyx_220066_
+STUID := ysyx_040066_
 CSRC_DIR := $(NPC_HOME)/csrc/src/
 CSRC_FILES := $(shell find $(CSRC_DIR) -name "*.cpp")
 CSRC_INCLUDE_DIR := $(NPC_HOME)/csrc/include/
