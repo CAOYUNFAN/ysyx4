@@ -1,4 +1,4 @@
-module ysyx_220066_clinet (
+module ysyx_040066_clinet (
     input clk,rst,
     input [63:0] addr,
     input MemRd,MemWr,

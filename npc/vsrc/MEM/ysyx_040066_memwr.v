@@ -1,4 +1,4 @@
-module ysyx_220066_memwr (
+module ysyx_040066_memwr (
     input clk,rst,MemWr,
     input [63:0] addr,
     input [7:0] wmask,

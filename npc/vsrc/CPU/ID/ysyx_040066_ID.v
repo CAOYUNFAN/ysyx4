@@ -1,4 +1,4 @@
-module ysyx_220066_ID (
+module ysyx_040066_ID (
     input clk,rst,block,
 
     input valid_in,instr_error_rd,csr_error,rs1_valid,rs2_valid,jmp,
@@ -48,13 +48,13 @@ module ysyx_220066_ID (
     wire [5:0] ALUctr_line;
 
 
-    ysyx_220066_Decode decode(
+    ysyx_040066_Decode decode(
         .OP(instr[6:0]),.Funct3(instr[14:12]),.Funct7(instr[31:25]),
         .ExtOp(ExtOp),.RegWr(RegWr),.ALUASrc(ALUASrc),.ALUBSrc(ALUBSrc),.ALUctr_out(ALUctr_line),.MemRd(MemRd),
         .Branch(Branch),.MemWr(MemWr),.MemOp(MemOp),.csr(csr),.error(err_temp)
     );
 
-    ysyx_220066_IMM ysyx_220066_imm(
+    ysyx_040066_IMM ysyx_040066_imm(
         .instr(instr[31:7]),.ExtOp(ExtOp),.imm(imm)
     );
 
@@ -92,7 +92,7 @@ module ysyx_220066_ID (
 
 endmodule
 
-module ysyx_220066_Decode (
+module ysyx_040066_Decode (
     input [6:0] OP,
     input [2:0] Funct3,
     input [6:0] Funct7,
@@ -194,7 +194,7 @@ module ysyx_220066_Decode (
 
 endmodule
 
-module ysyx_220066_IMM (
+module ysyx_040066_IMM (
     input [31:7] instr,
     input [2:0] ExtOp,
     output [31:0] imm

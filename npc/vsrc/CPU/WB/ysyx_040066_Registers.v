@@ -1,4 +1,4 @@
-module ysyx_220066_Registers(
+module ysyx_040066_Registers(
     input clk,rst,
     input wen,
     input [4:0] rd,
@@ -30,7 +30,7 @@ module ysyx_220066_Registers(
     input [4:0] rs2,
     output reg rs2_valid
 );
-    ysyx_220066_Regs module_regs(
+    ysyx_040066_Regs module_regs(
         .clk(clk),.wdata(data),.waddr(rd),.wen(wen&&rd!=5'b00000)
     );
     

@@ -1,4 +1,4 @@
-module ysyx_220066_M (
+module ysyx_040066_M (
     input clk,rst,valid_in,block,
     output valid,
 

@@ -1,4 +1,4 @@
-module ysyx_220066_switch (
+module ysyx_040066_switch (
     input [4289:0] part_group,
 
     output [4289:0] sw_group

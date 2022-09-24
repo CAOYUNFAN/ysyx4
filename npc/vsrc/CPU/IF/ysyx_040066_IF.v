@@ -1,4 +1,4 @@
-module ysyx_220066_IF (
+module ysyx_040066_IF (
     input clk,rst,block,id_block,
 
     input is_jmp,

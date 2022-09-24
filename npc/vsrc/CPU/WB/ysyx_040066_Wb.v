@@ -1,4 +1,4 @@
-module ysyx_220066_Wb(
+module ysyx_040066_Wb(
     input clk,rst,
 
     input wen_in,MemRd_in,MemWr_in,done_in,valid_in,error_in,block,
@@ -37,7 +37,7 @@ module ysyx_220066_Wb(
     assign wen=~rst&&wen_native&&~error&&~block;
     wire [63:0] real_read_data;
 
-    ysyx_220066_data_choose data_choose(
+    ysyx_040066_data_choose data_choose(
         .MemOp(MemOp_native),.addr_low(addr_lowbit_native),.basic_data(data_Rd),
         .data(real_read_data)
     );
@@ -56,7 +56,7 @@ module ysyx_220066_Wb(
     end
 endmodule
 
-module ysyx_220066_data_choose(
+module ysyx_040066_data_choose(
     input [2:0] MemOp,
     input [2:0] addr_low,
     input [63:0] basic_data,

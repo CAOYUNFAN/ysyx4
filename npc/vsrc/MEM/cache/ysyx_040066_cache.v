@@ -1,4 +1,4 @@
-module ysyx_220066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE_LEN=512)(
+module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE_LEN=512)(
     input clk,rst,force_update,
 
     //CPU

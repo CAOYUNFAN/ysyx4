@@ -1,4 +1,4 @@
-module ysyx_220066_EX(
+module ysyx_040066_EX(
     input clk,rst,block,valid_in,
     input [1:0] error_in,
     output valid,
@@ -112,7 +112,7 @@ module ysyx_220066_EX(
     wire [63:0] mul_result;
     wire [2:0] add_lowbit;
 
-    ysyx_220066_ALU alu(
+    ysyx_040066_ALU alu(
         .data_input(ALUAsrc_native?pc_native:src1_native),.datab_input(datab),
         .aluctr(ALUctr_native[4:0]),.zero(zero),.result(result),.add_lowbit(add_lowbit)
     );
@@ -126,7 +126,7 @@ module ysyx_220066_EX(
     assign error_div=is_div&&(src2_native[31:0]==32'h0)&&(ALUctr_native[4]||src2_native[63:32]==32'h0);
 
     wire is_jmp_line;
-    ysyx_220066_nxtPC nxtPC(
+    ysyx_040066_nxtPC nxtPC(
         .nxtpc(nxtpc),.is_jmp(is_jmp_line),.in_pc(pc_native),.BusA(src1_native),.Imm(imm_use),.Zero(zero),
         .Result_0(result[0]),.Branch(Branch_native)
     );

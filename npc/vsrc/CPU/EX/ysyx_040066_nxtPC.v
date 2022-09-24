@@ -18,7 +18,7 @@ module yxys_220066_jmp_control(
     endcase
 endmodule
 
-module ysyx_220066_nxtPC(
+module ysyx_040066_nxtPC(
     output [63:0] nxtpc,
     output is_jmp,
     input [63:0] in_pc,

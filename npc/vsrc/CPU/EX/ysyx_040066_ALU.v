@@ -1,4 +1,4 @@
-module ysyx_220066_ALU(
+module ysyx_040066_ALU(
     input [63:0] data_input,
     input [63:0] datab_input,
     input [4:0] aluctr,
@@ -8,7 +8,7 @@ module ysyx_220066_ALU(
     );
     wire ALctr,SUBctr,Wctr,CF,SF,OF;
     wire [63:0] Add_result;
-    ysyx_220066_ALU_decode alu_decode(aluctr[4:3],aluctr[1],ALctr,SUBctr,Wctr);
+    ysyx_040066_ALU_decode alu_decode(aluctr[4:3],aluctr[1],ALctr,SUBctr,Wctr);
     wire [31:0] data_sll;
     assign data_sll=(data_input[31:0]<<datab_input[4:0]);
     wire [31:0] data_srl;
@@ -16,7 +16,7 @@ module ysyx_220066_ALU(
     wire [31:0] data_sra;
     assign data_sra=$signed($signed(data_input[31:0])>>>$signed(datab_input[4:0]));
 
-    ysyx_220066_Adder adder(data_input,datab_input,SUBctr,Add_result,CF,SF,OF);
+    ysyx_040066_Adder adder(data_input,datab_input,SUBctr,Add_result,CF,SF,OF);
     always @(*)
     case (aluctr[2:0])
         3'o0: result={Wctr?{32{Add_result[31]}}:Add_result[63:32],Add_result[31:0]};
@@ -40,7 +40,7 @@ module ysyx_220066_ALU(
 
 endmodule
 
-module ysyx_220066_Adder(
+module ysyx_040066_Adder(
     input [63:0] x,
     input [63:0] y,
     input SUBctr,
@@ -59,7 +59,7 @@ module ysyx_220066_Adder(
     end
 endmodule
 
-module ysyx_220066_ALU_decode(
+module ysyx_040066_ALU_decode(
     input [4:3] ALUctr,
     input ALUctr_1,
     output ALctr,SUBctr,Wctr

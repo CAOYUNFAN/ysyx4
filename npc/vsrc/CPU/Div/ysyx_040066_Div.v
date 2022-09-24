@@ -1,4 +1,4 @@
-module ysyx_220066_Div(
+module ysyx_040066_Div(
     input clk,rst,
 
     input [63:0] src1_in,

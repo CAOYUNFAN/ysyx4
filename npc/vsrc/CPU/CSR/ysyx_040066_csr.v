@@ -1,4 +1,4 @@
-module ysyx_220066_csr (
+module ysyx_040066_csr (
     input rst,clk,
     input [11:0] csr_rd_addr,
     input [11:0] csr_wr_addr,
@@ -105,7 +105,7 @@ module ysyx_220066_csr (
 
 endmodule
 
-module ysyx_220066_csrwork(
+module ysyx_040066_csrwork(
     input [63:0] csr_data,
     input [63:0] rs1,
     input [4:0] zimm,

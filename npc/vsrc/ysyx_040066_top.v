@@ -1,5 +1,5 @@
 `timescale 1ns/1ps
-module ysyx_220066_top(
+module ysyx_040066_top(
   output [63:0] pc_nxt,
   output [63:0] pc_m,
   input clk,rst,
@@ -40,7 +40,7 @@ module ysyx_220066_top(
   wire data_valid,data_error;
   wire fence_i,d_ready;
 
-  ysyx_220066_cpu cpu(
+  ysyx_040066_cpu cpu(
     .clk(clk),.rst(rst),
     .pc_nxt(pc_nxt),
     .pc_rd(pc_rd),.instr_rd(instr),.instr_valid(instr_valid&&d_ready),.instr_error(instr_error),
@@ -52,7 +52,7 @@ module ysyx_220066_top(
 
   wire [63:0] instr_line;
   wire [31:0] icache_addr;
-  ysyx_220066_cache icache(
+  ysyx_040066_cache icache(
     .clk(clk),.rst(rst),.force_update(fence_i),
 
     .valid(1),.op(0),
@@ -69,7 +69,7 @@ module ysyx_220066_top(
   assign ins_burst=pc_rd[31];
 
   wire [31:0] dcache_addr;
-  ysyx_220066_cache dcache(
+  ysyx_040066_cache dcache(
     .clk(clk),.rst(rst),.force_update(1'b0),
 
     .valid(MemRd||MemWr),.op(MemWr),
@@ -87,18 +87,18 @@ module ysyx_220066_top(
   assign rd_addr=~rd_burst?addr:{32'h0,dcache_addr};
   assign wr_addr=rd_addr;
 
-/*  ysyx_220066_imem imem(
+/*  ysyx_040066_imem imem(
     .clk(clk),.rst(rst),
     .pc(pc_rd),.instr(instr),
     .error(instr_error),.valid(instr_valid)
   );
 
-  ysyx_220066_memwr memwr(
+  ysyx_040066_memwr memwr(
     .clk(clk),.rst(rst),.addr(addr),.wmask(wr_mask),
     .data(data_Wr),.MemWr(MemWr)
   );
 
-  ysyx_220066_dmem_rd dmemrd(
+  ysyx_040066_dmem_rd dmemrd(
     .clk(clk),.rst(rst),.MemRd(MemRd),
     .addr(addr),.data(data_Rd),
     .error(data_Rd_error),.valid(data_Rd_valid)
