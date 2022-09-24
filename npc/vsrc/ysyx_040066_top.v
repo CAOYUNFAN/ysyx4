@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+//`timescale 1ns/1ps
 module ysyx_040066_top(
   output [63:0] pc_nxt,
   output [63:0] pc_m,
@@ -28,6 +28,12 @@ module ysyx_040066_top(
   output reg [63:0] mcause,
   output reg [63:0] mtvec,
 
+  input [127:0] ram_Q [7:0],
+  output [127:0] ram_D [7:0],
+  output [127:0] ram_BWEN [1:0],
+  output [5:0] ram_A [1:0],
+  output ram_WEN [1:0],
+
   output error,done,valid
 );
   wire MemWr,MemRd;
@@ -52,7 +58,7 @@ module ysyx_040066_top(
 
   wire [63:0] instr_line;
   wire [31:0] icache_addr;
-  ysyx_040066_cache icache(
+  ysyx_040066_cache_top icache(
     .clk(clk),.rst(rst),.force_update(fence_i),
 
     .valid(1),.op(0),
@@ -61,7 +67,9 @@ module ysyx_040066_top(
     .ok(instr_valid),.ready(),.rdata(instr_line),.rw_error(instr_error),
 
     .addr(icache_addr),.rd_req(ins_req),.rd_ready(ins_ready),.rd_last(ins_last),.rd_error(ins_err),
-    .rd_data(ins_data),.wr_req(),.wr_data(),.wr_ready(1'b0),.wr_error(1'b0)
+    .rd_data(ins_data),.wr_req(),.wr_data(),.wr_ready(1'b0),.wr_error(1'b0),
+
+    .ram_Q(ram_Q[3:0]),.ram_D(ram_D[3:0]),.ram_BWEN(ram_BWEN[0]),.ram_A(ram_A[0]),.ram_WEN(ram_WEN[0])
   );
   reg pc_2;always@(posedge clk) pc_2<=pc_rd[2];
   assign instr=pc_2?instr_line[63:32]:instr_line[31:0];
@@ -69,7 +77,7 @@ module ysyx_040066_top(
   assign ins_burst=pc_rd[31];
 
   wire [31:0] dcache_addr;
-  ysyx_040066_cache dcache(
+  ysyx_040066_cache_top dcache(
     .clk(clk),.rst(rst),.force_update(1'b0),
 
     .valid(MemRd||MemWr),.op(MemWr),
@@ -79,7 +87,9 @@ module ysyx_040066_top(
     
     .addr(dcache_addr),
     .rd_req(rd_req),.rd_ready(rd_ready),.rd_last(rd_last),.rd_error(rd_err),.rd_data(rd_data),
-    .wr_req(wr_req),.wr_data(wr_data),.wr_ready(wr_ready),.wr_error(wr_err)
+    .wr_req(wr_req),.wr_data(wr_data),.wr_ready(wr_ready),.wr_error(wr_err),
+
+    .ram_Q(ram_Q[7:4]),.ram_D(ram_D[7:4]),.ram_BWEN(ram_BWEN[1]),.ram_A(ram_A[1]),.ram_WEN(ram_WEN[1])
   );
 
   assign rd_burst=dcache_addr[31];
