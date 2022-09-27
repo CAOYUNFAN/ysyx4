@@ -12,7 +12,7 @@ EMU_TOP_MODULE :=$(STUID)top
 EMU_TARGET := emu
 INSTR = #-DINSTR -DR_W -Dfully_info
 CFLAGS_NPC = -I$(CSRC_INCLUDE_DIR) -g -O2 $(INSTR) #-DMTRACE
-VFLAGS = $(INSTR) -DEMU_MUTLI -O3
+VFLAGS = $(INSTR) -DEMU_MUTLI -O3 -DWORKBENCH
 LDFLAGS =-lSDL2 
 
 DIFF = #--diff=$(NEMU_HOME)/build/riscv64-nemu-interpreter-so

@@ -72,6 +72,65 @@ module ysyx_040066 # (
     input                               io_master_rlast,
     input  [AXI_ID_WIDTH-1:0]           io_master_rid,
 
+
+    `ifdef WORKBENCH
+    output reg [63:0] dbg_regs [31:0],
+    output reg [63:0] mepc,
+    output reg [63:0] mstatus,
+    output reg [63:0] mcause,
+    output reg [63:0] mtvec,
+    output error,done,valid,
+    `else
+    output [5:0]                        io_sram0_addr,
+    output                              io_sram0_cen,
+    output                              io_sram0_wen,
+    output [127:0]                      io_sram0_wmask,
+    output [127:0]                      io_sram0_wdata,
+    input  [127:0]                      io_sram0_rdata,
+    output [5:0]                        io_sram1_addr,
+    output                              io_sram1_cen,
+    output                              io_sram1_wen,
+    output [127:0]                      io_sram1_wmask,
+    output [127:0]                      io_sram1_wdata,
+    input  [127:0]                      io_sram1_rdata,
+    output [5:0]                        io_sram2_addr,
+    output                              io_sram2_cen,
+    output                              io_sram2_wen,
+    output [127:0]                      io_sram2_wmask,
+    output [127:0]                      io_sram2_wdata,
+    input  [127:0]                      io_sram2_rdata,
+    output [5:0]                        io_sram3_addr,
+    output                              io_sram3_cen,
+    output                              io_sram3_wen,
+    output [127:0]                      io_sram3_wmask,
+    output [127:0]                      io_sram3_wdata,
+    input  [127:0]                      io_sram3_rdata,
+    output [5:0]                        io_sram4_addr,
+    output                              io_sram4_cen,
+    output                              io_sram4_wen,
+    output [127:0]                      io_sram4_wmask,
+    output [127:0]                      io_sram4_wdata,
+    input  [127:0]                      io_sram4_rdata,
+    output [5:0]                        io_sram5_addr,
+    output                              io_sram5_cen,
+    output                              io_sram5_wen,
+    output [127:0]                      io_sram5_wmask,
+    output [127:0]                      io_sram5_wdata,
+    input  [127:0]                      io_sram5_rdata,
+    output [5:0]                        io_sram6_addr,
+    output                              io_sram6_cen,
+    output                              io_sram6_wen,
+    output [127:0]                      io_sram6_wmask,
+    output [127:0]                      io_sram6_wdata,
+    input  [127:0]                      io_sram6_rdata,
+    output [5:0]                        io_sram7_addr,
+    output                              io_sram7_cen,
+    output                              io_sram7_wen,
+    output [127:0]                      io_sram7_wmask,
+    output [127:0]                      io_sram7_wdata,
+    input  [127:0]                      io_sram7_rdata,
+    `endif
+
     //AXI_slave
     output io_slave_awready,
     input io_slave_awvalid,
@@ -99,15 +158,27 @@ module ysyx_040066 # (
     input [7:0] io_slave_arlen,
     input [2:0] io_slave_arsize,
     input [1:0] io_slave_arburst,
+
+    input io_slave_rready,
+    output io_salve_rvalid,
+    output [1:0] io_slave_rresp,
+    output [AXI_ADDR_WIDTH-1:0] io_slave_rdata,
+    output io_slave_rlast,
+    output [AXI_ID_WIDTH-1:0] io_slave_rid
 );
-    
+    //dummy for slave
     assign io_slave_awready=0;
     assign io_slave_wready=0;
     assign io_slave_bvalid=0;
     assign io_slave_bresp=2'b11;
     assign io_slave_bid={AXI_ID_WIDTH{1'b0}};
     assign io_slave_arready=0;
-    
+    assign io_slave_rready=0;
+    assign io_slave_rresp=2'b11;
+    assign io_slave_rdata={AXI_ADDR_WIDTH{1'b0}};
+    assign io_slave_rlast=0;
+    assign io_slave_rid={AXI_ID_WIDTH{1'b0}};
+
 
     reg [511:0] rd_data;
     reg [511:0] ins_data;
@@ -125,6 +196,12 @@ module ysyx_040066 # (
     wire [7:0] wr_mask;
     wire [63:0] wr_addr;
 
+    wire [127:0] ram_Q [7:0];
+    wire [127:0] ram_D [7:0];
+    wire [127:0] ram_BWEN [1:0];
+    wire [5:0] ram_A [1:0];
+    wire ram_WEN [1:0];
+
     wire rst; assign rst=~reset;
     ysyx_220066_top top(
         .clk(clock),.rst(rst),
@@ -137,17 +214,91 @@ module ysyx_040066 # (
         .wr_req(wr_req),.wr_burst(wr_burst),.wr_len(wr_len),.wr_addr(wr_addr),
         .wr_ready(wr_ready),.wr_err(wr_err),.wr_mask(wr_mask),.wr_data(wr_data),
 
+        .ram_Q(ram_Q),.ram_D(ram_D),.ram_BWEN(ram_BWEN),.ram_A(ram_A),.ram_WEN(ram_WEN),
+        
         .dbg_regs(),.mepc(),.mstatus(),.mcause(),.mtvec(),
         .error(),.done(),.valid()
     );
 
+    `ifdef WORKBENCH
+    assign dbg_regs=top.dbg_regs;
+    assign mepc=top.mepc;
+    assign mstatus=top.mstatus;
+    assign mcause=top.mcause;
+    assign mtvec=top.mtvec;
+    assign error=top.error;
+    assign done=top.done;
+    assign valid=top.valid;
+    genvar x;generate for(x=0;x<8;x=x+1):sram
+        S011HD1P_X32Y2D128_BW(
+            .CLK(clk),.CEN(0),
+            .WEN(ram_WEN[x<4?0:1]),.BWEN(ram_BWEN[x<4?0:1]),.A(ram_A[x<4?0:1]),
+            .Q(ram_Q[x]),.D(ram_D[x])
+        );
+    endgenerate
+    `else
+    assign io_sram0_addr=ram_A[0];
+    assign io_sram0_cen=0;
+    assign io_sram0_wen=ram_WEN[0];
+    assign io_sram0_wmask=ram_BWEN[0];
+    assign io_sram0_wdata=ram_D[0];
+    assign ram_Q[0]=io_sram0_rdata;
+    assign io_sram1_addr=ram_A[0];
+    assign io_sram1_cen=0;
+    assign io_sram1_wen=ram_WEN[0];
+    assign io_sram1_wmask=ram_BWEN[0];
+    assign io_sram1_wdata=ram_D[1];
+    assign ram_Q[1]=io_sram1_rdata;
+    assign io_sram2_addr=ram_A[0];
+    assign io_sram2_cen=0;
+    assign io_sram2_wen=ram_WEN[0];
+    assign io_sram2_wmask=ram_BWEN[0];
+    assign io_sram2_wdata=ram_D[2];
+    assign ram_Q[2]=io_sram2_rdata;
+    assign io_sram3_addr=ram_A[0];
+    assign io_sram3_cen=0;
+    assign io_sram3_wen=ram_WEN[0];
+    assign io_sram3_wmask=ram_BWEN[0];
+    assign io_sram3_wdata=ram_D[3];
+    assign ram_Q[3]=io_sram3_rdata;
+    assign io_sram4_addr=ram_A[1];
+    assign io_sram4_cen=0;
+    assign io_sram4_wen=ram_WEN[1];
+    assign io_sram4_wmask=ram_BWEN[1];
+    assign io_sram4_wdata=ram_D[4];
+    assign ram_Q[4]=io_sram4_rdata;
+    assign io_sram5_addr=ram_A[1];
+    assign io_sram5_cen=0;
+    assign io_sram5_wen=ram_WEN[1];
+    assign io_sram5_wmask=ram_BWEN[1];
+    assign io_sram5_wdata=ram_D[5];
+    assign ram_Q[5]=io_sram5_rdata;
+    assign io_sram6_addr=ram_A[1];
+    assign io_sram6_cen=0;
+    assign io_sram6_wen=ram_WEN[1];
+    assign io_sram6_wmask=ram_BWEN[1];
+    assign io_sram6_wdata=ram_D[6];
+    assign ram_Q[6]=io_sram6_rdata;
+    assign io_sram7_addr=ram_A[1];
+    assign io_sram7_cen=0;
+    assign io_sram7_wen=ram_WEN[1];
+    assign io_sram7_wmask=ram_BWEN[1];
+    assign io_sram7_wdata=ram_D[7];
+    assign ram_Q[7]=io_sram7_rdata;
+    `endif
+
     // ------------------State Machine------------------TODO
     
-    reg ins_available,rd_available;
-    wire is_ins,is_rd,ins_done,rd_done;
-    assign is_ins=ins_req&&ins_available;
-    assign is_rd=rd_req&&rd_available&&~is_ins;
-    always @(posedge clk)begin
+    reg ins_ar_done,rd_ar_done,ins_done,ar_done;
+    reg [AXI_DATA_WIDTH-1:0] rdata;
+    reg [1:0] resp;
+    reg [AXI_ID_WIDTH-1:0] rid;
+    reg rlast;
+
+    wire ar_ins,ar_rd;
+    assign ar_ins=ins_req&&~ins_ar_done;
+    assign ar_rd=~ar_ins&&rd_req&&~rd_ar_done;
+    always @(posedge clk) begin
         if(rst) {ins_available,rd_available}<=2'b11;
         else begin
             if(is_ins&&io_master_arready) ins_available<=1'b0;
@@ -161,17 +312,39 @@ module ysyx_040066 # (
     assign ins_done=(io_master_rvalid&&io_master_rlast&&io_master_rid[0]);
     assign rd_done=(io_master_rvalid&&io_master_rlast&&~io_master_rid[0]);
     
+    //write
     reg [2:0] count;
+    reg aw_done,w_done,b_done;
+    reg [1:0] bresp;
+    always @(posedge clk) begin
+        if(rst) aw_done<=0;
+        else if(io_master_awready && io_master_awvalid ) aw_done<=1;
+        else if(io_master_bready  && io_master_bvalid  ) aw_done<=0;
+    end
+    always @(posedge clk) begin
+        if(rst) w_done<=0;
+        else if(io_master_wready  && io_master_wvalid  ) w_done<=io_master_wlast;
+        else if(io_master_bready  && io_master_bvalid  ) w_done<=0;
+    end
     always @(posedge clk) begin
         if(rst) count<=3'b0;
-        else if(wr_burst&&wr_req&&io_master_wready) count<=count+3'b1;
+        else if(io_master_wready  && io_master_wvalid  &&wr_burst) count<=count+3'b1;
         else count<=3'b0;
     end
+    always @(posedge clk) begin
+        if(~rst&&io_master_bready && io_master_bvalid) begin
+            bresp<=io_master_bresp;
+            b_done<=1;
+        end
+        else b_done<=0;
+    end
+    assign wr_err=~bresp[0];
+    assign wr_ready=b_done;
 
     // ------------------Write Transaction------------------
     wire [AXI_ID_WIDTH-1:0] axi_id              = {AXI_ID_WIDTH{1'b0}};
     // 写地址通道  以下没有备注初始化信号的都可能是你需要产生和用到的
-    assign io_master_awvalid   = wr_req;
+    assign io_master_awvalid   = wr_req&&~aw_done;
     assign io_master_awaddr    = wr_addr[31:0];
     assign io_master_awid      = axi_id;                                                                      //初始化信号即可
     assign io_master_awlen     = wr_burst?8'h7:8'b0;
@@ -179,7 +352,7 @@ module ysyx_040066 # (
     assign io_master_awburst   = `AXI_BURST_TYPE_INCR;                                                          //初始化信号即可
 
     // 写数据通道
-    assign io_master_wvalid    = wr_req;
+    assign io_master_wvalid    = wr_req&&aw_done&&~w_done;
     assign io_master_wdata     = wr_data[{count,3'h7}:{count,3'h0}] ;
     assign io_master_wstrb     = wr_burst?8'hff:wr_mask;
     assign io_master_wlast     = wr_burst||(count==3'h7);                                                    //初始化信号即可

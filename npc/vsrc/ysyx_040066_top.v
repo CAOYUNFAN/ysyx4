@@ -22,17 +22,17 @@ module ysyx_040066_top(
   input wr_ready,wr_err,
   output [511:0] wr_data,
 
-  output reg [63:0] dbg_regs [31:0],
-  output reg [63:0] mepc,
-  output reg [63:0] mstatus,
-  output reg [63:0] mcause,
-  output reg [63:0] mtvec,
-
   input [127:0] ram_Q [7:0],
   output [127:0] ram_D [7:0],
   output [127:0] ram_BWEN [1:0],
   output [5:0] ram_A [1:0],
   output ram_WEN [1:0],
+
+  output reg [63:0] dbg_regs [31:0],
+  output reg [63:0] mepc,
+  output reg [63:0] mstatus,
+  output reg [63:0] mcause,
+  output reg [63:0] mtvec,
 
   output error,done,valid
 );
