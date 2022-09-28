@@ -18,27 +18,89 @@ void trace_and_difftest(){
 #define CC(...) (0)
 #endif 
 
-void data_read(uLL addr,u8 burst,uLL * data,u8 * error);
-void data_write(uLL addr,u8 burst,uLL *data,u8 mask, u8 * error);
+void data_read(uLL addr,unsigned long * data,u8 * error);
+void data_write(uLL addr,unsigned long *data,u8 mask, u8 * error);
+
+struct read_stuct{
+  uint32_t left,addr,id;
+}read_table[2];
+
+struct{
+  uint32_t left,addr;
+  u8 tag,error;
+}write_table;
+
+static inline void add_ar(){
+  mycpu->io_master_arready=1;
+  int pos=0;
+  if(read_table[0].left) pos=1;
+  read_table[pos].id=mycpu->io_master_arid;
+  read_table[pos].addr=mycpu->io_master_araddr;
+  read_table[pos].left=mycpu->io_master_arlen+1;
+  return;
+}
+
+static inline void add_aw(){
+  mycpu->io_master_awready=1;
+  write_table.left=mycpu->io_master_awlen+1;
+  write_table.addr=mycpu->io_master_awaddr;
+  write_table.error=0;
+}
+
+static inline void deal_r(){
+  int pos=0;if(!read_table[0].left) pos=1;
+  if(!read_table[pos].left){
+    mycpu->io_master_rvalid=0;
+    return;
+  }
+  mycpu->io_master_rvalid=1;
+  mycpu->io_master_rid=read_table[pos].id;
+  mycpu->io_master_rlast=(read_table[pos].left==1);
+  u8 error;
+  data_read(read_table[pos].addr,&mycpu->io_master_rdata,&error);
+  mycpu->io_master_rresp=error?3:0;
+  read_table[pos].left--;
+  read_table[pos].addr+=64/8;
+}
+
+static inline void deal_w(){
+  if(!write_table.left){
+    mycpu->io_master_wready=0;
+    return;
+  }
+  mycpu->io_master_wready=1;
+  u8 error;
+  data_write(write_table.addr,&mycpu->io_master_wdata,mycpu->io_master_wstrb,&error);
+  write_table.addr+=64/8;
+  write_table.left--;
+  if(!write_table.left) Assert(mycpu->io_master_wlast,"Write expect to be ended!");
+  else Assert(!mycpu->io_master_wlast,"Write expect not to be ended!");
+  write_table.error|=error;
+  write_table.tag=(!write_table.left);
+}
+
+static inline void deal_b(){
+  if(!write_table.tag){
+    mycpu->io_master_bvalid=0;
+    return;
+  }
+  mycpu->io_master_bvalid=1;
+  write_table.tag=0;
+  mycpu->io_master_bresp=write_table.error?3:0;
+  mycpu->io_master_bid=0;
+}
 
 inline void cpu_exec_once(){
-    mycpu->clk=1;
+    mycpu->clock=1;
     CC("One cycle-UP!");
     mycpu->eval();
-    if(mycpu->done) return;
-    if(mycpu->ins_req){
-      mycpu->ins_ready=1;
-      data_read(mycpu->ins_addr,mycpu->ins_burst,(uLL *)mycpu->ins_data,&mycpu->ins_err);
-    }else mycpu->ins_ready=0;
-    if(mycpu->rd_req){
-      mycpu->rd_ready=1;
-      data_read(mycpu->rd_addr,mycpu->rd_burst,(uLL *)mycpu->rd_data,&mycpu->rd_err);
-    }else mycpu->rd_ready=0;
-    if(mycpu->wr_req){
-      mycpu->wr_ready=1;
-      data_write(mycpu->wr_addr,mycpu->wr_burst,(uLL *)mycpu->wr_data,mycpu->wr_mask,&mycpu->wr_err);
-    }else mycpu->wr_ready=0;
-    mycpu->clk=0;
+    deal_b();
+    deal_r();
+    deal_w();
+    if(mycpu->io_master_arvalid) add_ar();
+    else mycpu->io_master_arready=0;
+    if(mycpu->io_master_awvalid) add_aw();
+    else mycpu->io_master_awready=0;
     CC("One cycle-DOWN!");
     mycpu->eval();
     CC("One cycle-Completed!");

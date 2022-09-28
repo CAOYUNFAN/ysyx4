@@ -1,6 +1,6 @@
 .PHONY:sim clear sim_gdb find_display
 
-STUID := ysyx_040066_
+STUID := ysyx_040066
 CSRC_DIR := $(NPC_HOME)/csrc/src/
 CSRC_FILES := $(shell find $(CSRC_DIR) -name "*.cpp")
 CSRC_INCLUDE_DIR := $(NPC_HOME)/csrc/include/
@@ -8,7 +8,7 @@ CSRC_INCLUDE := $(shell find $(CSRC_INCLUDE) -name "*.h")
 VSRC_DIR := $(NPC_HOME)/vsrc
 VSRC_FILES := $(shell find $(VSRC_DIR) -name "*.v")
 EMU_DIR := $(NPC_HOME)/emu
-EMU_TOP_MODULE :=$(STUID)top
+EMU_TOP_MODULE :=$(STUID)
 EMU_TARGET := emu
 INSTR = #-DINSTR -DR_W -Dfully_info
 CFLAGS_NPC = -I$(CSRC_INCLUDE_DIR) -g -O2 $(INSTR) #-DMTRACE

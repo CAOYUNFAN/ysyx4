@@ -74,11 +74,13 @@ module ysyx_040066 # (
 
 
     `ifdef WORKBENCH
-    output reg [63:0] dbg_regs [31:0],
-    output reg [63:0] mepc,
-    output reg [63:0] mstatus,
-    output reg [63:0] mcause,
-    output reg [63:0] mtvec,
+    output [63:0] dbg_regs [31:0],
+    output [63:0] mepc,
+    output [63:0] mstatus,
+    output [63:0] mcause,
+    output [63:0] mtvec,
+    output [63:0] pc_nxt,
+    output [63:0] pc_m,
     output error,done,valid,
     `else
     output [5:0]                        io_sram0_addr,
@@ -173,18 +175,18 @@ module ysyx_040066 # (
     assign io_slave_bresp=2'b11;
     assign io_slave_bid={AXI_ID_WIDTH{1'b0}};
     assign io_slave_arready=0;
-    assign io_slave_rready=0;
+    assign io_salve_rvalid=0;
     assign io_slave_rresp=2'b11;
     assign io_slave_rdata={AXI_ADDR_WIDTH{1'b0}};
     assign io_slave_rlast=0;
     assign io_slave_rid={AXI_ID_WIDTH{1'b0}};
 
 
-    reg [511:0] rd_data;
-    reg [511:0] ins_data;
+    reg [63:0] rd_data;
+    reg [63:0] ins_data;
     wire [511:0] wr_data;
 
-    wire ins_req,ins_burst,ins_valid,ins_err,ins_last;
+    wire ins_req,ins_burst,ins_ready,ins_err,ins_last;
     wire [63:0] ins_addr;
 
     wire rd_req,rd_burst,rd_ready,rd_err,rd_last;
@@ -203,7 +205,8 @@ module ysyx_040066 # (
     wire ram_WEN [1:0];
 
     wire rst; assign rst=~reset;
-    ysyx_220066_top top(
+    wire clk; assign clk=clock;
+    ysyx_040066_top top(
         .clk(clock),.rst(rst),
         .ins_req(ins_req),.ins_burst(ins_burst),.ins_addr(ins_addr),.ins_last(ins_last),
         .ins_ready(ins_ready),.ins_err(ins_err),.ins_data(ins_data),
@@ -215,27 +218,24 @@ module ysyx_040066 # (
         .wr_ready(wr_ready),.wr_err(wr_err),.wr_mask(wr_mask),.wr_data(wr_data),
 
         .ram_Q(ram_Q),.ram_D(ram_D),.ram_BWEN(ram_BWEN),.ram_A(ram_A),.ram_WEN(ram_WEN),
-        
+
+        `ifdef WORKBENCH
+        .dbg_regs(dbg_regs),.mepc(mepc),.mstatus(mstatus),.mcause(mcause),.mtvec(mtvec),
+        .error(error),.done(done),.valid(valid),.pc_nxt(pc_nxt),.pc_m(pc_m)
+        `else
         .dbg_regs(),.mepc(),.mstatus(),.mcause(),.mtvec(),
-        .error(),.done(),.valid()
+        .error(),.done(),.valid(),.pc_nxt(),.pc_m()
+        `endif
     );
 
     `ifdef WORKBENCH
-    assign dbg_regs=top.dbg_regs;
-    assign mepc=top.mepc;
-    assign mstatus=top.mstatus;
-    assign mcause=top.mcause;
-    assign mtvec=top.mtvec;
-    assign error=top.error;
-    assign done=top.done;
-    assign valid=top.valid;
-    genvar x;generate for(x=0;x<8;x=x+1):sram
-        S011HD1P_X32Y2D128_BW(
+    genvar x;generate for(x=0;x<8;x=x+1) begin:sram
+        S011HD1P_X32Y2D128_BW ram(
             .CLK(clk),.CEN(0),
             .WEN(ram_WEN[x<4?0:1]),.BWEN(ram_BWEN[x<4?0:1]),.A(ram_A[x<4?0:1]),
             .Q(ram_Q[x]),.D(ram_D[x])
         );
-    endgenerate
+    end endgenerate
     `else
     assign io_sram0_addr=ram_A[0];
     assign io_sram0_cen=0;
@@ -287,31 +287,44 @@ module ysyx_040066 # (
     assign ram_Q[7]=io_sram7_rdata;
     `endif
 
-    // ------------------State Machine------------------TODO
-    
-    reg ins_ar_done,rd_ar_done,ins_done,ar_done;
+    // ------------------State Machine------------------
+    //read
+    //ins ID:1111,rd ID:0000
+    reg ins_ar_done,rd_ar_done; reg [2:0] done_status;//[0]:last,[1]:which,[2]:onecircle
     reg [AXI_DATA_WIDTH-1:0] rdata;
-    reg [1:0] resp;
+    reg [1:0] rresp;
     reg [AXI_ID_WIDTH-1:0] rid;
-    reg rlast;
 
-    wire ar_ins,ar_rd;
+    wire ar_ins,ar_rd,ins_done,rd_done;
     assign ar_ins=ins_req&&~ins_ar_done;
     assign ar_rd=~ar_ins&&rd_req&&~rd_ar_done;
+    assign ins_done=done_status[0]&&done_status[1];
+    assign rd_done=done_status[0]&&~done_status[1];
     always @(posedge clk) begin
-        if(rst) {ins_available,rd_available}<=2'b11;
+        if(rst) {ins_ar_done,rd_ar_done}<=2'b00;
         else begin
-            if(is_ins&&io_master_arready) ins_available<=1'b0;
-            else if(ins_done) ins_available<=1'b1;
+            if(ar_ins && io_master_arready && io_master_arvalid) ins_ar_done<=1;
+            else if(ins_done) ins_ar_done<=0;
 
-            if(is_rd&&io_master_arready) rd_available<=1'b0;
-            else if(rd_done) rd_available<=1'b1;
+            if(ar_rd  && io_master_arready && io_master_arvalid) rd_ar_done <=1;
+            else if(rd_done ) rd_ar_done <=0;
         end
     end
+    always @(posedge clk) begin
+        if(rst) done_status<=3'b00;
+        else if(io_master_rready&&io_master_rvalid) begin
+            rdata<=io_master_rdata;
+            rid<=io_master_rid;
+            rresp<=io_master_rresp;
+            done_status<={1'b1,io_master_rid[0],io_master_rlast};
+        end else done_status<=3'b00;
+    end
+    assign ins_ready=rid[0]&&done_status[2];
+    assign rd_ready=~rid[0]&&done_status[2];
+    assign ins_data=rdata;         assign rd_data=rdata;
+    assign ins_last=done_status[0];assign rd_last=done_status[0];
+    assign ins_err =~rresp[0];     assign rd_err =~rresp[0];
 
-    assign ins_done=(io_master_rvalid&&io_master_rlast&&io_master_rid[0]);
-    assign rd_done=(io_master_rvalid&&io_master_rlast&&~io_master_rid[0]);
-    
     //write
     reg [2:0] count;
     reg aw_done,w_done,b_done;
@@ -319,12 +332,12 @@ module ysyx_040066 # (
     always @(posedge clk) begin
         if(rst) aw_done<=0;
         else if(io_master_awready && io_master_awvalid ) aw_done<=1;
-        else if(io_master_bready  && io_master_bvalid  ) aw_done<=0;
+        else if(b_done) aw_done<=0;
     end
     always @(posedge clk) begin
         if(rst) w_done<=0;
         else if(io_master_wready  && io_master_wvalid  ) w_done<=io_master_wlast;
-        else if(io_master_bready  && io_master_bvalid  ) w_done<=0;
+        else if(b_done) w_done<=0;
     end
     always @(posedge clk) begin
         if(rst) count<=3'b0;
@@ -340,6 +353,10 @@ module ysyx_040066 # (
     end
     assign wr_err=~bresp[0];
     assign wr_ready=b_done;
+    wire [63:0] wr_r_data [7:0];
+    genvar i;generate for(i=0;i<8;i++)
+        assign wr_r_data[i]=wr_data[i*64+63:i*64];
+    endgenerate
 
     // ------------------Write Transaction------------------
     wire [AXI_ID_WIDTH-1:0] axi_id              = {AXI_ID_WIDTH{1'b0}};
@@ -353,7 +370,7 @@ module ysyx_040066 # (
 
     // 写数据通道
     assign io_master_wvalid    = wr_req&&aw_done&&~w_done;
-    assign io_master_wdata     = wr_data[{count,3'h7}:{count,3'h0}] ;
+    assign io_master_wdata     = wr_r_data[count];
     assign io_master_wstrb     = wr_burst?8'hff:wr_mask;
     assign io_master_wlast     = wr_burst||(count==3'h7);                                                    //初始化信号即可
 
@@ -363,18 +380,14 @@ module ysyx_040066 # (
     // ------------------Read Transaction------------------
 
     // Read address channel signals
-    assign io_master_arvalid   = ins_available||rd_available;
-    assign io_master_araddr    = ins_available?ins_addr:rd_addr;
-    assign io_master_arid      = {(AXI_ID_WIDTH-1){ins_available}};                                                                           //初始化信号即可                        
-    assign io_master_arlen     = (ins_available&&ins_burst||rd_available&&rd_burst)?8'h7:8'h0;                                                                          
-    assign io_master_arsize    = ins_available?(ins_burst?`AXI_SIZE_BYTES_64:`AXI_SIZE_BYTES_32):(rd_burst?`AXI_SIZE_BYTES_64:rd_len);
-    assign io_master_arburst   = (ins_available&&ins_burst||rd_available&&rd_burst)?`AXI_BURST_TYPE_INCR:`AXI_BURST_TYPE_FIXED;
+    assign io_master_arvalid   = ar_rd||ar_ins;
+    assign io_master_araddr    = ar_ins?ins_addr[31:0]:rd_addr[31:0];
+    assign io_master_arid      = {(AXI_ID_WIDTH){ar_ins}};                                                                           //初始化信号即可                        
+    assign io_master_arlen     = (ar_ins&&ins_burst||ar_rd&&rd_burst)?8'h7:8'h0;                                                                          
+    assign io_master_arsize    = ar_ins?(ins_burst?`AXI_SIZE_BYTES_64:`AXI_SIZE_BYTES_32):(rd_burst?`AXI_SIZE_BYTES_64:rd_len);
+    assign io_master_arburst   = `AXI_BURST_TYPE_INCR;
     
     // Read data channel signals
     assign io_master_rready    = 1'b1;
-
-    always @(posedge clk) if(io_master_rvalid) begin
-        
-    end
 
 endmodule

@@ -51,14 +51,14 @@ void parse_args(int argc,char * argv[]){
 }
 
 void cpu_init(){
-  mycpu->rst=1;
-  mycpu->clk=0;
+  mycpu->reset=1;
+  mycpu->clock=0;
   mycpu->eval();
-  mycpu->clk=1;
+  mycpu->clock=1;
   mycpu->eval();
-  mycpu->clk=0;
+  mycpu->clock=0;
   mycpu->eval();
-  mycpu->rst=0;
+  mycpu->reset=0;
 }
 
 void initialize(int argc,char * argv[]){
