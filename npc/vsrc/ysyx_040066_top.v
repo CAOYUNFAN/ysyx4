@@ -73,8 +73,8 @@ module ysyx_040066_top(
   );
   reg pc_2;always@(posedge clk) pc_2<=pc_rd[2];
   assign instr=pc_2?instr_line[63:32]:instr_line[31:0];
-  assign ins_addr=~pc_rd[31]?pc_rd:{32'h0,icache_addr};
   assign ins_burst=~pc_rd[31];
+  assign ins_addr=ins_burst?pc_rd:{32'h0,icache_addr};
 
   wire [31:0] dcache_addr;
   ysyx_040066_cache_top dcache(
@@ -94,7 +94,7 @@ module ysyx_040066_top(
 
   assign rd_burst=~dcache_addr[31];
   assign wr_burst=~dcache_addr[31];
-  assign rd_addr=~rd_burst?addr:{32'h0,dcache_addr};
+  assign rd_addr=rd_burst?addr:{32'h0,dcache_addr};
   assign wr_addr=rd_addr;
 
 /*  ysyx_040066_imem imem(
