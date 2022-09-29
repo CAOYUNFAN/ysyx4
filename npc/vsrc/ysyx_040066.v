@@ -393,7 +393,7 @@ module ysyx_040066 # (
 
     `ifdef INSTR
     always @(*) begin
-        if(~clk&&reset) $display("axi:wr_req=%b,aw=%b,w=%b,count=%b,b=%b",wr_req,aw_done,w_done,count,b_done);
+        if(~clk&&reset) $display("axi:wr_req=%b,aw=%b,w=%b,count=%b,b=%b,burst=%b",wr_req,aw_done,w_done,count,b_done,wr_burst);
     end
     `endif
 endmodule
