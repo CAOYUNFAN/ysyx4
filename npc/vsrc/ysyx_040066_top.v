@@ -92,8 +92,8 @@ module ysyx_040066_top(
     .ram_Q(ram_Q[7:4]),.ram_D(ram_D[7:4]),.ram_BWEN(ram_BWEN[1]),.ram_A(ram_A[1]),.ram_WEN(ram_WEN[1])
   );
 
-  assign rd_burst=dcache_addr[31];
-  assign wr_burst=dcache_addr[31];
+  assign rd_burst=~dcache_addr[31];
+  assign wr_burst=~dcache_addr[31];
   assign rd_addr=~rd_burst?addr:{32'h0,dcache_addr};
   assign wr_addr=rd_addr;
 
