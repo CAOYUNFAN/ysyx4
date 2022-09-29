@@ -145,16 +145,19 @@ void device_update(){
 }
 
 void data_read(uLL addr,unsigned long * data,u8 * error){
-    #ifdef MTRACE 
-    Log("read from addr %llx",addr);
-    #endif
     for(int i=0;i<7;i++) if(device_table[i]->in_range(addr)) {
         uLL data_local;
         device_table[i]->input(addr,&data_local,error);
         *data=data_local;
+        #ifdef MTRACE
+        Log("read from addr %llx,%llx,%d",addr,data_local,*error);
+        #endif
         return;
     }
     *error=1;*data=1145141919810uLL;
+    #ifdef MTRACE
+    Log("Unsuccessful read from addr %llx",addr);
+    #endif
     return;
 }
 
