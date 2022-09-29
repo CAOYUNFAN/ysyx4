@@ -145,7 +145,7 @@ void device_update(){
 }
 
 void data_read(uLL addr,unsigned long * data,u8 * error){
-    #ifdef MTRACE
+    #ifdef MTRACE 
     Log("read from addr %llx",addr);
     #endif
     for(int i=0;i<7;i++) if(device_table[i]->in_range(addr)) {
