@@ -364,7 +364,7 @@ module ysyx_040066 # (
     assign io_master_awvalid   = wr_req&&~aw_done;
     assign io_master_awaddr    = wr_addr[31:0];
     assign io_master_awid      = axi_id;                                                                      //初始化信号即可
-    assign io_master_awlen     = wr_burst?8'h7:8'b0;
+    assign io_master_awlen     = wr_burst?8'b0:8'h7;
     assign io_master_awsize    = wr_burst?`AXI_SIZE_BYTES_64:wr_len;
     assign io_master_awburst   = `AXI_BURST_TYPE_INCR;                                                          //初始化信号即可
 
@@ -383,7 +383,7 @@ module ysyx_040066 # (
     assign io_master_arvalid   = ar_rd||ar_ins;
     assign io_master_araddr    = ar_ins?ins_addr[31:0]:rd_addr[31:0];
     assign io_master_arid      = {(AXI_ID_WIDTH){ar_ins}};                                                                           //初始化信号即可                        
-    assign io_master_arlen     = (ar_ins&&ins_burst||ar_rd&&rd_burst)?8'h7:8'h0;                                                                          
+    assign io_master_arlen     = (ar_ins&&ins_burst||ar_rd&&rd_burst)?8'b0:8'h7;                                                                          
     assign io_master_arsize    = ar_ins?(ins_burst?`AXI_SIZE_BYTES_64:`AXI_SIZE_BYTES_32):(rd_burst?`AXI_SIZE_BYTES_64:rd_len);
     assign io_master_arburst   = `AXI_BURST_TYPE_INCR;
     
