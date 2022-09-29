@@ -37,7 +37,7 @@ static inline void add_ar(){
   read_table[pos].id=mycpu->io_master_arid;
   read_table[pos].addr=mycpu->io_master_araddr;
   read_table[pos].left=mycpu->io_master_arlen+1;
-  if(read_table[pos].left>=0x80000000u){
+  if(read_table[pos].addr>=0x80000000u){
     Assert(read_table[pos].left==8,"Read should be cached! %x",read_table[pos].addr);
   }else{
     Assert(read_table[pos].left==1,"Read should not be cached! %x",read_table[pos].addr);
