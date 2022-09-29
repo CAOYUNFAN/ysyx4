@@ -59,6 +59,7 @@ static inline void deal_r(){
   u8 error;
   data_read(read_table[pos].addr,&mycpu->io_master_rdata,&error);
   mycpu->io_master_rresp=error?3:0;
+  printf("%d\n",error);
   read_table[pos].left--;
   read_table[pos].addr+=64/8;
 }
