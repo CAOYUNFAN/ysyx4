@@ -37,7 +37,7 @@ static inline void add_ar(){
   read_table[pos].id=mycpu->io_master_arid;
   read_table[pos].addr=mycpu->io_master_araddr;
   read_table[pos].left=mycpu->io_master_arlen+1;
-  if(read_table[pos].left>>31u){
+  if(read_table[pos].left>=0x80000000u){
     Assert(read_table[pos].left==8,"Read should be cached! %x",read_table[pos].addr);
   }else{
     Assert(read_table[pos].left==1,"Read should not be cached! %x",read_table[pos].addr);
@@ -49,7 +49,7 @@ static inline void add_aw(){
   mycpu->io_master_awready=1;
   write_table.left=mycpu->io_master_awlen+1;
   write_table.addr=mycpu->io_master_awaddr;
-  if(write_table.addr>>31u){
+  if(write_table.addr>=0x80000000u){
     Assert(write_table.left==8,"Write should be cached! %x",write_table.addr);
   }else{
     Assert(write_table.left==1,"Write should be uncached! %x",write_table.addr);
