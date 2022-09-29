@@ -101,6 +101,7 @@ inline void cpu_exec_once(){
     else mycpu->io_master_arready=0;
     if(mycpu->io_master_awvalid) add_aw();
     else mycpu->io_master_awready=0;
+    mycpu->clock=0;
     CC("One cycle-DOWN!");
     mycpu->eval();
     CC("One cycle-Completed!");
