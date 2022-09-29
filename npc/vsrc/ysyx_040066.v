@@ -323,7 +323,7 @@ module ysyx_040066 # (
     assign rd_ready=~rid[0]&&done_status[2];
     assign ins_data=rdata;         assign rd_data=rdata;
     assign ins_last=done_status[0];assign rd_last=done_status[0];
-    assign ins_err =~rresp[0];     assign rd_err =~rresp[0];
+    assign ins_err =rresp[0];      assign rd_err =rresp[0];
 
     //write
     reg [2:0] count;
@@ -351,7 +351,7 @@ module ysyx_040066 # (
         end
         else b_done<=0;
     end
-    assign wr_err=~bresp[0];
+    assign wr_err=bresp[0];
     assign wr_ready=b_done;
     wire [63:0] wr_r_data [7:0];
     genvar i;generate for(i=0;i<8;i++)
