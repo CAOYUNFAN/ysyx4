@@ -86,8 +86,8 @@ static inline void deal_w(){
   data_write(write_table.addr,&mycpu->io_master_wdata,mycpu->io_master_wstrb,&error);
   write_table.addr+=64/8;
   write_table.left--;
-  if(!write_table.left) Assert(mycpu->io_master_wlast,"Write expect to be ended!");
-  else Assert(!mycpu->io_master_wlast,"Write expect not to be ended!");
+  if(!write_table.left) Assert(mycpu->io_master_wlast,"Write expect to be ended! %llx",write_table.addr);
+  else Assert(!mycpu->io_master_wlast,"Write expect not to be ended! %llx",write_table.addr);
   write_table.error|=error;
   write_table.tag=(!write_table.left);
 }
