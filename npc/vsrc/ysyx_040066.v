@@ -390,4 +390,10 @@ module ysyx_040066 # (
     // Read data channel signals
     assign io_master_rready    = 1'b1;
 
+
+    `ifdef INSTR
+    always @(*) begin
+        if(~clk) $display("axi:reset=%b",reset);
+    end
+    `endif
 endmodule
