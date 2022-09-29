@@ -341,7 +341,7 @@ module ysyx_040066 # (
     end
     always @(posedge clk) begin
         if(rst) count<=3'b0;
-        else if(io_master_wready  && io_master_wvalid  &&wr_burst) count<=count+3'b1;
+        else if(io_master_wready  && io_master_wvalid  &&~wr_burst) count<=count+3'b1;
         else count<=3'b0;
     end
     always @(posedge clk) begin
@@ -365,13 +365,13 @@ module ysyx_040066 # (
     assign io_master_awaddr    = wr_addr[31:0];
     assign io_master_awid      = axi_id;                                                                      //初始化信号即可
     assign io_master_awlen     = wr_burst?8'b0:8'h7;
-    assign io_master_awsize    = wr_burst?`AXI_SIZE_BYTES_64:wr_len;
+    assign io_master_awsize    = wr_burst?wr_len:`AXI_SIZE_BYTES_64;
     assign io_master_awburst   = `AXI_BURST_TYPE_INCR;                                                          //初始化信号即可
 
     // 写数据通道
     assign io_master_wvalid    = wr_req&&aw_done&&~w_done;
     assign io_master_wdata     = wr_r_data[count];
-    assign io_master_wstrb     = wr_burst?8'hff:wr_mask;
+    assign io_master_wstrb     = wr_burst?wr_mask:8'hff;
     assign io_master_wlast     = wr_burst||(count==3'h7);                                                    //初始化信号即可
 
     // 写应答通道
@@ -384,7 +384,7 @@ module ysyx_040066 # (
     assign io_master_araddr    = ar_ins?ins_addr[31:0]:rd_addr[31:0];
     assign io_master_arid      = {(AXI_ID_WIDTH){ar_ins}};                                                                           //初始化信号即可                        
     assign io_master_arlen     = (ar_ins&&ins_burst||ar_rd&&rd_burst)?8'b0:8'h7;                                                                          
-    assign io_master_arsize    = ar_ins?(ins_burst?`AXI_SIZE_BYTES_64:`AXI_SIZE_BYTES_32):(rd_burst?`AXI_SIZE_BYTES_64:rd_len);
+    assign io_master_arsize    = ar_ins?(ins_burst?`AXI_SIZE_BYTES_32:`AXI_SIZE_BYTES_64):(rd_burst?rd_len:`AXI_SIZE_BYTES_64);
     assign io_master_arburst   = `AXI_BURST_TYPE_INCR;
     
     // Read data channel signals
