@@ -393,7 +393,7 @@ module ysyx_040066 # (
 
     `ifdef INSTR
     always @(*) begin
-        if(~clk&&reset) $display("axi:read_valid=%b",io_master_rresp);
+        if(~clk&&reset) $display("axi:wr_req=%b,aw=%b,w=%b,count=%b,b=%b",wr_req,aw_done,w_done,count,b_done);
     end
     `endif
 endmodule
