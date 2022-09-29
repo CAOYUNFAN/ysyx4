@@ -87,7 +87,7 @@ module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
 
     reg [63:0] uncached_data;
     always @(posedge clk) uncached_data<=rd_data;
-    always @(posedge clk) uncached_done<=~rst&&uncache&&(ready_to_read&&status==2'b10||ready_to_write&&status==2'b11)&&~nxt_clear;
+    always @(posedge clk) uncached_done<=~rst&&uncache&&(ready_to_read&&status==2'b10||ready_to_write&&status==2'b11);
 
     assign ok=uncache?uncached_done:hit;
 
