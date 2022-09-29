@@ -44,6 +44,7 @@ static inline void add_aw(){
   mycpu->io_master_awready=1;
   write_table.left=mycpu->io_master_awlen+1;
   write_table.addr=mycpu->io_master_awaddr;
+  Log("new write:%x,%d",write_table.addr,write_table.left);
   write_table.error=0;
 }
 
