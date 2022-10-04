@@ -39,7 +39,6 @@ module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     reg [TAG_LEN-1:0] cache_tag [INDEX_NUM-1:0];
     reg [INDEX_NUM-1:0] cache_valid;
     reg [INDEX_NUM-1:0] cache_dirty;
-    reg [INDEX_NUM-1:0] cache_error;
     reg [(INDEX_NUM/2)-1:0] cache_freq;
     //control
     reg [1:0] status;//00:valid,10:waiting for read,11:wating for write,01:fence

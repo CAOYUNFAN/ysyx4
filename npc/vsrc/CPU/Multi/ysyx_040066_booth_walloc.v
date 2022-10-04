@@ -81,7 +81,7 @@ module ysyx_040066_booth_walloc(
 
     wire [129:0] final_line;
     assign final_line=wt_c_native+wt_s_native+{128'b0,part_cout_native};
-    assign result=is_long?final_line[127:64]:(is_w?{{32{final_line[31]}},final_line[31:0]}:final_line[63:0]);
+    assign result=is_long?final_line[127:64]:(is_w_native?{{32{final_line[31]}},final_line[31:0]}:final_line[63:0]);
     always @(*) begin
         //if(~clk) $display("final_line=%h",final_line);
     end
