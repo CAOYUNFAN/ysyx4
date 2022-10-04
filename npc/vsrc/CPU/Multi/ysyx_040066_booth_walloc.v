@@ -56,9 +56,11 @@ module ysyx_040066_booth_walloc(
         );
     end endgenerate
 
+    wire [29:0] unused_cout_group;
+    wire unused_cout;
     ysyx_040066_walloc_33bits walloc129(
         .src_in(sw_group[4289:4257]),.cin(wt_cout[128]),
-        .cout_group(),.s(wt_s[129]),.cout()
+        .cout_group(unused_cout_group),.s(wt_s[129]),.cout(unused_cout)
     );
 
     reg is_long;

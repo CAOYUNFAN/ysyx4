@@ -25,7 +25,8 @@ module ysyx_040066_cpu(
     wire [11:0] ex_csr_addr;
     wire [63:0] ex_nxtpc;
     wire [63:0] ex_csr_wdata;
-    wire [63:0] ex_pc,ex_instr;
+    wire [63:0] ex_pc;
+    reg [31:0] ex_instr; always@(posedge clk) ex_instr<=instr_rd;
     //M
     wire m_valid,m_wen,m_MemRd;
     wire [4:0] m_rd;
@@ -77,7 +78,7 @@ module ysyx_040066_cpu(
                     intr_ins_ac?63'd1:intr_ins_dec?63'd2:
                     intr_t?63'd7:63'd0;
     assign NO[63]=~intr_rd&&~intr_wr&&~intr_ecall&&~intr_ins_ac&&~intr_ins_dec&&intr_t;
-    assign tval=(intr_rd||intr_wr)?wb_addr:intr_ins_ac?ex_pc:intr_ins_dec?ex_instr:64'b0;
+    assign tval=(intr_rd||intr_wr)?wb_addr:intr_ins_ac?ex_pc:intr_ins_dec?{32'h0,ex_instr}:64'b0;
     ysyx_040066_csr module_csr(
         .rst(rst),.clk(clk),.clear_mip(clear_mip),
         .csr_rd_addr(instr[31:20]),
