@@ -1,7 +1,5 @@
 //`timescale 1ns/1ps
 module ysyx_040066_top(
-  output [63:0] pc_nxt,
-  output [63:0] pc_m,
   input clk,rst,
 
   output ins_req,ins_burst,
@@ -26,15 +24,7 @@ module ysyx_040066_top(
   output [127:0] ram_D [7:0],
   output [127:0] ram_BWEN [1:0],
   output [5:0] ram_A [1:0],
-  output ram_WEN [1:0],
-
-  output reg [63:0] dbg_regs [31:0],
-  output reg [63:0] mepc,
-  output reg [63:0] mstatus,
-  output reg [63:0] mcause,
-  output reg [63:0] mtvec,
-
-  output error,done,valid
+  output ram_WEN [1:0]
 );
   wire MemWr,MemRd;
   wire [63:0] addr;
@@ -45,6 +35,8 @@ module ysyx_040066_top(
   wire instr_valid,instr_error;
   wire data_valid,data_error;
   wire fence_i,d_ready;
+  wire error,done,valid;
+  wire [63:0] pc_nxt,pc_m;
 
   ysyx_040066_cpu cpu(
     .clk(clk),.rst(rst),
@@ -55,7 +47,7 @@ module ysyx_040066_top(
     .data_Rd(data_Rd),.data_Wr(data_Wr),.wr_len(wr_len),
     .error(error),.done(done),.out_valid(valid),.fence_i(fence_i)
   );
-
+  assign rd_len=wr_len;
   wire [63:0] instr_line;
   wire [31:0] icache_addr;
   ysyx_040066_cache_top icache(
@@ -97,33 +89,22 @@ module ysyx_040066_top(
   assign rd_addr=rd_burst?addr:{32'h0,dcache_addr};
   assign wr_addr=rd_addr;
 
-/*  ysyx_040066_imem imem(
-    .clk(clk),.rst(rst),
-    .pc(pc_rd),.instr(instr),
-    .error(instr_error),.valid(instr_valid)
-  );
-
-  ysyx_040066_memwr memwr(
-    .clk(clk),.rst(rst),.addr(addr),.wmask(wr_mask),
-    .data(data_Wr),.MemWr(MemWr)
-  );
-
-  ysyx_040066_dmem_rd dmemrd(
-    .clk(clk),.rst(rst),.MemRd(MemRd),
-    .addr(addr),.data(data_Rd),
-    .error(data_Rd_error),.valid(data_Rd_valid)
-  );*/
-
+`ifdef WORKBENCH
+  reg [63:0] dbg_regs [31:0];
+  import "DPI-C" function void set_gpr_ptr(input logic [63:0] a []);
+  initial set_gpr_ptr(dbg_regs);
+  import "DPI-C" function void set_pc_ptr(input logic [63:0] pc []);
+  initial set_pc_ptr(pc_nxt);
+  import "DPI-C" function void set_pc_m_ptr(input logic [63:0] pc_m []);
+  initial set_pc_m_ptr(pc_m);
+  import "DPI-C" function void status_now(input longint status);
+  always @(*) status_now({61'b0,error,done,valid});
   integer i;
   always @(*) begin
     for(i=1;i<32;i=i+1) dbg_regs[i]=cpu.module_regs.module_regs.rf[i];
     dbg_regs[0]=0;
 //    if(MemWr&&clk)$display("Write to:addr=%h,data=%x,help=%h,real=%h,wmask=%b",addr,data_Wr,data_Wr_help,data_Wr_data,wmask);
-    mepc=cpu.module_csr.mepc;
-    mstatus=cpu.module_csr.mstatus;
-    mcause=cpu.module_csr.mcause;
-    mtvec=cpu.module_csr.mtvec;
   end
-
+  `endif
   assign pc_m=cpu.module_m.nxtpc;
 endmodule

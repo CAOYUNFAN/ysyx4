@@ -164,25 +164,6 @@ module ysyx_040066 (
     assign io_slave_rlast=0;
     assign io_slave_rid={4{1'b0}};
 
-    `ifdef WORKBENCH
-    wire [63:0] dbg_regs [31:0];
-    wire [63:0] mepc;
-    wire [63:0] mstatus;
-    wire [63:0] mcause;
-    wire [63:0] mtvec;
-    wire [63:0] pc_nxt;
-    wire [63:0] pc_m;
-    wire error,done,valid;
-    import "DPI-C" function void set_gpr_ptr(input logic [63:0] a []);
-    initial set_gpr_ptr(dbg_regs);
-    import "DPI-C" function void set_pc_ptr(input logic [63:0] pc []);
-    initial set_pc_ptr(pc_nxt);
-    import "DPI-C" function void set_pc_m_ptr(input logic [63:0] pc_m []);
-    initial set_pc_m_ptr(pc_m);
-    import "DPI-C" function void status_now(input longint status);
-    always @(*) status_now({61'b0,error,done,valid});
-    `endif
-
     reg [63:0] rd_data;
     reg [63:0] ins_data;
     wire [511:0] wr_data;
@@ -220,15 +201,7 @@ module ysyx_040066 (
         .wr_req(wr_req),.wr_burst(wr_burst),.wr_len(wr_len),.wr_addr(wr_addr),
         .wr_ready(wr_ready),.wr_err(wr_err),.wr_mask(wr_mask),.wr_data(wr_data),
 
-        .ram_Q(ram_Q),.ram_D(ram_D),.ram_BWEN(ram_BWEN),.ram_A(ram_A),.ram_WEN(ram_WEN),
-
-        `ifdef WORKBENCH
-        .dbg_regs(dbg_regs),.mepc(mepc),.mstatus(mstatus),.mcause(mcause),.mtvec(mtvec),
-        .error(error),.done(done),.valid(valid),.pc_nxt(pc_nxt),.pc_m(pc_m)
-        `else
-        .dbg_regs(),.mepc(),.mstatus(),.mcause(),.mtvec(),
-        .error(),.done(),.valid(),.pc_nxt(),.pc_m()
-        `endif
+        .ram_Q(ram_Q),.ram_D(ram_D),.ram_BWEN(ram_BWEN),.ram_A(ram_A),.ram_WEN(ram_WEN)
     );
 
     `ifdef WORKBENCH
