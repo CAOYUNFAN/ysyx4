@@ -4,8 +4,7 @@ module ysyx_040066_ID (
     input valid_in,instr_error_rd,csr_error,rs1_valid,rs2_valid,jmp,
     input [31:0] instr_read,
     input [63:0] pc_in,
-    output reg rs_block,
-    output [63:0] pc
+    output reg rs_block
 );
     wire valid;
 
@@ -21,6 +20,7 @@ module ysyx_040066_ID (
     wire [2:0] MemOp;
     wire [11:0] csr_addr;
     wire [1:0] error;
+    wire [63:0] pc;
     wire done;
     wire fence_i;
 

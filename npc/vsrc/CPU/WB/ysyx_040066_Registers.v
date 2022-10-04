@@ -1,5 +1,5 @@
 module ysyx_040066_Registers(
-    input clk,rst,
+    input clk,
     input wen,
     input [4:0] rd,
     input [63:0] data,

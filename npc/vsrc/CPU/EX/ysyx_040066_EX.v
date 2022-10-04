@@ -109,7 +109,6 @@ module ysyx_040066_EX(
         2'b11:datab=csr_data_native;
     endcase
     wire zero;
-    wire [63:0] mul_result;
     wire [2:0] add_lowbit;
 
     ysyx_040066_ALU alu(
@@ -121,9 +120,6 @@ module ysyx_040066_EX(
     assign is_mul=ALUctr_native[5]&&~ALUctr_native[2];
     assign is_div=ALUctr_native[5]&&ALUctr_native[2];
     assign is_ex=~MemRd_native&&~ALUctr_native[5];
-
-    wire error_div;
-    assign error_div=is_div&&(src2_native[31:0]==32'h0)&&(ALUctr_native[4]||src2_native[63:32]==32'h0);
 
     wire is_jmp_line;
     ysyx_040066_nxtPC nxtPC(

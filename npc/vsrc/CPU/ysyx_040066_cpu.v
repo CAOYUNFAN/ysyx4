@@ -17,7 +17,6 @@ module ysyx_040066_cpu(
 );
     //ID
     wire id_rs1_valid,id_rs2_valid;
-    wire [63:0] id_pc;
     //EX
     wire ex_valid,ex_wen,ex_isex,ex_is_jmp,ex_ecall,ex_mret,ex_csr,ex_done;
     wire [4:0] ex_rd;
@@ -42,7 +41,7 @@ module ysyx_040066_cpu(
     wire [63:0] csr_nxtpc;
     wire csr_jmp;
 
-    wire [31:0] instr;
+    wire [31:15] instr;
 
     wire div_block,instr_block,mem_block,id_block;
     assign div_block=~div_ready;
@@ -60,7 +59,7 @@ module ysyx_040066_cpu(
     );
     
     ysyx_040066_Registers module_regs(
-        .clk(clk),.rst(rst),.wen(wb_wen),.rd(wb_rd),.data(wb_data),
+        .clk(clk),.wen(wb_wen),.rd(wb_rd),.data(wb_data),
         .ex_rd(ex_rd),.ex_wen(ex_wen&&ex_valid),.ex_data(ex_data),.ex_valid(ex_isex),
         .m_rd(m_rd),.m_wen(m_wen&&m_valid),.m_data(m_data),.m_valid(~m_MemRd),
         .rs1(instr[19:15]),.rs1_valid(id_rs1_valid),
@@ -92,9 +91,9 @@ module ysyx_040066_cpu(
         .clk(clk),.rst(rst),.block(global_block||id_block),
         .rs1_valid(id_rs1_valid),.rs2_valid(id_rs2_valid),.jmp((ex_is_jmp&&ex_valid)||csr_jmp),      
         .valid_in(module_if.valid),.instr_read(instr_rd),.pc_in(module_if.pc),.instr_error_rd(instr_error),
-        .csr_error(module_csr.rd_err),.rs_block(id_block),.pc(id_pc)
+        .csr_error(module_csr.rd_err),.rs_block(id_block)
     );
-    assign instr=module_id.instr;
+    assign instr=module_id.instr[31:15];
 
     ysyx_040066_EX module_ex(
         .clk(clk),.rst(rst),.block(global_block),
