@@ -72,17 +72,6 @@ module ysyx_040066 # (
     input                               io_master_rlast,
     input  [AXI_ID_WIDTH-1:0]           io_master_rid,
 
-
-    `ifdef WORKBENCH
-    output [63:0] dbg_regs [31:0],
-    output [63:0] mepc,
-    output [63:0] mstatus,
-    output [63:0] mcause,
-    output [63:0] mtvec,
-    output [63:0] pc_nxt,
-    output [63:0] pc_m,
-    output error,done,valid,
-    `else
     output [5:0]                        io_sram0_addr,
     output                              io_sram0_cen,
     output                              io_sram0_wen,
@@ -131,7 +120,6 @@ module ysyx_040066 # (
     output [127:0]                      io_sram7_wmask,
     output [127:0]                      io_sram7_wdata,
     input  [127:0]                      io_sram7_rdata,
-    `endif
 
     //AXI_slave
     output io_slave_awready,
@@ -181,6 +169,22 @@ module ysyx_040066 # (
     assign io_slave_rlast=0;
     assign io_slave_rid={AXI_ID_WIDTH{1'b0}};
 
+    `ifdef WORKBENCH
+    wire [63:0] dbg_regs [31:0];
+    wire [63:0] mepc;
+    wire [63:0] mstatus;
+    wire [63:0] mcause;
+    wire [63:0] mtvec;
+    wire [63:0] pc_nxt;
+    wire [63:0] pc_m;
+    wire error,done,valid;
+    import "DPI-C" function void set_gpr_ptr(input logic [63:0] a []);
+    initial set_gpr_ptr(dbg_regs);
+    import "DPI-C" function void set_pc_ptr(input logic [63:0] pc []);
+    initial set_pc_ptr(pc_nxt);
+    import "DPI-C" function void set_pc_m_ptr(input logic [63:0] pc_m []);
+    initial set_pc_m_ptr(pc_m);
+    `endif
 
     reg [63:0] rd_data;
     reg [63:0] ins_data;
@@ -206,6 +210,8 @@ module ysyx_040066 # (
 
     wire rst; assign rst=~reset;
     wire clk; assign clk=clock;
+
+
     ysyx_040066_top top(
         .clk(clock),.rst(rst),
         .ins_req(ins_req),.ins_burst(ins_burst),.ins_addr(ins_addr),.ins_last(ins_last),

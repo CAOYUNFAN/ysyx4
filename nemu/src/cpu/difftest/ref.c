@@ -18,7 +18,10 @@ void difftest_regcpy(void *dut, bool direction) {
     memcpy(dut,&cpu,sizeof(CPU_state));
   }else{
     Assert(direction==DIFFTEST_TO_REF,"Unexpected direction %d",direction);
-    memcpy(&cpu,dut,sizeof(CPU_state));
+    CPU_state * dut_state=(CPU_state *)dut;
+    for(int i=0;i<32;i++) cpu.gpr[i]=dut_state->gpr[i];
+    cpu.pc=dut_state->pc;
+    //memcpy(&cpu,dut,sizeof(CPU_state));
   }
 }
 

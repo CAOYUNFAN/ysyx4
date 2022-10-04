@@ -54,7 +54,8 @@ static int skip_dut_nr_inst = 0;
 // can not produce consistent behavior with NEMU
 void difftest_skip_ref() {
     if(is_difftest){
-        uLL jmp_pc=mycpu->pc_m;
+        extern uint64_t pc_m;
+        uLL jmp_pc=*pc_m;
         skip_dut_nr_inst = 0;
         is_skip_ref_pc[num++]=jmp_pc;
     }

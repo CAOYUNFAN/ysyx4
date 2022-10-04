@@ -1,15 +1,19 @@
 #include <common.h>
 #include <debug.h>
 #include <device.h>
+#include "verilated_dpi.h"
 
-extern "C" void assert_check_msg(bool cond,char * msg,...){
-    if(!cond){
-        va_list ap;
-        va_start(ap,msg);
-        vprintf(msg,ap); 
-        va_end(ap);
-        assert(0);
-    }
+uint64_t *cpu_gpr = NULL, *pc =NULL,*pc_m=NULL;
+extern "C" void set_gpr_ptr(const svOpenArrayHandle r) {
+  cpu_gpr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
+}
+
+extern "C" void set_pc_ptr(const svOpenArrayHandle r){
+    pc=(uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
+}
+
+extern "C" void set_pc_m_ptr(const svOpenArrayHandle r){
+    pc_m=(uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
 }
 
 extern "C" void data_read(uLL raddr,uLL *rdata,u8 * error){
