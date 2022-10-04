@@ -12,9 +12,9 @@ module ysyx_040066_booth_walloc(
     reg [65:0] y;
     always @(posedge clk) if(~block) begin
         x[63:0]<=src1_in;
-        x[129:64]<={66{src1_in[63]&&(ALUctr[1]^ALUctr[0])}};
+        x[129:64]<={66{src1_in[63]&&(ALUctr_in[1]^ALUctr_in[0])}};
         y[63:0]<=src2_in;
-        y[65:64]<={2{src2_in[63]&&~ALUctr[1]}};
+        y[65:64]<={2{src2_in[63]&&~ALUctr_in[1]}};
     end
 
     //pre_work
