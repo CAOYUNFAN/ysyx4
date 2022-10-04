@@ -50,16 +50,18 @@ module ysyx_040066_top(
   assign rd_len=wr_len;
   wire [63:0] instr_line;
   wire [31:0] icache_addr;
+  wire icahce_req,icache_ready;//unused
+  wire [511:0] icache_data;//unused
   ysyx_040066_cache_top icache(
     .clk(clk),.rst(rst),.force_update(fence_i),
 
     .valid(1),.op(0),
     .tag(pc_rd[31:11]),.index(pc_rd[10:6]),.offset(pc_rd[5:3]),
     .wstrb(8'b0),.wdata(64'h0),.fence(1'b0),
-    .ok(instr_valid),.ready(),.rdata(instr_line),.rw_error(instr_error),
+    .ok(instr_valid),.ready(icache_ready),.rdata(instr_line),.rw_error(instr_error),
 
     .addr(icache_addr),.rd_req(ins_req),.rd_ready(ins_ready),.rd_last(ins_last),.rd_error(ins_err),
-    .rd_data(ins_data),.wr_req(),.wr_data(),.wr_ready(1'b0),.wr_error(1'b0),
+    .rd_data(ins_data),.wr_req(icahce_req),.wr_data(icache_data),.wr_ready(1'b0),.wr_error(1'b0),
 
     .ram_Q(ram_Q[3:0]),.ram_D(ram_D[3:0]),.ram_BWEN(ram_BWEN[0]),.ram_A(ram_A[0]),.ram_WEN(ram_WEN[0])
   );
