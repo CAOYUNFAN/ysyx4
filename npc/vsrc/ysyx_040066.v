@@ -32,7 +32,7 @@ module ysyx_040066 (
     input                               reset,
     input                               io_interrupt,
 
-    // AXI-master
+
     input                               io_master_awready,              
     output                              io_master_awvalid,
     output [31:0]                       io_master_awaddr,
@@ -116,7 +116,7 @@ module ysyx_040066 (
     output [127:0]                      io_sram7_wdata,
     input  [127:0]                      io_sram7_rdata,
 
-    //AXI_slave
+    
     output io_slave_awready,
     input io_slave_awvalid,
     input [31:0] io_slave_awaddr,
@@ -145,9 +145,9 @@ module ysyx_040066 (
     input [1:0] io_slave_arburst,
 
     input io_slave_rready,
-    output io_salve_rvalid,
+    output io_slave_rvalid,
     output [1:0] io_slave_rresp,
-    output [31:0] io_slave_rdata,
+    output [63:0] io_slave_rdata,
     output io_slave_rlast,
     output [3:0] io_slave_rid
 );
@@ -158,9 +158,9 @@ module ysyx_040066 (
     assign io_slave_bresp=2'b11;
     assign io_slave_bid={4{1'b0}};
     assign io_slave_arready=0;
-    assign io_salve_rvalid=0;
+    assign io_slave_rvalid=0;
     assign io_slave_rresp=2'b11;
-    assign io_slave_rdata={32{1'b0}};
+    assign io_slave_rdata=64'b0;
     assign io_slave_rlast=0;
     assign io_slave_rid={4{1'b0}};
 
