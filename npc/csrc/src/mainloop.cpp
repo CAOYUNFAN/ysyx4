@@ -4,11 +4,12 @@
 #include <kernel.h>
 uLL oldpc;
 int global_status;
+extern uint64_t *cpu_gpr,*pc;
 void trace_and_difftest(){
     extern int is_difftest;
     if(is_difftest){
         extern void difftest_step(uLL,uLL);
-        difftest_step(oldpc,mycpu->pc_nxt);
+        difftest_step(oldpc,*pc);
     }
 }
 
@@ -122,39 +123,39 @@ inline void cpu_exec_once(){
 
 extern int exit_code;
 void statistics(){
-  if(mycpu->error) {
+  if(cpu_status.error) {
     Log("Error has happened. NPC aborted.");
     reg_display();
     exit_code=1;
   }
   else{
-    if(mycpu->dbg_regs[10]) Log("Npc hit bad trap.");
+    if(cpu_gpr[10]) Log("Npc hit bad trap.");
     else Log("Npc hit good trap.");
-    exit_code=mycpu->dbg_regs[10];
+    exit_code=cpu_gpr[10];
   }
 }
 
 void cpu_exec(uLL n){
-    if(mycpu->valid&&(mycpu->error||mycpu->done)){
+    if(cpu_status.valid&&(cpu_status.error||cpu_status.done)){
       Log("Simulation has ended. Please restart the system mannually");
       return;
     }
     global_status=1;
     while (n--){
-        oldpc=mycpu->pc_nxt;
+        oldpc=*pc;
         int tt=0;
         cpu_exec_once();
-        while(!mycpu->valid&&tt<200) cpu_exec_once(),++tt;
-        if(!mycpu->valid){
+        while(!cpu_status.valid&&tt<200) cpu_exec_once(),++tt;
+        if(!cpu_status.valid){
           Log("npc run too much cycles!");
           reg_display();
           exit(1);
         }
-        if(mycpu->valid&&(mycpu->error||mycpu->done)) {
+        if(cpu_status.valid&&(cpu_status.error||cpu_status.done)) {
           statistics();
           return;
         }
-        if(mycpu->valid) trace_and_difftest();
+        if(cpu_status.valid) trace_and_difftest();
         extern void device_update();
         device_update();
     }

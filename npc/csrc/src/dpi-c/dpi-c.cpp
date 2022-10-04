@@ -1,9 +1,11 @@
 #include <common.h>
 #include <debug.h>
 #include <device.h>
+#include <kernel.h>
 #include "verilated_dpi.h"
 
 uint64_t *cpu_gpr = NULL, *pc =NULL,*pc_m=NULL;
+status_of_cpu cpu_status;
 extern "C" void set_gpr_ptr(const svOpenArrayHandle r) {
   cpu_gpr = (uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
 }
@@ -14,6 +16,10 @@ extern "C" void set_pc_ptr(const svOpenArrayHandle r){
 
 extern "C" void set_pc_m_ptr(const svOpenArrayHandle r){
     pc_m=(uint64_t *)(((VerilatedDpiOpenVar*)r)->datap());
+}
+
+extern "C" void status_now(unsigned status){
+    memcpy(&cpu_status,&status,1);
 }
 
 extern "C" void data_read(uLL raddr,uLL *rdata,u8 * error){

@@ -23,7 +23,7 @@ extern uint64_t *cpu_gpr, *pc;
   
 void reg_display() {
     for(int i=0;i<32;i++) Cao_show_reg(regs[i],cpu_gpr[i]);
-    Cao_show_reg("pc",mycpu->pc_nxt);
+    Cao_show_reg("pc",*pc);
 
     #define CSR_SHOW(name) Cao_show_reg(str(name),mycpu->name);
     //CSR_MAP(CSR_SHOW)

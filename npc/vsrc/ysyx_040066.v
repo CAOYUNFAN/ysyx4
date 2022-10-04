@@ -1,3 +1,4 @@
+/*
 // Burst types
 `define AXI_BURST_TYPE_FIXED                                2'b00               //突发类型  FIFO
 `define AXI_BURST_TYPE_INCR                                 2'b01               //ram  
@@ -24,15 +25,9 @@
 `define AXI_SIZE_BYTES_32                                   3'b101
 `define AXI_SIZE_BYTES_64                                   3'b110
 `define AXI_SIZE_BYTES_128                                  3'b111
+*/
 
-module ysyx_040066 # (
-    parameter RW_DATA_WIDTH     = 64,
-    parameter RW_ADDR_WIDTH     = 32,
-    parameter AXI_DATA_WIDTH    = 64,
-    parameter AXI_ADDR_WIDTH    = 32,
-    parameter AXI_ID_WIDTH      = 4,
-    parameter AXI_STRB_WIDTH    = AXI_DATA_WIDTH/8
-)(
+module ysyx_040066 (
     input                               clock,
     input                               reset,
     input                               io_interrupt,
@@ -40,27 +35,27 @@ module ysyx_040066 # (
     // AXI-master
     input                               io_master_awready,              
     output                              io_master_awvalid,
-    output [AXI_ADDR_WIDTH-1:0]         io_master_awaddr,
-    output [AXI_ID_WIDTH-1:0]           io_master_awid,
+    output [31:0]                       io_master_awaddr,
+    output [3:0]                        io_master_awid,
     output [7:0]                        io_master_awlen,
     output [2:0]                        io_master_awsize,
     output [1:0]                        io_master_awburst,
 
     input                               io_master_wready,                
     output                              io_master_wvalid,
-    output [AXI_DATA_WIDTH-1:0]         io_master_wdata,
-    output [AXI_DATA_WIDTH/8-1:0]       io_master_wstrb,
+    output [63:0]                       io_master_wdata,
+    output [7:0]                        io_master_wstrb,
     output                              io_master_wlast,
     
     output                              io_master_bready,                
     input                               io_master_bvalid,
     input  [1:0]                        io_master_bresp,                 
-    input  [AXI_ID_WIDTH-1:0]           io_master_bid,
+    input  [3:0]                        io_master_bid,
 
     input                               io_master_arready,                
     output                              io_master_arvalid,
-    output [AXI_ADDR_WIDTH-1:0]         io_master_araddr,
-    output [AXI_ID_WIDTH-1:0]           io_master_arid,
+    output [31:0]                       io_master_araddr,
+    output [3:0]                        io_master_arid,
     output [7:0]                        io_master_arlen,
     output [2:0]                        io_master_arsize,
     output [1:0]                        io_master_arburst,
@@ -68,9 +63,9 @@ module ysyx_040066 # (
     output                              io_master_rready,                 
     input                               io_master_rvalid,                
     input  [1:0]                        io_master_rresp,
-    input  [AXI_DATA_WIDTH-1:0]         io_master_rdata,
+    input  [63:0]                       io_master_rdata,
     input                               io_master_rlast,
-    input  [AXI_ID_WIDTH-1:0]           io_master_rid,
+    input  [3:0]                        io_master_rid,
 
     output [5:0]                        io_sram0_addr,
     output                              io_sram0_cen,
@@ -124,27 +119,27 @@ module ysyx_040066 # (
     //AXI_slave
     output io_slave_awready,
     input io_slave_awvalid,
-    input [AXI_ADDR_WIDTH-1:0] io_slave_awaddr,
-    input [AXI_ID_WIDTH-1:0] io_slave_awid,
+    input [31:0] io_slave_awaddr,
+    input [3:0] io_slave_awid,
     input [7:0] io_slave_awlen,
     input [2:0] io_slave_awsize,
     input [1:0] io_slave_awburst,
 
     output io_slave_wready,
     input io_slave_wvalid,
-    input [AXI_DATA_WIDTH-1:0] io_slave_wdata,
-    input [AXI_DATA_WIDTH/8-1:0] io_slave_wstrb,
+    input [63:0] io_slave_wdata,
+    input [7:0] io_slave_wstrb,
     input io_slave_wlast,
 
     input io_slave_bready,
     output io_slave_bvalid,
     output [1:0] io_slave_bresp,
-    output [AXI_ID_WIDTH-1:0] io_slave_bid,
+    output [3:0] io_slave_bid,
 
     output io_slave_arready,
     input io_slave_arvalid,
-    input [AXI_ADDR_WIDTH-1:0] io_slave_araddr,
-    input [AXI_ID_WIDTH-1:0] io_slave_arid,
+    input [31:0] io_slave_araddr,
+    input [3:0] io_slave_arid,
     input [7:0] io_slave_arlen,
     input [2:0] io_slave_arsize,
     input [1:0] io_slave_arburst,
@@ -152,22 +147,22 @@ module ysyx_040066 # (
     input io_slave_rready,
     output io_salve_rvalid,
     output [1:0] io_slave_rresp,
-    output [AXI_ADDR_WIDTH-1:0] io_slave_rdata,
+    output [31:0] io_slave_rdata,
     output io_slave_rlast,
-    output [AXI_ID_WIDTH-1:0] io_slave_rid
+    output [3:0] io_slave_rid
 );
     //dummy for slave
     assign io_slave_awready=0;
     assign io_slave_wready=0;
     assign io_slave_bvalid=0;
     assign io_slave_bresp=2'b11;
-    assign io_slave_bid={AXI_ID_WIDTH{1'b0}};
+    assign io_slave_bid={4{1'b0}};
     assign io_slave_arready=0;
     assign io_salve_rvalid=0;
     assign io_slave_rresp=2'b11;
-    assign io_slave_rdata={AXI_ADDR_WIDTH{1'b0}};
+    assign io_slave_rdata={32{1'b0}};
     assign io_slave_rlast=0;
-    assign io_slave_rid={AXI_ID_WIDTH{1'b0}};
+    assign io_slave_rid={4{1'b0}};
 
     `ifdef WORKBENCH
     wire [63:0] dbg_regs [31:0];
@@ -184,6 +179,8 @@ module ysyx_040066 # (
     initial set_pc_ptr(pc_nxt);
     import "DPI-C" function void set_pc_m_ptr(input logic [63:0] pc_m []);
     initial set_pc_m_ptr(pc_m);
+    import "DPI-C" function void status_now(input longint status);
+    always @(*) status_now({61'b0,error,done,valid});
     `endif
 
     reg [63:0] rd_data;
@@ -297,9 +294,9 @@ module ysyx_040066 # (
     //read
     //ins ID:1111,rd ID:0000
     reg ins_ar_done,rd_ar_done; reg [2:0] done_status;//[0]:last,[1]:which,[2]:onecircle
-    reg [AXI_DATA_WIDTH-1:0] rdata;
+    reg [63:0] rdata;
     reg [1:0] rresp;
-    reg [AXI_ID_WIDTH-1:0] rid;
+    reg [3:0] rid;
 
     wire ar_ins,ar_rd,ins_done,rd_done;
     assign ar_ins=ins_req&&~ins_ar_done;
@@ -365,14 +362,14 @@ module ysyx_040066 # (
     endgenerate
 
     // ------------------Write Transaction------------------
-    wire [AXI_ID_WIDTH-1:0] axi_id              = {AXI_ID_WIDTH{1'b0}};
+    wire [3:0] axi_id              = {4{1'b0}};
     // 写地址通道  以下没有备注初始化信号的都可能是你需要产生和用到的
     assign io_master_awvalid   = wr_req&&~aw_done;
     assign io_master_awaddr    = wr_addr[31:0];
     assign io_master_awid      = axi_id;                                                                      //初始化信号即可
     assign io_master_awlen     = wr_burst?8'b0:8'h7;
-    assign io_master_awsize    = wr_burst?wr_len:`AXI_SIZE_BYTES_64;
-    assign io_master_awburst   = `AXI_BURST_TYPE_INCR;                                                          //初始化信号即可
+    assign io_master_awsize    = wr_burst?wr_len:3'b110;
+    assign io_master_awburst   = 2'b01;                                                          //初始化信号即可
 
     // 写数据通道
     assign io_master_wvalid    = wr_req&&aw_done&&~w_done;
@@ -388,10 +385,10 @@ module ysyx_040066 # (
     // Read address channel signals
     assign io_master_arvalid   = ar_rd||ar_ins;
     assign io_master_araddr    = ar_ins?ins_addr[31:0]:rd_addr[31:0];
-    assign io_master_arid      = {(AXI_ID_WIDTH){ar_ins}};                                                                           //初始化信号即可                        
+    assign io_master_arid      = {(4){ar_ins}};                                                                           //初始化信号即可                        
     assign io_master_arlen     = (ar_ins&&ins_burst||ar_rd&&rd_burst)?8'b0:8'h7;                                                                          
-    assign io_master_arsize    = ar_ins?(ins_burst?`AXI_SIZE_BYTES_32:`AXI_SIZE_BYTES_64):(rd_burst?rd_len:`AXI_SIZE_BYTES_64);
-    assign io_master_arburst   = `AXI_BURST_TYPE_INCR;
+    assign io_master_arsize    = ar_ins?(ins_burst?3'b101:3'b110):(rd_burst?rd_len:3'b110);
+    assign io_master_arburst   = 2'b01;
     
     // Read data channel signals
     assign io_master_rready    = 1'b1;
