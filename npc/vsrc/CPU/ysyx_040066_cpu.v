@@ -57,7 +57,7 @@ module ysyx_040066_cpu(
         .is_jmp(ex_is_jmp||csr_jmp),
         .nxtpc(csr_jmp?csr_nxtpc:ex_nxtpc),.native_pc(pc_rd)
     );
-    assign instr_read=~(global_block||id_block);
+    
     ysyx_040066_Registers module_regs(
         .clk(clk),.wen(wb_wen),.rd(wb_rd),.data(wb_data),
         .ex_rd(ex_rd),.ex_wen(ex_wen&&ex_valid),.ex_data(ex_data),.ex_valid(ex_isex),
@@ -94,7 +94,7 @@ module ysyx_040066_cpu(
         .csr_error(module_csr.rd_err),.rs_block(id_block)
     );
     assign instr=module_id.instr[31:15];
-
+    assign instr_read=~(id_block||m_block);
     ysyx_040066_EX module_ex(
         .clk(clk),.rst(rst),.block(global_block),
         .valid_in(module_id.valid),.raise_intr(intr_t||intr_rd||intr_wr),
@@ -189,6 +189,10 @@ module ysyx_040066_cpu(
         out_valid<=module_wb.valid;
         done<=~rst&&module_wb.done;
         error<=module_wb.error||module_csr.wr_err;
+        if(out_valid&&error) begin
+            $display("ERROR DECTED! nxtpc=%h",pc_nxt);
+            $finish;
+        end
 //        $display("error:%b %b,data_valid=%b",error,module_wb.error,data_Rd_error);
     end
 
