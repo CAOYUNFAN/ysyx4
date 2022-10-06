@@ -186,7 +186,7 @@ module ysyx_040066 (
     wire [5:0] ram_A [1:0];
     wire ram_WEN [1:0];
 
-    wire rst; assign rst=~reset;
+    wire rst; assign rst=reset;
     wire clk; assign clk=clock;
 
 
@@ -317,7 +317,7 @@ module ysyx_040066 (
     end
     always @(posedge clk) begin
         if(rst) count<=3'b0;
-        else if(io_master_wready  && io_master_wvalid  &&~wr_burst) count<=count+3'b1;
+        else if(io_master_wready  && io_master_wvalid  && wr_burst) count<=count+3'b1;
         else count<=3'b0;
     end
     always @(posedge clk) begin
@@ -340,15 +340,15 @@ module ysyx_040066 (
     assign io_master_awvalid   = wr_req&&~aw_done;
     assign io_master_awaddr    = wr_addr[31:0];
     assign io_master_awid      = axi_id;                                                                      //初始化信号即可
-    assign io_master_awlen     = wr_burst?8'b0:8'h7;
-    assign io_master_awsize    = wr_burst?wr_len:3'b110;
+    assign io_master_awlen     = wr_burst?8'h7:8'b0;
+    assign io_master_awsize    = wr_burst?3'b011:wr_len;
     assign io_master_awburst   = 2'b01;                                                          //初始化信号即可
 
     // 写数据通道
     assign io_master_wvalid    = wr_req&&aw_done&&~w_done;
     assign io_master_wdata     = wr_r_data[count];
-    assign io_master_wstrb     = wr_burst?wr_mask:8'hff;
-    assign io_master_wlast     = wr_burst||(count==3'h7);                                                    //初始化信号即可
+    assign io_master_wstrb     = wr_burst?8'hff:wr_mask;
+    assign io_master_wlast     = ~wr_burst||(count==3'h7);                                                    //初始化信号即可
 
     // 写应答通道
     assign io_master_bready    = 1'b1;
@@ -359,8 +359,8 @@ module ysyx_040066 (
     assign io_master_arvalid   = ar_rd||ar_ins;
     assign io_master_araddr    = ar_ins?ins_addr[31:0]:rd_addr[31:0];
     assign io_master_arid      = {(4){ar_ins}};                                                                           //初始化信号即可                        
-    assign io_master_arlen     = (ar_ins&&ins_burst||ar_rd&&rd_burst)?8'b0:8'h7;                                                                          
-    assign io_master_arsize    = ar_ins?(ins_burst?3'b101:3'b110):(rd_burst?rd_len:3'b110);
+    assign io_master_arlen     = (ar_ins&&ins_burst||ar_rd&&rd_burst)?8'h7:8'b0;                                                                          
+    assign io_master_arsize    = ar_ins?(ins_burst?3'b011:3'b010):(rd_burst?3'b011:rd_len);
     assign io_master_arburst   = 2'b01;
     
     // Read data channel signals
@@ -368,8 +368,10 @@ module ysyx_040066 (
 
 
     `ifdef INSTR
-    always @(*) begin
-        if(~clk&&reset) $display("axi:wr_req=%b,aw=%b,w=%b,count=%b,b=%b,burst=%b",wr_req,aw_done,w_done,count,b_done,wr_burst);
+    always @(*) if(~clk&&reset) begin
+        $display("axi: wr_req=%b,aw=%b,w=%b,count=%b,b=%b,burst=%b,addr=%h",wr_req,aw_done,w_done,count,b_done,wr_burst,wr_addr[31:0]);
+        $display("axi:ins_req=%b,ar=%b,r=%b,is_ins=%b,size=%b,addr=%h",ins_req,ins_ar_done,ins_done,ar_ins,io_master_arsize,ins_addr[31:0]);
+        $display("axi: rd_req=%b,ar=%b,r=%b,is_rd =%b,len=%b,addr=%h",rd_req,rd_ar_done,rd_done,ar_rd,io_master_arlen,rd_addr[31:0]);
     end
     `endif
 endmodule

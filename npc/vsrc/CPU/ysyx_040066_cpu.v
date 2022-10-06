@@ -6,7 +6,7 @@ module ysyx_040066_cpu(
     input data_valid,data_error,
 
     output reg error,done,
-    output MemWr,MemRd,fence_i,
+    output MemWr,MemRd,fence_i,instr_read,
     output [63:0] pc_rd,
     output reg [63:0] pc_nxt,
     output reg out_valid,
@@ -57,7 +57,7 @@ module ysyx_040066_cpu(
         .is_jmp(ex_is_jmp||csr_jmp),
         .nxtpc(csr_jmp?csr_nxtpc:ex_nxtpc),.native_pc(pc_rd)
     );
-    
+    assign instr_read=~(global_block||id_block);
     ysyx_040066_Registers module_regs(
         .clk(clk),.wen(wb_wen),.rd(wb_rd),.data(wb_data),
         .ex_rd(ex_rd),.ex_wen(ex_wen&&ex_valid),.ex_data(ex_data),.ex_valid(ex_isex),

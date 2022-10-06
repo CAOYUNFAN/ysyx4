@@ -32,7 +32,7 @@ module ysyx_040066_top(
   wire [63:0] pc_rd;
   wire [63:0] data_Wr;
   wire [31:0] instr;
-  wire instr_valid,instr_error;
+  wire instr_valid,instr_error,instr_read;
   wire data_valid,data_error;
   wire fence_i,d_ready;
   wire error,done,valid;
@@ -40,7 +40,7 @@ module ysyx_040066_top(
 
   ysyx_040066_cpu cpu(
     .clk(clk),.rst(rst),
-    .pc_nxt(pc_nxt),
+    .pc_nxt(pc_nxt),.instr_read(instr_read),
     .pc_rd(pc_rd),.instr_rd(instr),.instr_valid(instr_valid&&d_ready),.instr_error(instr_error),
     .addr(addr),.wr_mask(wr_mask),.MemRd(MemRd),.MemWr(MemWr),
     .data_valid(data_valid),.data_error(data_error),
@@ -55,7 +55,7 @@ module ysyx_040066_top(
   ysyx_040066_cache_top icache(
     .clk(clk),.rst(rst),.force_update(fence_i),
 
-    .valid(1),.op(0),
+    .valid(1),.op(0),.read(instr_read),
     .tag(pc_rd[31:11]),.index(pc_rd[10:6]),.offset(pc_rd[5:3]),
     .wstrb(8'b0),.wdata(64'h0),.fence(1'b0),
     .ok(instr_valid),.ready(icache_ready),.rdata(instr_line),.rw_error(instr_error),
@@ -67,14 +67,14 @@ module ysyx_040066_top(
   );
   reg pc_2;always@(posedge clk) pc_2<=pc_rd[2];
   assign instr=pc_2?instr_line[63:32]:instr_line[31:0];
-  assign ins_burst=~pc_rd[31];
-  assign ins_addr=ins_burst?pc_rd:{32'h0,icache_addr};
+  assign ins_burst=pc_rd[31];
+  assign ins_addr=ins_burst?{32'h0,icache_addr}:pc_rd;
 
   wire [31:0] dcache_addr;
   ysyx_040066_cache_top dcache(
     .clk(clk),.rst(rst),.force_update(1'b0),
 
-    .valid(MemRd||MemWr),.op(MemWr),
+    .valid(MemRd||MemWr),.op(MemWr),.read(1'b1),
     .tag(addr[31:11]),.index(addr[10:6]),.offset(addr[5:3]),
     .wstrb(wr_mask),.wdata(data_Wr),.ok(data_valid),.ready(d_ready),
     .rdata(data_Rd),.rw_error(data_error),.fence(fence_i),
@@ -86,9 +86,9 @@ module ysyx_040066_top(
     .ram_Q(ram_Q[7:4]),.ram_D(ram_D[7:4]),.ram_BWEN(ram_BWEN[1]),.ram_A(ram_A[1]),.ram_WEN(ram_WEN[1])
   );
 
-  assign rd_burst=~dcache_addr[31];
-  assign wr_burst=~dcache_addr[31];
-  assign rd_addr=rd_burst?addr:{32'h0,dcache_addr};
+  assign rd_burst=dcache_addr[31];
+  assign wr_burst=dcache_addr[31];
+  assign rd_addr=rd_burst?{32'h0,dcache_addr}:addr;
   assign wr_addr=rd_addr;
 
 `ifdef WORKBENCH

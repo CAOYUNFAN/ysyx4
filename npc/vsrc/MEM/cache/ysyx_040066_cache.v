@@ -3,7 +3,7 @@ module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
 
     //CPU
     //[63:32] [31:11] [10:6] [5:3] [2:0]
-    input valid,op,//op 0:read,1:write
+    input valid,op,read,//op 0:read,1:write
     input [IDNEX_LEN-1:0] index,
     input [TAG_LEN-1:0] tag,
     input [OFFSET_LEN-1:0] offset,
@@ -86,7 +86,11 @@ module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
 
     reg [63:0] uncached_data;
     always @(posedge clk) uncached_data<=rd_data;
-    always @(posedge clk) uncached_done<=~rst&&uncache&&(ready_to_read&&status==2'b10||ready_to_write&&status==2'b11);
+    always @(posedge clk) begin
+        if(rst) uncached_done<=0;
+        else if(uncache&&(ready_to_read&&status==2'b10||ready_to_write&&status==2'b11)) uncached_done<=1;
+        else if(uncache&&uncached_done&&read) uncached_done<=0;
+    end
 
     assign ok=uncache?uncached_done:hit;
 

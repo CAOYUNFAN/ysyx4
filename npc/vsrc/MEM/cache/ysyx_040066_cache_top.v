@@ -1,6 +1,6 @@
 module ysyx_040066_cache_top(
     input clk,rst,force_update,
-    input valid,op,
+    input valid,op,read,
     input [4:0] index,
     input [20:0] tag,
     input [2:0] offset,
@@ -42,7 +42,7 @@ module ysyx_040066_cache_top(
     ysyx_040066_cache cache(
         .clk(clk),.rst(rst),.force_update(force_update),
 
-        .valid(valid),.op(op),
+        .valid(valid),.op(op),.read(read),
         .index(index),.tag(tag),.offset(offset),
         .wstrb(wstrb),.wdata(wdata),.ok(ok),.ready(ready),
         .rdata(rdata),.rw_error(rw_error),.fence(fence),

@@ -50,13 +50,13 @@ module ysyx_040066_M (
         is_div_native<=is_div_in;
         wr_mask<=wr_mask_in;
         fence_i<=fence_i_in&&valid_in&&~error_in;
-        case (MemOp_in[1:0])
+        wr_len<={1'b0,MemOp_in[1:0]};
+        /*case (MemOp_in[1:0])
             2'b00:wr_len<=3'b011;
             2'b01:wr_len<=3'b100;
             2'b10:wr_len<=3'b101;
             2'b11:wr_len<=3'b110;
-        endcase
-        //$display("MM:data_Wr=%h,data_Wr_in=%h",data_Wr,data_Wr_in);
+        endcase*/
     end
 
     assign valid=valid_native&&(div_valid||~is_div_native);
