@@ -61,20 +61,6 @@ void difftest_skip_ref() {
     }
 }
 
-// this is used to deal with instruction packing in QEMU.
-// Sometimes letting QEMU step once will execute multiple instructions.
-// We should skip checking until NEMU's pc catches up with QEMU's pc.
-// The semantic is
-//   Let REF run `nr_ref` instructions first.
-//   We expect that DUT will catch up with REF within `nr_dut` instructions.
-void difftest_skip_dut(int nr_ref, int nr_dut) {
-    skip_dut_nr_inst += nr_dut;
-
-    while (nr_ref -- > 0) {
-        ref_difftest_exec(1);
-    }
-}
-
 static void checkregs(CPU_state *ref, uLL pc) {
     if (!difftest_checkregs(ref, pc)) {
         panic("NOT the same!");
@@ -86,18 +72,6 @@ void difftest_step(uLL pc, uLL npc) {
     if(!difftest_enabled) return;
     CPU_state ref_r;
 
-    if (skip_dut_nr_inst > 0) {
-        ref_difftest_regcpy(&ref_r, DIFFTEST_TO_DUT);
-        if (ref_r.pc == npc) {
-            skip_dut_nr_inst = 0;
-            checkregs(&ref_r, npc);
-            return;
-        }
-        skip_dut_nr_inst --;
-        if (skip_dut_nr_inst == 0)
-        panic("can not catch up with ref.pc = %llx at pc = %llx", ref_r.pc, (uLL)pc);
-        return;
-    }
     for(int i=0;i<num;i++) if (is_skip_ref_pc[i]==npc) {
         //Log("%d:%llx is skipped.",num,npc);
         // to skip the checking of an instruction, just copy the reg state to reference design
