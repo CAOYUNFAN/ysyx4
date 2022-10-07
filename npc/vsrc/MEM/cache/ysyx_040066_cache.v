@@ -85,7 +85,7 @@ module ysyx_040066_cache #(TAG_LEN=21,IDNEX_LEN=5,OFFSET_LEN=3,INDEX_NUM=64,LINE
     wire [LINE_LEN-1:0] rd;
 
     reg [63:0] uncached_data;
-    always @(posedge clk) uncached_data<=rd_data;
+    always @(posedge clk) if(~uncached_done) uncached_data<=rd_data;
     always @(posedge clk) begin
         if(rst) uncached_done<=0;
         else if(uncache&&(ready_to_read&&status==2'b10||ready_to_write&&status==2'b11)) uncached_done<=1;

@@ -34,6 +34,7 @@ module ysyx_040066_csr (
     assign jmp=ret||raise_intr;
 
     always @(*) case(csr_rd_addr)
+        12'hf14: begin csr_data_native=64'h0; rd_err=0; end
         12'h341: begin csr_data_native=mepc; rd_err=0; end
         12'h300: begin csr_data_native=mstatus; rd_err=0; end
         12'h342: begin csr_data_native=mcause; rd_err=0; end
@@ -55,7 +56,8 @@ module ysyx_040066_csr (
                     (csr_wr_addr!=12'h304)&&
                     (csr_wr_addr!=12'h340)&&
                     (csr_wr_addr!=12'h343)&&
-                    (csr_wr_addr!=12'h344);
+                    (csr_wr_addr!=12'h344)&&
+                    (csr_wr_addr!=12'hf14);
 
     always @(posedge clk) begin
         if(rst) begin

@@ -318,7 +318,6 @@ module ysyx_040066 (
     always @(posedge clk) begin
         if(rst) count<=3'b0;
         else if(io_master_wready  && io_master_wvalid  && wr_burst) count<=count+3'b1;
-        else count<=3'b0;
     end
     always @(posedge clk) begin
         if(~rst&&io_master_bready && io_master_bvalid) begin

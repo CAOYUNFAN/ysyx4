@@ -70,7 +70,7 @@ module ysyx_040066_cpu(
     wire intr_ecall,intr_t,intr_ins_ac,intr_ins_dec,intr_rd,intr_wr;
     wire [63:0] NO,mstatus,mie,tval;
     assign intr_ecall=ex_ecall&&ex_valid_native;
-    assign intr_t=intr_time&&mstatus[3]&&mie[7];
+    assign intr_t=intr_time&&mstatus[3]&&mie[7]&&ex_valid_native;
     assign raise_intr=intr_ecall||intr_t||intr_ins_ac||intr_ins_dec||intr_rd||intr_wr;
     assign NO[62:0]=intr_rd?63'd5:intr_wr?63'd7:
                     intr_ecall?63'd11:
@@ -94,7 +94,7 @@ module ysyx_040066_cpu(
         .csr_error(module_csr.rd_err),.rs_block(id_block)
     );
     assign instr=module_id.instr[31:15];
-    assign instr_read=~(id_block||m_block);
+    assign instr_read=~(global_block||id_block);
     ysyx_040066_EX module_ex(
         .clk(clk),.rst(rst),.block(global_block),
         .valid_in(module_id.valid),.raise_intr(intr_t||intr_rd||intr_wr),
@@ -200,7 +200,7 @@ module ysyx_040066_cpu(
         `ifdef INSTR
         if(~clk) $display("done:nxtpc=%h,out_valid=%b,error=%b,global_block=%b",pc_nxt,out_valid,error,global_block);
         `endif
-//        $display("clk=%b,pc=%h,instr=%h",clk,pc,instr);
+        //if(~clk&&pc_nxt[31:0]>=32'h30000ee0&&pc_nxt[31:0]<=32'h30000fec)$display("%h:s0=%h,a0=%h,circle=%d",pc_nxt[31:0],module_regs.module_regs.rf[8],module_regs.module_regs.rf[10],module_client.mtime);
 //        if(clk) $display("iscsr?%b,Funct3=%b,csrwen=",iscsr,instr[14:12],csr_wen&&~error_temp);
     end
 endmodule
