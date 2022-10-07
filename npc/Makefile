@@ -15,7 +15,7 @@ CFLAGS_NPC = -I$(CSRC_INCLUDE_DIR) -g -O2 $(INSTR) #-DMTRACE
 VFLAGS = $(INSTR) -O3 -DWORKBENCH #-DEMU_MUTLI
 LDFLAGS =-lSDL2 
 
-DIFF = --diff=$(NEMU_HOME)/build/riscv64-nemu-interpreter-so
+DIFF = #--diff=$(NEMU_HOME)/build/riscv64-nemu-interpreter-so
 IMG ?= 
 ARGS ?= --log=$(NPC_HOME)/emu/log.txt
 
