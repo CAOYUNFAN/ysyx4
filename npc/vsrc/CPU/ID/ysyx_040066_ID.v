@@ -33,11 +33,11 @@ module ysyx_040066_ID (
     always @(posedge clk) valid_native<=~rst&&(block?valid_native:valid_in);
 
     reg [31:0] prev_instr;
+    wire [31:0] instr;
     reg prev_block,instr_error_prev;
     always @(posedge clk) prev_instr<=instr;
     always @(posedge clk) if(~block) instr_error_prev<=instr_error_rd;
     always @(posedge clk) prev_block<=block;
-    wire [31:0] instr;
     wire instr_error;
     assign instr=prev_block?prev_instr:instr_read;
     assign instr_error=prev_block?instr_error_prev:instr_error_rd;

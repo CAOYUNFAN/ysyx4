@@ -135,7 +135,7 @@ module ysyx_040066_cpu(
         .csr_data(module_ex.csr_data),.rs1(module_ex.src1),.zimm(module_ex.rs1),.csrctl(module_ex.MemOp),.data(ex_csr_wdata)
     );
 
-    wire div_valid,div_ready;
+    wire div_valid;
     wire [63:0] div_result;
     ysyx_040066_Div module_div(
         .clk(clk),.rst(rst||intr_rd||intr_wr),

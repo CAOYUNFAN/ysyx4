@@ -299,7 +299,7 @@ module ysyx_040066 (
     assign rd_ready=~rid[0]&&done_status[2];
     assign ins_data=rdata;         assign rd_data=rdata;
     assign ins_last=done_status[0];assign rd_last=done_status[0];
-    assign ins_err =rresp[1];      assign rd_err =rresp[0];
+    assign ins_err =rresp[1];      assign rd_err =rresp[1];
 
     //write
     reg [2:0] count;

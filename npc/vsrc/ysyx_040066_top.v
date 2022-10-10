@@ -55,7 +55,7 @@ module ysyx_040066_top(
   ysyx_040066_cache_top icache(
     .clk(clk),.rst(rst),.force_update(fence_i),
 
-    .valid(1),.op(0),.read(instr_read),
+    .valid(1'b1),.op(1'b0),.read(instr_read),
     .tag(pc_rd[31:11]),.index(pc_rd[10:6]),.offset(pc_rd[5:3]),
     .wstrb(8'b0),.wdata(64'h0),.fence(1'b0),
     .ok(instr_valid),.ready(icache_ready),.rdata(instr_line),.rw_error(instr_error),
